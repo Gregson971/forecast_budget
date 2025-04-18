@@ -1,0 +1,12 @@
+services:
+   postgres:
+    image: postgres:latest
+    container_name: forecast_budget_postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: forecast_budget
+      POSTGRES_USER: gregson
+      POSTGRES_PASSWORD: password
+    

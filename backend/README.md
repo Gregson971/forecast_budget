@@ -30,7 +30,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5 Run the application
+5. Run the docker compose file
+
+```bash
+docker-compose up -d
+```
+
+6. Run the application
 
 ```bash
 uvicorn main:app --reload
@@ -38,7 +44,10 @@ uvicorn main:app --reload
 
 ## API Documentation
 
-The API documentation is available at link TBD.
+The API documentation is available at :
+
+- http://localhost:8000/docs
+- http://localhost:8000/redoc
 
 ## Database
 
