@@ -9,7 +9,7 @@ This is the backend for the Forecast Budget app. It is a FastAPI application tha
 1 Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/forecast-budget-backend.git
+git clone https://github.com/yourusername/forecast-budget.git
 ```
 
 2 Create a virtual environment
@@ -39,7 +39,7 @@ docker-compose up -d
 6. Run the application
 
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
 
 ## API Documentation
