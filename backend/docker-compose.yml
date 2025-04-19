@@ -1,5 +1,5 @@
 services:
-   postgres:
+  postgres:
     image: postgres:latest
     container_name: forecast_budget_postgres
     restart: always
@@ -7,6 +7,17 @@ services:
       - 5432:5432
     environment:
       POSTGRES_DB: forecast_budget
-      POSTGRES_USER: gregson
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-    
+ 
+  api:
+    build: .
+    container_name: forecast_budget_api
+    restart: always
+    ports:
+      - 8000:8000
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/forecast_budget
+      SECRET_KEY: ${SECRET_KEY}
+    depends_on:
+      - postgres
