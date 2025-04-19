@@ -17,6 +17,9 @@ class InMemoryUserRepository(UserRepository):
     def get_by_email(self, email: str) -> User:
         return self.users.get(email)
 
+    def get_by_id(self, user_id: str) -> User:
+        return self.users.get(user_id)
+
 
 def test_register_new_user():
     """Test pour le cas d'utilisation de création d'un utilisateur."""

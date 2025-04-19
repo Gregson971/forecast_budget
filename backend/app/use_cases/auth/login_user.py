@@ -17,9 +17,13 @@ class LoginUser:
         self.validate_credentials(email, password)
 
         user = self.user_repo.get_by_email(email)
-        token = TokenService.create_access_token({"sub": user.id})
+        payload = {"sub": user.id}
 
-        return token
+        return {
+            "access_token": TokenService.create_access_token(payload),
+            "refresh_token": TokenService.create_refresh_token(payload),
+            "token_type": "Bearer",
+        }
 
     def validate_credentials(self, email: str, password: str) -> None:
         """Valide les identifiants d'un utilisateur."""

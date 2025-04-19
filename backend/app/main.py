@@ -2,7 +2,8 @@
 
 from fastapi import FastAPI
 from app.infrastructure.db.database import Base, engine
-from app.interfaces.api.auth import router
+from app.interfaces.api.auth import auth_router
+from app.interfaces.api.user import user_router
 
 # Création automatique des tables
 Base.metadata.create_all(bind=engine)
@@ -22,4 +23,5 @@ def read_root():
     return {"message": "Bienvenue sur l'API de gestion de budget"}
 
 
-app.include_router(router)
+app.include_router(auth_router)
+app.include_router(user_router)

@@ -20,6 +20,9 @@ class InMemoryUserRepository(UserRepository):
     def get_by_email(self, email: str) -> User:
         return self.users.get(email)
 
+    def get_by_id(self, user_id: str) -> User:
+        return self.users.get(user_id)
+
 
 def test_login_user_with_valid_credentials():
     """Test pour le cas d'utilisation de login d'un utilisateur avec des identifiants valides."""
@@ -38,10 +41,16 @@ def test_login_user_with_valid_credentials():
     repo.add(user)
 
     use_case = LoginUser(repo)
-    token = use_case.execute(email="john.doe@example.com", password="password")
+    tokens = use_case.execute(email="john.doe@example.com", password="password")
 
-    assert token is not None
-    assert isinstance(token, str)
+    assert tokens is not None
+    assert isinstance(tokens, dict)
+    assert "access_token" in tokens
+    assert "refresh_token" in tokens
+    assert "token_type" in tokens
+    assert tokens["token_type"] == "Bearer"
+    assert isinstance(tokens["access_token"], str)
+    assert isinstance(tokens["refresh_token"], str)
 
 
 def test_login_user_with_invalid_credentials():
@@ -50,13 +59,8 @@ def test_login_user_with_invalid_credentials():
     repo = InMemoryUserRepository()
     use_case = LoginUser(repo)
 
-    user_data = {
-        "email": "john.doe@example.com",
-        "password": "wrong_password",
-    }
-
     try:
-        use_case.execute(user_data["email"], user_data["password"])
+        use_case.execute(email="john.doe@example.com", password="wrong_password")
         assert False, "Should raise ValueError"
     except ValueError as e:
         assert str(e) == "Vos identifiants sont invalides"

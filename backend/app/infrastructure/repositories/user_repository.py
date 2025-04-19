@@ -41,3 +41,21 @@ class SQLUserRepository(UserRepository):
             )
 
         return None
+
+    def get_by_id(self, user_id: str) -> User:
+        """Récupère un utilisateur par son id."""
+
+        user_db = self.db.query(UserDB).filter(UserDB.id == user_id).first()
+
+        if user_db:
+            return User(
+                id=user_db.id,
+                first_name=user_db.first_name,
+                last_name=user_db.last_name,
+                email=user_db.email,
+                password=user_db.password,
+                created_at=user_db.created_at,
+                updated_at=user_db.updated_at,
+            )
+
+        return None

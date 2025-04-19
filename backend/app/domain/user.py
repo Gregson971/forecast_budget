@@ -30,3 +30,8 @@ class UserRepository(ABC):
     def get_by_email(self, email: str) -> User:
         """Récupère un utilisateur par son email."""
         pass
+
+    @abstractmethod
+    def get_by_id(self, user_id: str) -> User:
+        """Récupère un utilisateur par son id."""
+        pass
