@@ -26,6 +26,10 @@ class UserDB(Base):
         """Met à jour le timestamp de modification."""
         self.updated_at = datetime.now(UTC)
 
+    def __repr__(self) -> str:
+        """Représentation de l'utilisateur."""
+        return f"User(id={self.id}, email={self.email})"
+
 
 class RefreshTokenDB(Base):
     """Modèle de données pour le token de rafraîchissement."""
@@ -36,3 +40,7 @@ class RefreshTokenDB(Base):
     user_id = Column(String, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     revoked = Column(Boolean, default=False)
+
+    def __repr__(self) -> str:
+        """Représentation du token de rafraîchissement."""
+        return f"RefreshToken(token={self.token}, user_id={self.user_id})"
