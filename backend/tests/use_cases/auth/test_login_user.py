@@ -5,6 +5,7 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from app.use_cases.auth.login_user import LoginUser
 from app.domain.user import UserRepository, User
+from app.domain.token import RefreshTokenRepository, RefreshToken
 
 
 class InMemoryUserRepository(UserRepository):
@@ -24,10 +25,28 @@ class InMemoryUserRepository(UserRepository):
         return self.users.get(user_id)
 
 
+class InMemoryRefreshTokenRepository(RefreshTokenRepository):
+    """Implémentation en mémoire d'un repository de refresh tokens."""
+
+    def __init__(self):
+        self.tokens = {}
+
+    def add(self, token: RefreshToken) -> RefreshToken:
+        self.tokens[token.token] = token
+        return token
+
+    def get_by_token(self, token: str) -> RefreshToken:
+        return self.tokens.get(token)
+
+    def get_by_user_id(self, user_id: str) -> list[RefreshToken]:
+        return [token for token in self.tokens.values() if token.user_id == user_id]
+
+
 def test_login_user_with_valid_credentials():
     """Test pour le cas d'utilisation de login d'un utilisateur avec des identifiants valides."""
 
-    repo = InMemoryUserRepository()
+    user_repo = InMemoryUserRepository()
+    refresh_token_repo = InMemoryRefreshTokenRepository()
 
     user = User(
         id=str(uuid.uuid4()),
@@ -38,9 +57,9 @@ def test_login_user_with_valid_credentials():
         created_at=datetime.now(),
         updated_at=datetime.now(),
     )
-    repo.add(user)
+    user_repo.add(user)
 
-    use_case = LoginUser(repo)
+    use_case = LoginUser(user_repo, refresh_token_repo)
     tokens = use_case.execute(email="john.doe@example.com", password="password")
 
     assert tokens is not None
@@ -52,12 +71,20 @@ def test_login_user_with_valid_credentials():
     assert isinstance(tokens["access_token"], str)
     assert isinstance(tokens["refresh_token"], str)
 
+    # Vérifie que le refresh token a été sauvegardé
+    stored_tokens = refresh_token_repo.get_by_user_id(user.id)
+    assert len(stored_tokens) == 1
+    assert stored_tokens[0].token == tokens["refresh_token"]
+    assert stored_tokens[0].user_id == user.id
+    assert not stored_tokens[0].revoked
+
 
 def test_login_user_with_invalid_credentials():
     """Test pour le cas d'utilisation de login d'un utilisateur avec des identifiants invalides."""
 
-    repo = InMemoryUserRepository()
-    use_case = LoginUser(repo)
+    user_repo = InMemoryUserRepository()
+    refresh_token_repo = InMemoryRefreshTokenRepository()
+    use_case = LoginUser(user_repo, refresh_token_repo)
 
     try:
         use_case.execute(email="john.doe@example.com", password="wrong_password")
@@ -69,8 +96,9 @@ def test_login_user_with_invalid_credentials():
 def test_login_user_with_non_existent_email():
     """Test pour le cas d'utilisation de login d'un utilisateur avec un email non existant."""
 
-    repo = InMemoryUserRepository()
-    use_case = LoginUser(repo)
+    user_repo = InMemoryUserRepository()
+    refresh_token_repo = InMemoryRefreshTokenRepository()
+    use_case = LoginUser(user_repo, refresh_token_repo)
 
     try:
         use_case.execute(email="non_existent_email@example.com", password="password")

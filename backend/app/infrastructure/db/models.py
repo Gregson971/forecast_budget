@@ -1,7 +1,7 @@
 """Modèles de données pour la base de données."""
 
 from datetime import datetime, UTC
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, String, DateTime, Boolean, ForeignKey
 from app.infrastructure.db.database import Base
 
 
@@ -25,3 +25,14 @@ class UserDB(Base):
     def update_timestamp(self) -> None:
         """Met à jour le timestamp de modification."""
         self.updated_at = datetime.now(UTC)
+
+
+class RefreshTokenDB(Base):
+    """Modèle de données pour le token de rafraîchissement."""
+
+    __tablename__ = "refresh_tokens"
+
+    token = Column(String, primary_key=True, index=True)
+    user_id = Column(String, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    revoked = Column(Boolean, default=False)

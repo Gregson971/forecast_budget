@@ -10,6 +10,7 @@ This is the backend for the Forecast Budget app. It is a FastAPI application tha
 
 ```bash
 git clone https://github.com/yourusername/forecast-budget.git
+cd backend
 ```
 
 2 Create a virtual environment

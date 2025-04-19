@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from app.infrastructure.db.database import SessionLocal
 from app.infrastructure.repositories.user_repository import SQLUserRepository
+from app.infrastructure.repositories.refresh_token_repository import SQLRefreshTokenRepository
 from app.infrastructure.security.dependencies import get_current_user
 from app.infrastructure.security.token_service import TokenService
 from app.use_cases.auth.register_user import RegisterUser
@@ -90,6 +91,12 @@ class UserResponse(BaseModel):
     email: EmailStr
 
 
+class LogoutRequest(BaseModel):
+    """Modèle de requête pour le logout d'un utilisateur."""
+
+    refresh_token: str
+
+
 @auth_router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
     """Récupère les informations de l'utilisateur connecté."""
@@ -125,7 +132,7 @@ async def login_user(
 
     try:
         login_data = LoginRequest.from_form(form_data)
-        use_case = LoginUser(SQLUserRepository(db))
+        use_case = LoginUser(SQLUserRepository(db), SQLRefreshTokenRepository(db))
         tokens = use_case.execute(login_data.username, login_data.password)
         return tokens
 
@@ -142,12 +149,17 @@ async def login_user(
 
 
 @auth_router.post("/refresh", response_model=TokenResponse)
-def refresh_token(data: RefreshTokenRequest):
+def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     """Rafraîchit un token."""
+
+    token_repo = SQLRefreshTokenRepository(db)
 
     try:
         payload = TokenService.decode_token(data.refresh_token)
         if payload.get("type") != "refresh":
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide")
+
+        if not token_repo.is_valid(data.refresh_token):
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide")
 
         new_access = TokenService.create_access_token(payload)
@@ -158,3 +170,12 @@ def refresh_token(data: RefreshTokenRequest):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Impossible de rafraîchir le token",
         ) from e
+
+
+@auth_router.post("/logout")
+def logout_user(data: LogoutRequest, db: Session = Depends(get_db)):
+    """Déconnecte un utilisateur."""
+
+    token_repo = SQLRefreshTokenRepository(db)
+    token_repo.revoke(data.refresh_token)
+    return {"message": "Déconnexion réussie"}
