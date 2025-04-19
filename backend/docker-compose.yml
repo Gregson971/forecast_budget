@@ -6,9 +6,9 @@ services:
     ports:
       - 5432:5432
     environment:
-      POSTGRES_DB: forecast_budget
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
  
   api:
     build: .
@@ -17,7 +17,8 @@ services:
     ports:
       - 8000:8000
     environment:
-      DATABASE_URL: postgresql://postgres:password@postgres:5432/forecast_budget
+      DATABASE_URL: ${DATABASE_URL}
       SECRET_KEY: ${SECRET_KEY}
+      ORIGINS_ALLOWED: ${ORIGINS_ALLOWED}
     depends_on:
       - postgres
