@@ -14,6 +14,7 @@ from app.infrastructure.security.dependencies import get_current_user
 from app.use_cases.auth.register_user import RegisterUser
 from app.use_cases.auth.login_user import LoginUser
 from app.use_cases.auth.refresh_token import RefreshToken
+from app.use_cases.auth.get_user_sessions import GetUserSessions
 from app.domain.user import User
 from app.infrastructure.security.token_service import TokenService
 
@@ -84,25 +85,26 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str
 
 
-class UserResponse(BaseModel):
-    """Modèle de réponse pour l'utilisateur connecté."""
-
-    id: str
-    first_name: str
-    last_name: str
-    email: EmailStr
-
-
 class LogoutRequest(BaseModel):
     """Modèle de requête pour le logout d'un utilisateur."""
 
     refresh_token: str
 
 
-@auth_router.get("/me", response_model=UserResponse)
+@auth_router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
     """Récupère les informations de l'utilisateur connecté."""
     return current_user
+
+
+@auth_router.get("/me/sessions")
+def list_user_sessions(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    """Récupère toutes les sessions de l'utilisateur connecté."""
+
+    use_case = GetUserSessions(SQLSessionRepository(db))
+    return use_case.execute(current_user.id)
 
 
 @auth_router.post("/register", response_model=RegisterResponse)

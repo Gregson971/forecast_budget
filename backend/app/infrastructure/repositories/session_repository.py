@@ -32,3 +32,13 @@ class SQLSessionRepository:
         if session:
             session.revoked = True
             self.db.commit()
+
+    def get_all_by_user_id(self, user_id: str) -> list[SessionDB]:
+        """Récupère toutes les sessions d'un utilisateur."""
+
+        return (
+            self.db.query(SessionDB)
+            .filter(SessionDB.user_id == user_id)
+            .order_by(SessionDB.created_at.desc())
+            .all()
+        )

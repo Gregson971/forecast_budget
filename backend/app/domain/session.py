@@ -31,3 +31,7 @@ class SessionRepository:
     def revoke(self, session_id: str) -> None:
         """Marque une session comme revoquée."""
         pass
+
+    def get_all_by_user_id(self, user_id: str) -> list[Session]:
+        """Récupère toutes les sessions d'un utilisateur."""
+        pass
