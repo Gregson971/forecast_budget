@@ -1,7 +1,7 @@
 """Module contenant les routes d'authentification."""
 
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
@@ -9,11 +9,13 @@ from sqlalchemy.orm import Session
 from app.infrastructure.db.database import SessionLocal
 from app.infrastructure.repositories.user_repository import SQLUserRepository
 from app.infrastructure.repositories.refresh_token_repository import SQLRefreshTokenRepository
+from app.infrastructure.repositories.session_repository import SQLSessionRepository
 from app.infrastructure.security.dependencies import get_current_user
-from app.infrastructure.security.token_service import TokenService
 from app.use_cases.auth.register_user import RegisterUser
 from app.use_cases.auth.login_user import LoginUser
+from app.use_cases.auth.refresh_token import RefreshToken
 from app.domain.user import User
+from app.infrastructure.security.token_service import TokenService
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -126,7 +128,9 @@ def register_user(data: RegisterRequest, db: Session = Depends(get_db)):
 
 @auth_router.post("/login", response_model=FullTokenResponse)
 async def login_user(
-    form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
     """Login d'un utilisateur."""
 
@@ -134,6 +138,19 @@ async def login_user(
         login_data = LoginRequest.from_form(form_data)
         use_case = LoginUser(SQLUserRepository(db), SQLRefreshTokenRepository(db))
         tokens = use_case.execute(login_data.username, login_data.password)
+
+        # Récupérer l'ID de l'utilisateur à partir du token
+        payload = TokenService.decode_token(tokens["access_token"])
+        user_id = payload["sub"]
+
+        use_case.create_session(
+            user_id=user_id,
+            refresh_token=tokens["refresh_token"],
+            user_agent=request.headers.get("user-agent", ""),
+            ip=request.client.host,
+            repo=SQLSessionRepository(db),
+        )
+
         return tokens
 
     except ValueError as e:
@@ -152,23 +169,16 @@ async def login_user(
 def refresh_token(data: RefreshTokenRequest, db: Session = Depends(get_db)):
     """Rafraîchit un token."""
 
-    token_repo = SQLRefreshTokenRepository(db)
-
     try:
-        payload = TokenService.decode_token(data.refresh_token)
-        if payload.get("type") != "refresh":
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide")
+        use_case = RefreshToken(SQLSessionRepository(db), SQLUserRepository(db))
+        token = use_case.refresh_access_token(data.refresh_token)
 
-        if not token_repo.is_valid(data.refresh_token):
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token invalide")
-
-        new_access = TokenService.create_access_token(payload)
-        return {"access_token": new_access, "token_type": "Bearer"}
+        return {"access_token": token, "token_type": "Bearer"}
 
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Impossible de rafraîchir le token",
+            detail="Votre session est expirée ou invalide",
         ) from e
 
 

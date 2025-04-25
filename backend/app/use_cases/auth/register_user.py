@@ -2,7 +2,7 @@
 
 import re
 import uuid
-from datetime import datetime
+from datetime import datetime, UTC
 from passlib.hash import bcrypt
 from app.domain.user import User, UserRepository
 
@@ -44,8 +44,8 @@ class RegisterUser:
             last_name=data["last_name"],
             email=data["email"],
             password=hashed_password,
-            created_at=datetime.now(),
-            updated_at=datetime.now(),
+            created_at=datetime.now(UTC),
+            updated_at=datetime.now(UTC),
         )
 
         # Ajouter l'utilisateur à la base de données

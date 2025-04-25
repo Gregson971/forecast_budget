@@ -1,9 +1,11 @@
 """Module contenant le cas d'utilisation de login d'un utilisateur."""
 
-from datetime import datetime
+import uuid
+from datetime import datetime, UTC
 from passlib.hash import bcrypt
 from app.domain.user import UserRepository
 from app.domain.token import RefreshTokenRepository, RefreshToken
+from app.domain.session import Session, SessionRepository
 from app.infrastructure.security.token_service import TokenService
 
 
@@ -27,7 +29,7 @@ class LoginUser:
 
         self.refresh_token_repo.add(
             RefreshToken(
-                token=refresh_token, user_id=user.id, created_at=datetime.now(), revoked=False
+                token=refresh_token, user_id=user.id, created_at=datetime.now(UTC), revoked=False
             )
         )
 
@@ -43,3 +45,18 @@ class LoginUser:
         user = self.user_repo.get_by_email(email)
         if not user or not bcrypt.verify(password, user.password):
             raise ValueError("Vos identifiants sont invalides")
+
+    def create_session(
+        self, user_id: str, refresh_token: str, user_agent: str, ip: str, repo: SessionRepository
+    ) -> None:
+        """Crée une session."""
+
+        session = Session(
+            id=str(uuid.uuid4()),
+            user_id=user_id,
+            refresh_token=refresh_token,
+            user_agent=user_agent,
+            ip_address=ip,
+            created_at=datetime.now(UTC),
+        )
+        repo.add(session)
