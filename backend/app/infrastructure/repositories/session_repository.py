@@ -42,3 +42,16 @@ class SQLSessionRepository:
             .order_by(SessionDB.created_at.desc())
             .all()
         )
+
+    def get_by_id(self, session_id: str) -> SessionDB | None:
+        """Récupère une session par son id."""
+
+        return self.db.query(SessionDB).filter_by(id=session_id).first()
+
+    def revoke_by_id(self, session_id: str, user_id: str) -> None:
+        """Marque une session comme revoquée par son id."""
+
+        session = self.db.query(SessionDB).filter_by(id=session_id, user_id=user_id).first()
+        if session:
+            session.revoked = True
+            self.db.commit()

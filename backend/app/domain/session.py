@@ -35,3 +35,11 @@ class SessionRepository:
     def get_all_by_user_id(self, user_id: str) -> list[Session]:
         """Récupère toutes les sessions d'un utilisateur."""
         pass
+
+    def get_by_id(self, session_id: str) -> Session:
+        """Récupère une session par son id."""
+        pass
+
+    def revoke_by_id(self, session_id: str, user_id: str) -> None:
+        """Marque une session comme revoquée par son id."""
+        pass

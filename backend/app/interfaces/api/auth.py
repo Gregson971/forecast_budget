@@ -15,6 +15,7 @@ from app.use_cases.auth.register_user import RegisterUser
 from app.use_cases.auth.login_user import LoginUser
 from app.use_cases.auth.refresh_token import RefreshToken
 from app.use_cases.auth.get_user_sessions import GetUserSessions
+from app.use_cases.auth.revoke_user_session import RevokeUserSession
 from app.domain.user import User
 from app.infrastructure.security.token_service import TokenService
 
@@ -105,6 +106,18 @@ def list_user_sessions(
 
     use_case = GetUserSessions(SQLSessionRepository(db))
     return use_case.execute(current_user.id)
+
+
+@auth_router.delete("/me/sessions/{session_id}")
+def revoke_user_session(
+    session_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    """Révoque une session de l'utilisateur connecté."""
+
+    use_case = RevokeUserSession(SQLSessionRepository(db))
+    use_case.execute(session_id, current_user.id)
+
+    return {"message": "Session révoquée avec succès"}
 
 
 @auth_router.post("/register", response_model=RegisterResponse)
