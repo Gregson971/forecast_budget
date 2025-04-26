@@ -3,7 +3,7 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
-import axios from '../utils/api';
+import axios from '@/lib/axios';
 
 type User = { email: string };
 type AuthContextType = {
@@ -11,6 +11,8 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, first_name: string, last_name: string) => Promise<void>;
   logout: () => void;
+  getSessions: () => Promise<any[]>;
+  revokeSession: (sessionId: string) => Promise<void>;
 };
 type JWTPayload = {
   exp: number; // timestamp en secondes
@@ -89,6 +91,38 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const getSessions = async () => {
+    const res = await axios.get('/auth/me/sessions', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+
+    if (res.status !== 200) {
+      toast.error('Erreur lors de la récupération des sessions');
+      return [];
+    }
+
+    const sessions = res.data;
+
+    return sessions;
+  };
+
+  const revokeSession = async (sessionId: string) => {
+    const res = await axios.delete(`/auth/me/sessions/${sessionId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+      },
+    });
+
+    if (res.status !== 200) {
+      toast.error('Erreur lors de la révocation de la session');
+      return;
+    }
+
+    toast.success('Session révoquée avec succès');
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       const token = localStorage.getItem('access_token');
@@ -108,7 +142,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  return <AuthContext.Provider value={{ user, login, register, logout }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

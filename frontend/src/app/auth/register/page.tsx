@@ -1,7 +1,7 @@
 'use client';
 
-import { useAuth } from '../../context/AuthContext';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 
 export default function RegisterPage() {
   const { register } = useAuth();

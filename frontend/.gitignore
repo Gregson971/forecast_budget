@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# VSCode config is in .vscode/settings.json
+.vscode/
+.DS_Store
