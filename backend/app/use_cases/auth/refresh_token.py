@@ -2,8 +2,8 @@
 
 from datetime import timedelta
 from fastapi import HTTPException
-from app.domain.session import SessionRepository
-from app.domain.user import UserRepository
+from app.domain.interfaces.session_repository_interface import SessionRepository
+from app.domain.interfaces.user_repository_interface import UserRepository
 from app.infrastructure.security.token_service import TokenService
 
 

@@ -16,7 +16,7 @@ from app.use_cases.auth.login_user import LoginUser
 from app.use_cases.auth.refresh_token import RefreshToken
 from app.use_cases.auth.get_user_sessions import GetUserSessions
 from app.use_cases.auth.revoke_user_session import RevokeUserSession
-from app.domain.user import User
+from app.domain.entities.user import User
 from app.infrastructure.security.token_service import TokenService
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])

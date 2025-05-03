@@ -4,7 +4,7 @@ from datetime import datetime
 from unittest.mock import Mock
 from fastapi import HTTPException
 from app.use_cases.auth.revoke_user_session import RevokeUserSession
-from app.domain.session import Session
+from app.domain.entities.session import Session
 import pytest
 
 

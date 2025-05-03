@@ -1,21 +1,7 @@
-"""Module contenant les classes liées aux utilisateurs."""
+"""Module contenant les interfaces pour les opérations liées aux utilisateurs."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from datetime import datetime
-
-
-@dataclass
-class User:
-    """Représente un utilisateur."""
-
-    id: str
-    first_name: str
-    last_name: str
-    email: str
-    password: str
-    created_at: datetime
-    updated_at: datetime
+from app.domain.entities.user import User
 
 
 class UserRepository(ABC):

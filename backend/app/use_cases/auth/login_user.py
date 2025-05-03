@@ -3,9 +3,11 @@
 import uuid
 from datetime import datetime, UTC
 from passlib.hash import bcrypt
-from app.domain.user import UserRepository
-from app.domain.token import RefreshTokenRepository, RefreshToken
-from app.domain.session import Session, SessionRepository
+from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.entities.token import RefreshToken
+from app.domain.interfaces.token_repository_interface import RefreshTokenRepository
+from app.domain.entities.session import Session
+from app.domain.interfaces.session_repository_interface import SessionRepository
 from app.infrastructure.security.token_service import TokenService
 
 

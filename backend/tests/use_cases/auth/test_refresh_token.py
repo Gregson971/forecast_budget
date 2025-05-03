@@ -6,8 +6,8 @@ from uuid import uuid4
 import pytest
 from fastapi import HTTPException
 
-from app.domain.session import Session
-from app.domain.user import User
+from app.domain.entities.session import Session
+from app.domain.entities.user import User
 from app.use_cases.auth.refresh_token import RefreshToken
 
 

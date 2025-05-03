@@ -4,7 +4,8 @@ import re
 import uuid
 from datetime import datetime, UTC
 from passlib.hash import bcrypt
-from app.domain.user import User, UserRepository
+from app.domain.entities.user import User
+from app.domain.interfaces.user_repository_interface import UserRepository
 
 
 class RegisterUser:

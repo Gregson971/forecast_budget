@@ -3,7 +3,8 @@
 import uuid
 from datetime import datetime
 from app.use_cases.user.get_user import GetUser
-from app.domain.user import UserRepository, User
+from app.domain.entities.user import User
+from app.domain.interfaces.user_repository_interface import UserRepository
 
 
 class InMemoryUserRepository(UserRepository):

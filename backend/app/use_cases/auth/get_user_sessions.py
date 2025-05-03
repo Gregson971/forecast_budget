@@ -1,6 +1,7 @@
 """Module contenant le cas d'utilisation pour récupérer toutes les sessions d'un utilisateur."""
 
-from app.domain.session import SessionRepository, Session
+from app.domain.interfaces.session_repository_interface import SessionRepository
+from app.domain.entities.session import Session
 
 
 class GetUserSessions:

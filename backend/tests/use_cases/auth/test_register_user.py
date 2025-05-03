@@ -1,7 +1,8 @@
 """Tests pour le cas d'utilisation de création d'un utilisateur."""
 
 from app.use_cases.auth.register_user import RegisterUser
-from app.domain.user import UserRepository, User
+from app.domain.entities.user import User
+from app.domain.interfaces.user_repository_interface import UserRepository
 
 
 class InMemoryUserRepository(UserRepository):

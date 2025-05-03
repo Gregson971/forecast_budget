@@ -2,7 +2,7 @@
 
 from datetime import datetime
 import pytest
-from app.domain.session import Session
+from app.domain.entities.session import Session
 from app.use_cases.auth.get_user_sessions import GetUserSessions
 
 

@@ -4,8 +4,8 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.infrastructure.db.database import Base, engine
-from app.interfaces.api.auth import auth_router
-from app.interfaces.api.user import user_router
+from app.external_interfaces.api.auth import auth_router
+from app.external_interfaces.api.user import user_router
 
 # Création automatique des tables
 Base.metadata.create_all(bind=engine)

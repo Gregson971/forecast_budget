@@ -1,11 +1,12 @@
 """Module contenant le repository des sessions."""
 
 from sqlalchemy.orm import Session as DBSession
-from app.domain.session import Session
+from app.domain.entities.session import Session
+from app.domain.interfaces.session_repository_interface import SessionRepository
 from app.infrastructure.db.models import SessionDB
 
 
-class SQLSessionRepository:
+class SQLSessionRepository(SessionRepository):
     """Repository des sessions."""
 
     def __init__(self, db: DBSession):

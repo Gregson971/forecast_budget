@@ -1,6 +1,7 @@
 """Module contenant le cas d'utilisation pour récupérer un utilisateur."""
 
-from app.domain.user import UserRepository, User
+from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.entities.user import User
 
 
 class GetUser:

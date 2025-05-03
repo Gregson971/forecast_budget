@@ -1,7 +1,7 @@
 """Cas d'utilisation pour révoquer une session d'un utilisateur."""
 
 from fastapi import HTTPException
-from app.domain.session import SessionRepository
+from app.domain.interfaces.session_repository_interface import SessionRepository
 
 
 class RevokeUserSession:

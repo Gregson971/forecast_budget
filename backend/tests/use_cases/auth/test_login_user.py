@@ -4,8 +4,10 @@ import uuid
 from datetime import datetime
 from passlib.hash import bcrypt
 from app.use_cases.auth.login_user import LoginUser
-from app.domain.user import UserRepository, User
-from app.domain.token import RefreshTokenRepository, RefreshToken
+from app.domain.entities.user import User
+from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.entities.token import RefreshToken
+from app.domain.interfaces.token_repository_interface import RefreshTokenRepository
 
 
 class InMemoryUserRepository(UserRepository):
@@ -34,6 +36,12 @@ class InMemoryRefreshTokenRepository(RefreshTokenRepository):
     def add(self, token: RefreshToken) -> RefreshToken:
         self.tokens[token.token] = token
         return token
+
+    def revoke(self, token_str: str) -> None:
+        del self.tokens[token_str]
+
+    def is_valid(self, token_str: str) -> bool:
+        return token_str in self.tokens
 
     def get_by_token(self, token: str) -> RefreshToken:
         return self.tokens.get(token)
