@@ -19,12 +19,18 @@ class SQLSessionRepository(SessionRepository):
         self.db.add(session_db)
         self.db.commit()
         self.db.refresh(session_db)
-        return session_db
 
-    def get_by_refresh_token(self, token: str) -> SessionDB | None:
+        return Session(**session_db.__dict__)
+
+    def get_by_refresh_token(self, token: str) -> Session:
         """Récupère une session par son token de rafraîchissement."""
 
-        return self.db.query(SessionDB).filter_by(refresh_token=token).first()
+        session_db = self.db.query(SessionDB).filter_by(refresh_token=token).first()
+
+        if not session_db:
+            raise ValueError("Session non trouvée")
+
+        return Session(**session_db.__dict__)
 
     def revoke(self, token: str):
         """Marque une session comme revoquée."""
@@ -34,25 +40,38 @@ class SQLSessionRepository(SessionRepository):
             session.revoked = True
             self.db.commit()
 
-    def get_all_by_user_id(self, user_id: str) -> list[SessionDB]:
+    def get_all_by_user_id(self, user_id: str) -> list[Session]:
         """Récupère toutes les sessions d'un utilisateur."""
 
-        return (
+        sessions = (
             self.db.query(SessionDB)
             .filter(SessionDB.user_id == user_id)
             .order_by(SessionDB.created_at.desc())
             .all()
         )
 
-    def get_by_id(self, session_id: str) -> SessionDB | None:
+        if not sessions:
+            raise ValueError("Aucune session trouvée")
+
+        return [Session(**session.__dict__) for session in sessions]
+
+    def get_by_id(self, session_id: str) -> Session:
         """Récupère une session par son id."""
 
-        return self.db.query(SessionDB).filter_by(id=session_id).first()
+        session_db = self.db.query(SessionDB).filter_by(id=session_id).first()
+
+        if not session_db:
+            raise ValueError("Session non trouvée")
+
+        return Session(**session_db.__dict__)
 
     def revoke_by_id(self, session_id: str, user_id: str) -> None:
         """Marque une session comme revoquée par son id."""
 
         session = self.db.query(SessionDB).filter_by(id=session_id, user_id=user_id).first()
-        if session:
-            session.revoked = True
-            self.db.commit()
+
+        if not session:
+            raise ValueError("Session non trouvée")
+
+        session.revoked = True
+        self.db.commit()

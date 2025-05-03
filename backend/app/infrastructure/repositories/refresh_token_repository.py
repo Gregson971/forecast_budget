@@ -14,50 +14,50 @@ class SQLRefreshTokenRepository(RefreshTokenRepository):
 
     def add(self, token: RefreshToken) -> RefreshToken:
         """Ajoute un token de rafraîchissement à la base de données."""
-        token_db = RefreshTokenDB(
-            token=token.token,
-            user_id=token.user_id,
-            created_at=token.created_at,
-            revoked=token.revoked,
-        )
+        token_db = RefreshTokenDB(**token.__dict__)
         self.db.add(token_db)
         self.db.commit()
+        self.db.refresh(token_db)
+
+        return RefreshToken(**token_db.__dict__)
 
     def revoke(self, token_str: str) -> None:
         """Marque un token de rafraîchissement comme revoqué."""
 
-        token = self.db.query(RefreshTokenDB).filter(RefreshTokenDB.token == token_str).first()
-        if token:
-            token.revoked = True
-            self.db.commit()
+        token_db = self.db.query(RefreshTokenDB).filter(RefreshTokenDB.token == token_str).first()
+
+        if not token_db:
+            raise ValueError("Token non trouvé")
+
+        token_db.revoked = True
+        self.db.commit()
 
     def is_valid(self, token_str: str) -> bool:
         """Vérifie si un token de rafraîchissement est valide."""
 
-        token = self.db.query(RefreshTokenDB).filter_by(token=token_str, revoked=False).first()
-        return token is not None
+        token_db = self.db.query(RefreshTokenDB).filter_by(token=token_str, revoked=False).first()
+
+        if not token_db:
+            raise ValueError("Token non trouvé")
+
+        return token_db is not None
 
     def get_by_token(self, token: str) -> RefreshToken:
         """Récupère un token de rafraîchissement par son token."""
 
         token_db = self.db.query(RefreshTokenDB).filter_by(token=token).first()
-        return RefreshToken(
-            token=token_db.token,
-            user_id=token_db.user_id,
-            created_at=token_db.created_at,
-            revoked=token_db.revoked,
-        )
+
+        if not token_db:
+            raise ValueError("Token non trouvé")
+
+        return RefreshToken(**token_db.__dict__)
 
     def get_by_user_id(self, user_id: str) -> list[RefreshToken]:
         """Récupère tous les tokens de rafraîchissement d'un utilisateur."""
 
         token_db = self.db.query(RefreshTokenDB).filter_by(user_id=user_id).all()
-        return [
-            RefreshToken(
-                token=token_db.token,
-                user_id=token_db.user_id,
-                created_at=token_db.created_at,
-                revoked=token_db.revoked,
-            )
-            for token_db in token_db
-        ]
+
+        if not token_db:
+            raise ValueError("Aucun token trouvé")
+
+        return [RefreshToken(**token_db.__dict__) for token_db in token_db]

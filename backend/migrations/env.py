@@ -16,6 +16,7 @@ from app.infrastructure.db.database import Base  # noqa
 from app.infrastructure.db.models.user_db import UserDB
 from app.infrastructure.db.models.refresh_token_db import RefreshTokenDB
 from app.infrastructure.db.models.session_db import SessionDB
+from app.infrastructure.db.models.expense_db import ExpenseDB
 from app.infrastructure.db.database import DATABASE_URL
 
 # this is the Alembic Config object, which provides

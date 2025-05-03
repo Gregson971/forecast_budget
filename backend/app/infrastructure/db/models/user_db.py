@@ -22,10 +22,6 @@ class UserDB(Base):
         """Retourne le nom complet de l'utilisateur."""
         return f"{self.first_name} {self.last_name}"
 
-    def update_timestamp(self) -> None:
-        """Met à jour le timestamp de modification."""
-        self.updated_at = datetime.now(UTC)
-
     def __repr__(self) -> str:
         """Représentation de l'utilisateur."""
         return f"User(id={self.id}, email={self.email})"
