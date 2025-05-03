@@ -11,13 +11,13 @@ from app.infrastructure.repositories.user_repository import SQLUserRepository
 from app.infrastructure.repositories.refresh_token_repository import SQLRefreshTokenRepository
 from app.infrastructure.repositories.session_repository import SQLSessionRepository
 from app.infrastructure.security.dependencies import get_current_user
+from app.infrastructure.security.token_service import TokenService
 from app.use_cases.auth.register_user import RegisterUser
 from app.use_cases.auth.login_user import LoginUser
 from app.use_cases.auth.refresh_token import RefreshToken
 from app.use_cases.auth.get_user_sessions import GetUserSessions
 from app.use_cases.auth.revoke_user_session import RevokeUserSession
 from app.domain.entities.user import User
-from app.infrastructure.security.token_service import TokenService
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -44,11 +44,11 @@ class RegisterRequest(BaseModel):
 class RegisterResponse(BaseModel):
     """Modèle de réponse pour l'inscription d'un utilisateur."""
 
-    message: str
     id: str
     first_name: str
     last_name: str
     email: EmailStr
+    message: str
     created_at: datetime
     updated_at: datetime
 

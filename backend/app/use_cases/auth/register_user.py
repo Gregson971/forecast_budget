@@ -14,20 +14,6 @@ class RegisterUser:
     def __init__(self, user_repo: UserRepository):
         self.user_repo = user_repo
 
-    def validate_data(self, data: dict) -> None:
-        """Valide les données d'entrée pour la création d'un utilisateur."""
-
-        required_fields = ["first_name", "last_name", "email", "password"]
-        for field in required_fields:
-            if field not in data or not data[field]:
-                raise ValueError(f"Le champ {field} est requis")
-
-    def validate_email(self, email: str) -> None:
-        """Valide l'email d'entrée."""
-
-        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            raise ValueError("L'email est invalide")
-
     def execute(self, data: dict):
         """Exécute le cas d'utilisation de création d'un utilisateur."""
 
@@ -53,3 +39,17 @@ class RegisterUser:
         self.user_repo.add(user)
 
         return user
+
+    def validate_data(self, data: dict) -> None:
+        """Valide les données d'entrée pour la création d'un utilisateur."""
+
+        required_fields = ["first_name", "last_name", "email", "password"]
+        for field in required_fields:
+            if field not in data or not data[field]:
+                raise ValueError(f"Le champ {field} est requis")
+
+    def validate_email(self, email: str) -> None:
+        """Valide l'email d'entrée."""
+
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            raise ValueError("L'email est invalide")

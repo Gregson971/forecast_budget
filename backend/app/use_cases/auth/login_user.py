@@ -49,7 +49,12 @@ class LoginUser:
             raise ValueError("Vos identifiants sont invalides")
 
     def create_session(
-        self, user_id: str, refresh_token: str, user_agent: str, ip: str, repo: SessionRepository
+        self,
+        user_id: str,
+        refresh_token: str,
+        user_agent: str,
+        ip: str,
+        repo: SessionRepository,
     ) -> None:
         """Crée une session."""
 

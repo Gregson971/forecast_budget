@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session as DBSession
 from app.domain.entities.session import Session
 from app.domain.interfaces.session_repository_interface import SessionRepository
-from app.infrastructure.db.models import SessionDB
+from app.infrastructure.db.models.session_db import SessionDB
 
 
 class SQLSessionRepository(SessionRepository):

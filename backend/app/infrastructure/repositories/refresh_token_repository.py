@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 from app.domain.entities.token import RefreshToken
 from app.domain.interfaces.token_repository_interface import RefreshTokenRepository
-from app.infrastructure.db.models import RefreshTokenDB
+from app.infrastructure.db.models.refresh_token_db import RefreshTokenDB
 
 
 class SQLRefreshTokenRepository(RefreshTokenRepository):

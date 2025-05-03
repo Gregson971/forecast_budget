@@ -3,7 +3,7 @@
 from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository_interface import UserRepository
-from app.infrastructure.db.models import UserDB
+from app.infrastructure.db.models.user_db import UserDB
 
 
 class SQLUserRepository(UserRepository):

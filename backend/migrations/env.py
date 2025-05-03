@@ -12,7 +12,10 @@ from alembic import context
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Import tous les modèles pour que Alembic puisse les détecter
-from app.infrastructure.db.models import Base, UserDB, RefreshTokenDB  # noqa
+from app.infrastructure.db.database import Base  # noqa
+from app.infrastructure.db.models.user_db import UserDB
+from app.infrastructure.db.models.refresh_token_db import RefreshTokenDB
+from app.infrastructure.db.models.session_db import SessionDB
 from app.infrastructure.db.database import DATABASE_URL
 
 # this is the Alembic Config object, which provides
