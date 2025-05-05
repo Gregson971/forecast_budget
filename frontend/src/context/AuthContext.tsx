@@ -3,8 +3,8 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
-import axios from '@/lib/axios';
-
+import { loginService, registerService, refreshTokenService, getSessionsService, revokeSessionService } from '@/services/auth';
+import { getExpensesService } from '@/services/expense';
 type User = { email: string };
 type AuthContextType = {
   user: User | null;
@@ -13,6 +13,7 @@ type AuthContextType = {
   logout: () => void;
   getSessions: () => Promise<any[]>;
   revokeSession: (sessionId: string) => Promise<void>;
+  getExpenses: () => Promise<any[]>;
 };
 type JWTPayload = {
   exp: number; // timestamp en secondes
@@ -25,12 +26,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const login = async (email: string, password: string) => {
-    const formData = new FormData();
-    formData.append('username', email);
-    formData.append('password', password);
-
-    const res = await axios.post('/auth/login', formData);
-    const { access_token, refresh_token } = res.data;
+    const { access_token, refresh_token } = await loginService(email, password);
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('refresh_token', refresh_token);
     setUser({ email });
@@ -42,7 +38,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const register = async (email: string, password: string, first_name: string, last_name: string) => {
-    await axios.post('/auth/register', { email, password, first_name, last_name });
+    await registerService(email, password, first_name, last_name);
     await login(email, password);
     toast.success('Inscription réussie', {
       description: "Vous allez être redirigé vers la page d'accueil.",
@@ -77,8 +73,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!refresh_token) return forceLogout();
 
     try {
-      const res = await axios.post('/auth/refresh', { refresh_token });
-      const { access_token } = res.data;
+      const { access_token } = await refreshTokenService(refresh_token);
       localStorage.setItem('access_token', access_token);
       console.log('🔁 Token refreshed');
     } catch (error) {
@@ -92,35 +87,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const getSessions = async () => {
-    const res = await axios.get('/auth/me/sessions', {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    });
+    try {
+      const access_token = localStorage.getItem('access_token');
+      if (!access_token) return [];
 
-    if (res.status !== 200) {
+      const sessions = await getSessionsService(access_token);
+      return sessions;
+    } catch (error) {
       toast.error('Erreur lors de la récupération des sessions');
       return [];
     }
-
-    const sessions = res.data;
-
-    return sessions;
   };
 
   const revokeSession = async (sessionId: string) => {
-    const res = await axios.delete(`/auth/me/sessions/${sessionId}`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-      },
-    });
+    try {
+      const access_token = localStorage.getItem('access_token');
+      if (!access_token) return;
 
-    if (res.status !== 200) {
+      await revokeSessionService(sessionId, access_token);
+      toast.success('Session révoquée avec succès');
+    } catch (error) {
       toast.error('Erreur lors de la révocation de la session');
-      return;
     }
+  };
 
-    toast.success('Session révoquée avec succès');
+  const getExpenses = async () => {
+    try {
+      const access_token = localStorage.getItem('access_token');
+      if (!access_token) return [];
+
+      const expenses = await getExpensesService();
+      return expenses;
+    } catch (error) {
+      toast.error('Erreur lors de la récupération des dépenses');
+      return [];
+    }
   };
 
   useEffect(() => {
@@ -142,7 +143,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession, getExpenses }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);
