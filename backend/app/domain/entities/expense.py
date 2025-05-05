@@ -14,9 +14,9 @@ class Expense:
     name: str
     amount: float
     date: datetime
+    created_at: datetime
+    updated_at: datetime
     category: Optional[str] = None
     description: Optional[str] = None
     is_recurring: bool = False
     frequency: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime

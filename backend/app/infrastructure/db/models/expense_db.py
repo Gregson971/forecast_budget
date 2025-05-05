@@ -19,8 +19,8 @@ class ExpenseDB(Base):
     description = Column(String)
     is_recurring = Column(Boolean, default=False)
     frequency = Column(String)
-    created_at = Column(DateTime, default=datetime.now(UTC))
-    updated_at = Column(DateTime, default=datetime.now(UTC))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC))
 
     def __repr__(self) -> str:
         """Représentation de la dépense."""
