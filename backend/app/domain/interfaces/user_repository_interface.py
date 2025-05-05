@@ -13,6 +13,11 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
+    def get_all(self) -> list[User]:
+        """Récupère tous les utilisateurs."""
+        pass
+
+    @abstractmethod
     def get_by_email(self, email: str) -> User:
         """Récupère un utilisateur par son email."""
         pass

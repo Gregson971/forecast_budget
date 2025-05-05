@@ -17,11 +17,16 @@ class InMemoryExpenseRepository:
 
         return self.expenses.get(expense_id)
 
-    def delete(self, expense_id: str) -> None:
+    def delete(self, expense_id: str, user_id: str) -> None:
         """Supprime une dépense."""
 
         if expense_id not in self.expenses:
             raise ValueError("La dépense n'existe pas")
+
+        expense = self.expenses[expense_id]
+
+        if expense.user_id != user_id:
+            raise ValueError("L'utilisateur n'est pas autorisé à supprimer cette dépense")
 
         del self.expenses[expense_id]
 
@@ -44,7 +49,7 @@ def test_delete_expense_success():
     repo.expenses[expense_id] = expense
 
     use_case = DeleteExpense(repo)
-    use_case.execute(expense_id)
+    use_case.execute(expense_id, user_id)
 
     assert expense_id not in repo.expenses
 
@@ -55,6 +60,16 @@ def test_delete_expense_failure_with_invalid_expense_id():
     repo = InMemoryExpenseRepository()
     use_case = DeleteExpense(repo)
 
-    use_case.execute(uuid4())
+    use_case.execute(uuid4(), uuid4())
 
     assert not repo.expenses
+
+
+def test_delete_expense_failure_with_invalid_user_id():
+    """Test pour le cas d'utilisation de suppression d'une dépense
+    avec un id d'utilisateur invalide."""
+
+    repo = InMemoryExpenseRepository()
+    use_case = DeleteExpense(repo)
+
+    use_case.execute(uuid4(), uuid4())

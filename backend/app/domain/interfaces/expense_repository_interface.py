@@ -13,12 +13,12 @@ class ExpenseRepository(ABC):
         pass
 
     @abstractmethod
-    def get_all(self) -> list[Expense]:
+    def get_all(self, user_id: str) -> list[Expense]:
         """Récupère toutes les dépenses."""
         pass
 
     @abstractmethod
-    def get_by_id(self, expense_id: str) -> Expense:
+    def get_by_id(self, expense_id: str, user_id: str) -> Expense:
         """Récupère une dépense par son id."""
         pass
 
@@ -28,7 +28,7 @@ class ExpenseRepository(ABC):
         pass
 
     @abstractmethod
-    def update(self, expense: Expense) -> Expense:
+    def update(self, expense: Expense, user_id: str) -> Expense:
         """Met à jour une dépense."""
         pass
 

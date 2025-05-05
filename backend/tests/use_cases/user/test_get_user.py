@@ -26,6 +26,9 @@ class InMemoryUserRepository(UserRepository):
     def get_by_id(self, user_id: str) -> User:
         return self.users.get(user_id)
 
+    def get_all(self) -> list[User]:
+        return list(self.users.values())
+
 
 def test_get_user_with_valid_id():
     """Test pour le cas d'utilisation de récupération d'un utilisateur avec un id valide."""

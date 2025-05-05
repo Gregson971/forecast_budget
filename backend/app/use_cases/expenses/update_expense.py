@@ -10,12 +10,13 @@ class UpdateExpense:
     def __init__(self, expense_repo: ExpenseRepository):
         self.expense_repo = expense_repo
 
-    def execute(self, expense: Expense) -> Expense | None:
+    def execute(self, expense: Expense, user_id: str) -> Expense | None:
         """Exécute le cas d'utilisation."""
 
         try:
             self.validate_expense(expense)
-            return self.expense_repo.update(expense)
+            self.validate_user_id(user_id)
+            return self.expense_repo.update(expense, user_id)
         except ValueError:
             return None
 
@@ -36,3 +37,9 @@ class UpdateExpense:
 
         if not expense.date:
             raise ValueError("La date de la dépense est requise")
+
+    def validate_user_id(self, user_id: str) -> None:
+        """Valide l'id de l'utilisateur."""
+
+        if not user_id:
+            raise ValueError("L'id de l'utilisateur est requis")

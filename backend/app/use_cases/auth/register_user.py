@@ -19,6 +19,7 @@ class RegisterUser:
 
         self.validate_data(data)
         self.validate_email(data["email"])
+
         # Vérifier si l'utilisateur existe déjà
         if self.user_repo.get_by_email(data["email"]):
             raise ValueError("L'utilisateur existe déjà")

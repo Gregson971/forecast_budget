@@ -16,6 +16,10 @@ class MockSessionRepository:
         """Récupère toutes les sessions d'un utilisateur."""
         return [session for session in self.sessions if session.user_id == user_id]
 
+    def get_by_id(self, session_id: str) -> Session:
+        """Récupère une session par son id."""
+        return next((session for session in self.sessions if session.id == session_id), None)
+
 
 @pytest.fixture
 def session_repository():

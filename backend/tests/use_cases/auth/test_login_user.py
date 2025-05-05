@@ -26,6 +26,9 @@ class InMemoryUserRepository(UserRepository):
     def get_by_id(self, user_id: str) -> User:
         return self.users.get(user_id)
 
+    def get_all(self) -> list[User]:
+        return list(self.users.values())
+
 
 class InMemoryRefreshTokenRepository(RefreshTokenRepository):
     """Implémentation en mémoire d'un repository de refresh tokens."""

@@ -20,7 +20,7 @@ class SQLSessionRepository(SessionRepository):
         self.db.commit()
         self.db.refresh(session_db)
 
-        return Session(**session_db.__dict__)
+        return session_db
 
     def get_by_refresh_token(self, token: str) -> Session:
         """Récupère une session par son token de rafraîchissement."""
@@ -30,7 +30,7 @@ class SQLSessionRepository(SessionRepository):
         if not session_db:
             raise ValueError("Session non trouvée")
 
-        return Session(**session_db.__dict__)
+        return session_db
 
     def revoke(self, token: str):
         """Marque une session comme revoquée."""
@@ -53,7 +53,7 @@ class SQLSessionRepository(SessionRepository):
         if not sessions:
             raise ValueError("Aucune session trouvée")
 
-        return [Session(**session.__dict__) for session in sessions]
+        return sessions
 
     def get_by_id(self, session_id: str) -> Session:
         """Récupère une session par son id."""
@@ -63,7 +63,7 @@ class SQLSessionRepository(SessionRepository):
         if not session_db:
             raise ValueError("Session non trouvée")
 
-        return Session(**session_db.__dict__)
+        return session_db
 
     def revoke_by_id(self, session_id: str, user_id: str) -> None:
         """Marque une session comme revoquée par son id."""

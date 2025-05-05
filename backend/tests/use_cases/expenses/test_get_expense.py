@@ -12,10 +12,14 @@ class InMemoryExpenseRepository:
     def __init__(self):
         self.expenses = {}
 
-    def get_by_id(self, expense_id: str) -> Expense | None:
+    def get_by_id(self, expense_id: str, user_id: str) -> Expense | None:
         """Récupère une dépense par son id."""
 
-        return self.expenses.get(expense_id)
+        expense = self.expenses.get(expense_id)
+
+        if expense and expense.user_id == user_id:
+            return expense
+        return None
 
 
 def test_get_expense_success():
@@ -36,7 +40,7 @@ def test_get_expense_success():
     repo.expenses[expense_id] = expense
 
     use_case = GetExpense(repo)
-    result = use_case.execute(expense_id)
+    result = use_case.execute(expense_id, user_id)
 
     assert result == expense
 
@@ -47,6 +51,6 @@ def test_get_expense_failure_with_invalid_expense_id():
     repo = InMemoryExpenseRepository()
     use_case = GetExpense(repo)
 
-    result = use_case.execute(uuid4())
+    result = use_case.execute(uuid4(), uuid4())
 
     assert result is None

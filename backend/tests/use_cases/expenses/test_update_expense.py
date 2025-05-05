@@ -12,11 +12,14 @@ class InMemoryExpenseRepository:
     def __init__(self):
         self.expenses = {}
 
-    def update(self, expense: Expense) -> Expense:
+    def update(self, expense: Expense, user_id: str) -> Expense:
         """Mise à jour d'une dépense."""
 
         if expense.id not in self.expenses:
             raise ValueError("La dépense n'existe pas")
+
+        if expense.user_id != user_id:
+            raise ValueError("L'utilisateur n'est pas autorisé à mettre à jour cette dépense")
 
         self.expenses[expense.id] = expense
         return expense
@@ -50,7 +53,7 @@ def test_update_expense_success():
     )
 
     use_case = UpdateExpense(repo)
-    result = use_case.execute(updated_expense)
+    result = use_case.execute(updated_expense, user_id)
 
     assert result is not None
     assert result.name == "Transport (métro)"
@@ -63,9 +66,11 @@ def test_update_expense_failure_with_invalid_expense_id():
     repo = InMemoryExpenseRepository()
     use_case = UpdateExpense(repo)
 
+    user_id = uuid4()
+    expense_id = uuid4()
     updated_expense = Expense(
-        id=uuid4(),
-        user_id=uuid4(),
+        id=expense_id,
+        user_id=user_id,
         name="Transport",
         amount=50.0,
         date=datetime.now(UTC),
@@ -73,6 +78,6 @@ def test_update_expense_failure_with_invalid_expense_id():
         updated_at=datetime.now(UTC),
     )
 
-    result = use_case.execute(updated_expense)
+    result = use_case.execute(updated_expense, user_id)
 
     assert result is None
