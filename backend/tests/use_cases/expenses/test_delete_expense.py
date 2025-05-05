@@ -44,9 +44,8 @@ def test_delete_expense_success():
     repo.expenses[expense_id] = expense
 
     use_case = DeleteExpense(repo)
-    result = use_case.execute(expense_id)
+    use_case.execute(expense_id)
 
-    assert result is None
     assert expense_id not in repo.expenses
 
 
@@ -56,6 +55,6 @@ def test_delete_expense_failure_with_invalid_expense_id():
     repo = InMemoryExpenseRepository()
     use_case = DeleteExpense(repo)
 
-    result = use_case.execute(uuid4())
+    use_case.execute(uuid4())
 
-    assert result is None
+    assert not repo.expenses
