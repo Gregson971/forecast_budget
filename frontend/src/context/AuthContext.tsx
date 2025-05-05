@@ -3,8 +3,9 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
-import { loginService, registerService, refreshTokenService, getSessionsService, revokeSessionService } from '@/services/auth';
-import { getExpensesService } from '@/services/expense';
+import { loginService, registerService, refreshTokenService, getSessionsService, revokeSessionService, getUserService } from '@/services/auth';
+import { getExpensesService, createExpenseService } from '@/services/expense';
+
 type User = { email: string };
 type AuthContextType = {
   user: User | null;
@@ -13,7 +14,9 @@ type AuthContextType = {
   logout: () => void;
   getSessions: () => Promise<any[]>;
   revokeSession: (sessionId: string) => Promise<void>;
+  getUser: () => Promise<User | null>;
   getExpenses: () => Promise<any[]>;
+  createExpense: (expense: any) => Promise<void>;
 };
 type JWTPayload = {
   exp: number; // timestamp en secondes
@@ -86,6 +89,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const getUser = async (): Promise<User | null> => {
+    const access_token = localStorage.getItem('access_token');
+    if (!access_token) return null;
+
+    const user = await getUserService(access_token);
+    setUser(user);
+    return user;
+  };
+
   const getSessions = async () => {
     try {
       const access_token = localStorage.getItem('access_token');
@@ -124,6 +136,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const createExpense = async (expense: any) => {
+    try {
+      const access_token = localStorage.getItem('access_token');
+      if (!access_token) return;
+
+      await createExpenseService(expense);
+    } catch (error: any) {
+      toast.error('Erreur lors de la création de la dépense', error.response.data.detail);
+    }
+  };
+
   useEffect(() => {
     const interval = setInterval(() => {
       const token = localStorage.getItem('access_token');
@@ -143,7 +166,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession, getExpenses }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession, getUser, getExpenses, createExpense }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

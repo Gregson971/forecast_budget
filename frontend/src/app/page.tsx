@@ -36,6 +36,16 @@ export default function Home() {
           </div>
         </div>
 
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16'>
+          <div className='bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg'>
+            <h2 className='text-xl font-semibold mb-4 text-gray-900 dark:text-white'>Dépenses</h2>
+            <p className='text-gray-600 dark:text-gray-300 mb-4'>Suivez vos dépenses et revenus en temps réel</p>
+            <Link href='/expenses' className='inline-block bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors'>
+              Voir les dépenses
+            </Link>
+          </div>
+        </div>
+
         <div className='text-center'>
           <h2 className='text-2xl font-semibold mb-8 text-gray-900 dark:text-white'>Commencez dès maintenant</h2>
           <Link

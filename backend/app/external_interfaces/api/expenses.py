@@ -1,7 +1,11 @@
 """Module contenant les routes pour les dépenses."""
 
+from datetime import date, datetime, UTC
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
+import uuid
 
 from app.domain.entities.expense import Expense
 from app.domain.entities.user import User
@@ -18,6 +22,18 @@ from app.use_cases.expenses.delete_expense import DeleteExpense
 expense_router = APIRouter(prefix="/expenses", tags=["expenses"])
 
 
+class ExpenseCreateRequest(BaseModel):
+    """Modèle de requête pour la création d'une dépense."""
+
+    name: str
+    amount: float
+    date: date
+    category: str
+    description: Optional[str] = None
+    is_recurring: Optional[bool] = False
+    frequency: Optional[str] = None
+
+
 # Dépendance d'injection de session DB
 def get_db():
     """Dépendance d'injection de session DB."""
@@ -30,15 +46,23 @@ def get_db():
 
 @expense_router.post("", response_model=Expense)
 def create_expense(
-    expense: Expense, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+    expense: ExpenseCreateRequest,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     """Crée une dépense."""
 
-    try:
-        use_case = CreateExpense(SQLExpenseRepository(db))
-        expense.user_id = current_user.id
+    use_case = CreateExpense(SQLExpenseRepository(db))
 
-        return use_case.execute(expense)
+    try:
+        expense_data = expense.model_dump()
+        expense_data["user_id"] = current_user.id
+        expense_data["id"] = str(uuid.uuid4())
+        expense_data["created_at"] = datetime.now(UTC)
+        expense_data["updated_at"] = datetime.now(UTC)
+        expense_obj = Expense(**expense_data)
+        new_expense = use_case.execute(expense_obj)
+        return new_expense
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 

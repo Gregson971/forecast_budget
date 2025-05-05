@@ -36,3 +36,12 @@ export const revokeSessionService = async (sessionId: string, access_token: stri
   });
   return res.data;
 }; 
+
+export const getUserService = async (access_token: string) => {
+  const res = await api.get('/auth/me', {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return res.data;
+};

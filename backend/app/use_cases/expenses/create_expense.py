@@ -1,5 +1,7 @@
 """Module contenant le cas d'utilisation pour créer une dépense."""
 
+import uuid
+from datetime import datetime, UTC
 from app.domain.entities.expense import Expense
 from app.domain.interfaces.expense_repository_interface import ExpenseRepository
 
@@ -15,7 +17,21 @@ class CreateExpense:
 
         try:
             self.validate_expense(expense)
-            return self.expense_repo.create(expense)
+            new_expense = Expense(
+                id=str(uuid.uuid4()),
+                user_id=expense.user_id,
+                name=expense.name,
+                amount=expense.amount,
+                date=expense.date,
+                category=expense.category,
+                description=expense.description,
+                is_recurring=expense.is_recurring,
+                frequency=expense.frequency,
+                created_at=datetime.now(UTC),
+                updated_at=datetime.now(UTC),
+            )
+            self.expense_repo.create(new_expense)
+            return new_expense
         except ValueError:
             return None
 
