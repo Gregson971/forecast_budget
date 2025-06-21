@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
 
 export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }) {
   const { createExpense } = useAuth();
@@ -47,58 +49,86 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
   };
 
   return (
-    <form onSubmit={handleSubmit} className='mb-6 p-4 bg-white rounded-xl shadow-sm space-y-4'>
-      <div>
-        <label className='block text-sm font-medium'>Nom</label>
-        <input type='text' name='name' value={form.name} onChange={handleChange} required className='input' />
+    <div className='space-y-6'>
+      <div className='text-center mb-6'>
+        <h2 className='text-2xl font-bold text-white mb-2'>Nouvelle dépense</h2>
+        <p className='text-gray-400'>Ajoutez une nouvelle dépense à votre budget</p>
       </div>
 
-      <div>
-        <label className='block text-sm font-medium'>Montant (€)</label>
-        <input type='number' name='amount' value={form.amount} onChange={handleChange} required className='input' />
-      </div>
+      <form onSubmit={handleSubmit} className='space-y-6'>
+        <Input label='Nom de la dépense' type='text' name='name' value={form.name} onChange={handleChange} placeholder='Ex: Courses alimentaires' required />
 
-      <div>
-        <label className='block text-sm font-medium'>Date</label>
-        <input type='date' name='date' value={form.date} onChange={handleChange} required className='input' />
-      </div>
+        <Input label='Montant (€)' type='number' name='amount' value={form.amount} onChange={handleChange} placeholder='0.00' required />
 
-      <div>
-        <label className='block text-sm font-medium'>Catégorie (optionnelle)</label>
-        <select name='category' value={form.category} onChange={handleChange} className='input'>
-          <option value=''>Aucune</option>
-          <option value='food'>Nourriture</option>
-          <option value='transport'>Transport</option>
-          <option value='entertainment'>Loisirs</option>
-          <option value='shopping'>Shopping</option>
-          <option value='health'>Santé</option>
-          <option value='housing'>Logement</option>
-          <option value='utilities'>Utilités</option>
-          <option value='insurance'>Assurance</option>
-          <option value='subscriptions'>Abonnements</option>
-          <option value='other'>Autre</option>
-        </select>
-      </div>
+        <Input label='Date' type='date' name='date' value={form.date} onChange={handleChange} required />
 
-      <div>
-        <label className='block text-sm font-medium'>Description (optionnelle)</label>
-        <input type='text' name='description' value={form.description} onChange={handleChange} className='input' />
-      </div>
+        <div className='space-y-2'>
+          <label className='text-sm font-medium text-gray-300 block'>Catégorie</label>
+          <select
+            name='category'
+            value={form.category}
+            onChange={handleChange}
+            className='w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gray-500 transition-all duration-300 backdrop-blur-sm'
+          >
+            <option value=''>Sélectionner une catégorie</option>
+            <option value='food'>🍽️ Nourriture</option>
+            <option value='transport'>🚗 Transport</option>
+            <option value='entertainment'>🎮 Loisirs</option>
+            <option value='shopping'>🛍️ Shopping</option>
+            <option value='health'>🏥 Santé</option>
+            <option value='housing'>🏠 Logement</option>
+            <option value='utilities'>⚡ Utilités</option>
+            <option value='insurance'>🛡️ Assurance</option>
+            <option value='subscriptions'>📱 Abonnements</option>
+            <option value='other'>📦 Autre</option>
+          </select>
+        </div>
 
-      <div>
-        <label className='block text-sm font-medium'>Fréquence (optionnelle)</label>
-        <select name='frequency' value={form.frequency} onChange={handleChange} className='input'>
-          <option value=''>Aucune</option>
-          <option value='monthly'>Mensuelle</option>
-          <option value='yearly'>Annuelle</option>
-        </select>
-      </div>
+        <Input
+          label='Description (optionnelle)'
+          type='text'
+          name='description'
+          value={form.description}
+          onChange={handleChange}
+          placeholder='Description détaillée de la dépense'
+        />
 
-      {error && <p className='text-red-600 text-sm'>{error}</p>}
+        <div className='space-y-2'>
+          <label className='text-sm font-medium text-gray-300 block'>Fréquence (optionnelle)</label>
+          <select
+            name='frequency'
+            value={form.frequency}
+            onChange={handleChange}
+            className='w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gray-500 transition-all duration-300 backdrop-blur-sm'
+          >
+            <option value=''>Aucune fréquence</option>
+            <option value='monthly'>📅 Mensuelle</option>
+            <option value='yearly'>📆 Annuelle</option>
+          </select>
+        </div>
 
-      <button type='submit' className='btn-primary' disabled={loading}>
-        {loading ? 'Ajout en cours...' : 'Ajouter'}
-      </button>
-    </form>
+        {error && (
+          <div className='p-4 bg-red-500/10 border border-red-500/20 rounded-xl'>
+            <p className='text-red-400 text-sm'>{error}</p>
+          </div>
+        )}
+
+        <Button type='submit' className='w-full' disabled={loading}>
+          {loading ? (
+            <div className='flex items-center justify-center'>
+              <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
+              Ajout en cours...
+            </div>
+          ) : (
+            <div className='flex items-center justify-center'>
+              <svg className='w-5 h-5 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
+              </svg>
+              Ajouter la dépense
+            </div>
+          )}
+        </Button>
+      </form>
+    </div>
   );
 }

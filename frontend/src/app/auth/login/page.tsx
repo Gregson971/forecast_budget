@@ -2,25 +2,78 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(username, password);
+    setIsLoading(true);
+    try {
+      await login(username, password);
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-primary text-white'>
-      <form onSubmit={handleSubmit} className='bg-white/10 p-8 rounded-xl shadow-xl space-y-4 w-96'>
-        <h1 className='text-2xl font-bold text-center'>Se connecter</h1>
-        <input className='w-full p-2 rounded bg-white text-black' placeholder='Email' value={username} onChange={(e) => setUsername(e.target.value)} />
-        <input className='w-full p-2 rounded bg-white text-black' placeholder='Mot de passe' type='password' value={password} onChange={(e) => setPassword(e.target.value)} />
-        <button className='w-full bg-accent text-primary font-bold py-2 rounded'>Connexion</button>
-      </form>
+    <div className='min-h-screen relative overflow-hidden flex items-center justify-center'>
+      {/* Arrière-plan avec effet de particules */}
+      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900'></div>
+      <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)]'></div>
+
+      <div className='relative z-10 w-full max-w-md'>
+        <div className='glass-card p-8 rounded-2xl shadow-2xl fade-in'>
+          <div className='text-center mb-8'>
+            <div className='w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+              <svg className='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+                />
+              </svg>
+            </div>
+            <h1 className='text-3xl font-bold text-white mb-2'>Connexion</h1>
+            <p className='text-gray-400'>Accédez à votre compte Forecast Budget</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className='space-y-6'>
+            <Input label='Email' type='email' placeholder='votre@email.com' value={username} onChange={(e) => setUsername(e.target.value)} required />
+
+            <Input label='Mot de passe' type='password' placeholder='Votre mot de passe' value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+            <Button type='submit' className='w-full' disabled={isLoading}>
+              {isLoading ? (
+                <div className='flex items-center justify-center'>
+                  <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
+                  Connexion en cours...
+                </div>
+              ) : (
+                'Se connecter'
+              )}
+            </Button>
+          </form>
+
+          <div className='mt-8 text-center'>
+            <p className='text-gray-400'>
+              Pas encore de compte ?{' '}
+              <Link href='/auth/register' className='text-indigo-400 hover:text-indigo-300 font-medium transition-colors'>
+                Créer un compte
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
