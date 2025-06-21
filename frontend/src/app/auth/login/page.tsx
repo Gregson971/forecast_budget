@@ -1,26 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
+import { useAuthService } from '@/hooks/useAuth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, loginState } = useAuthService();
+  const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     try {
-      await login(username, password);
+      const { access_token, refresh_token } = await login({ email: username, password });
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+
+      toast.success('Connexion réussie', {
+        description: "Vous allez être redirigé vers la page d'accueil.",
+        duration: 5000,
+      });
+
+      router.push('/');
     } catch (error) {
       console.error('Erreur de connexion:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -52,8 +60,14 @@ export default function LoginPage() {
 
             <Input label='Mot de passe' type='password' placeholder='Votre mot de passe' value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-            <Button type='submit' className='w-full' disabled={isLoading}>
-              {isLoading ? (
+            {loginState.error && (
+              <div className='p-3 bg-red-500/20 border border-red-500/30 rounded-lg'>
+                <p className='text-sm text-red-400'>{loginState.error}</p>
+              </div>
+            )}
+
+            <Button type='submit' className='w-full' disabled={loginState.loading}>
+              {loginState.loading ? (
                 <div className='flex items-center justify-center'>
                   <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
                   Connexion en cours...

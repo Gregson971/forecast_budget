@@ -1,8 +1,9 @@
 """Module contenant les modèles liés aux dépenses."""
 
 from datetime import datetime, UTC
-from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Boolean
+from sqlalchemy import Column, String, DateTime, Float, ForeignKey, Boolean, Enum as SQLEnum
 from app.infrastructure.db.database import Base
+from app.domain.entities.expense import ExpenseCategory, ExpenseFrequency
 
 
 class ExpenseDB(Base):
@@ -15,10 +16,10 @@ class ExpenseDB(Base):
     name = Column(String, nullable=False)
     amount = Column(Float, nullable=False)
     date = Column(DateTime, nullable=False)
-    category = Column(String)
+    category = Column(SQLEnum(ExpenseCategory), nullable=False)
     description = Column(String)
     is_recurring = Column(Boolean, default=False)
-    frequency = Column(String)
+    frequency = Column(SQLEnum(ExpenseFrequency))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
     updated_at = Column(DateTime, default=lambda: datetime.now(UTC))
 

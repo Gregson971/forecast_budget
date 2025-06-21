@@ -1,13 +1,20 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '@/context/AuthContext';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
+import { CreateExpenseRequest, Category, Frequency } from '@/types/expense';
 
-export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }) {
-  const { createExpense } = useAuth();
-  const [form, setForm] = useState({
+interface ExpenseFormProps {
+  onAdd: (expense: CreateExpenseRequest) => void;
+  categories: Category[];
+  frequencies: Frequency[];
+  loadingData: boolean;
+  dataError: string | null;
+}
+
+export default function ExpenseForm({ onAdd, categories, frequencies, loadingData, dataError }: ExpenseFormProps) {
+  const [form, setForm] = useState<CreateExpenseRequest>({
     name: '',
     amount: 0,
     date: new Date().toISOString().split('T')[0],
@@ -21,7 +28,11 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
   const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value, type } = e.target;
+    setForm({
+      ...form,
+      [name]: type === 'number' ? parseFloat(value) || 0 : value,
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -30,7 +41,6 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
     setLoading(true);
 
     try {
-      await createExpense(form);
       onAdd(form);
       setForm({
         name: '',
@@ -48,12 +58,33 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
     }
   };
 
+  if (loadingData) {
+    return (
+      <div className='space-y-6'>
+        <div className='text-center mb-6'>
+          <h2 className='text-2xl font-bold text-white mb-2'>Nouvelle dépense</h2>
+          <p className='text-gray-400'>Ajoutez une nouvelle dépense à votre budget</p>
+        </div>
+        <div className='flex items-center justify-center py-8'>
+          <div className='w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin'></div>
+          <span className='ml-3 text-gray-400'>Chargement des données...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='space-y-6'>
       <div className='text-center mb-6'>
         <h2 className='text-2xl font-bold text-white mb-2'>Nouvelle dépense</h2>
         <p className='text-gray-400'>Ajoutez une nouvelle dépense à votre budget</p>
       </div>
+
+      {dataError && (
+        <div className='p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl'>
+          <p className='text-yellow-400 text-sm'>{dataError}</p>
+        </div>
+      )}
 
       <form onSubmit={handleSubmit} className='space-y-6'>
         <Input label='Nom de la dépense' type='text' name='name' value={form.name} onChange={handleChange} placeholder='Ex: Courses alimentaires' required />
@@ -69,18 +100,14 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
             value={form.category}
             onChange={handleChange}
             className='w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gray-500 transition-all duration-300 backdrop-blur-sm'
+            required
           >
             <option value=''>Sélectionner une catégorie</option>
-            <option value='food'>🍽️ Nourriture</option>
-            <option value='transport'>🚗 Transport</option>
-            <option value='entertainment'>🎮 Loisirs</option>
-            <option value='shopping'>🛍️ Shopping</option>
-            <option value='health'>🏥 Santé</option>
-            <option value='housing'>🏠 Logement</option>
-            <option value='utilities'>⚡ Utilités</option>
-            <option value='insurance'>🛡️ Assurance</option>
-            <option value='subscriptions'>📱 Abonnements</option>
-            <option value='other'>📦 Autre</option>
+            {categories.map((category) => (
+              <option key={category.value} value={category.value}>
+                {category.label}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -88,7 +115,7 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
           label='Description (optionnelle)'
           type='text'
           name='description'
-          value={form.description}
+          value={form.description || ''}
           onChange={handleChange}
           placeholder='Description détaillée de la dépense'
         />
@@ -97,13 +124,16 @@ export default function ExpenseForm({ onAdd }: { onAdd: (expense: any) => void }
           <label className='text-sm font-medium text-gray-300 block'>Fréquence (optionnelle)</label>
           <select
             name='frequency'
-            value={form.frequency}
+            value={form.frequency || ''}
             onChange={handleChange}
             className='w-full px-4 py-3 bg-gray-800/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent hover:border-gray-500 transition-all duration-300 backdrop-blur-sm'
           >
             <option value=''>Aucune fréquence</option>
-            <option value='monthly'>📅 Mensuelle</option>
-            <option value='yearly'>📆 Annuelle</option>
+            {frequencies.map((frequency) => (
+              <option key={frequency.value} value={frequency.value}>
+                {frequency.label}
+              </option>
+            ))}
           </select>
         </div>
 

@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime, UTC
-from app.domain.entities.expense import Expense
+from app.domain.entities.expense import Expense, ExpenseCategory, ExpenseFrequency
 from app.domain.interfaces.expense_repository_interface import ExpenseRepository
 
 
@@ -52,3 +52,12 @@ class CreateExpense:
 
         if not expense.category:
             raise ValueError("La catégorie est requise")
+
+        if not isinstance(expense.category, ExpenseCategory):
+            raise ValueError("La catégorie doit être une valeur valide")
+
+        if expense.frequency and not isinstance(expense.frequency, ExpenseFrequency):
+            raise ValueError("La fréquence doit être une valeur valide")
+
+        if expense.is_recurring and not expense.frequency:
+            raise ValueError("La fréquence est requise pour une dépense récurrente")

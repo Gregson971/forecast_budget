@@ -1,26 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
 type User = { email: string; first_name: string; last_name: string };
 
 export default function Navbar() {
-  const { getUser, logout } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const userData = await getUser();
-        setUser(userData as User);
-      } catch (error) {
-        console.error("Erreur lors de la récupération de l'utilisateur:", error);
-      }
-    };
-    fetchUser();
-  }, []);
+  const { user, logout } = useAuth();
 
   return (
     <nav className='glass sticky top-0 z-50 backdrop-blur-xl border-b border-white/10'>
@@ -48,8 +34,8 @@ export default function Navbar() {
                 <div className='flex items-center space-x-3'>
                   <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center'>
                     <span className='text-sm font-medium text-white'>
-                      {user.first_name.charAt(0)}
-                      {user.last_name.charAt(0)}
+                      {user.first_name?.charAt(0)}
+                      {user.last_name?.charAt(0)}
                     </span>
                   </div>
                   <span className='text-gray-300 font-medium'>

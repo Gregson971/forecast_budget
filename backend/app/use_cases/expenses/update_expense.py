@@ -1,6 +1,6 @@
 """Module contenant le cas d'utilisation de mise à jour d'une dépense."""
 
-from app.domain.entities.expense import Expense
+from app.domain.entities.expense import Expense, ExpenseCategory, ExpenseFrequency
 from app.domain.interfaces.expense_repository_interface import ExpenseRepository
 
 
@@ -37,6 +37,15 @@ class UpdateExpense:
 
         if not expense.date:
             raise ValueError("La date de la dépense est requise")
+
+        if expense.category and not isinstance(expense.category, ExpenseCategory):
+            raise ValueError("La catégorie doit être une valeur valide")
+
+        if expense.frequency and not isinstance(expense.frequency, ExpenseFrequency):
+            raise ValueError("La fréquence doit être une valeur valide")
+
+        if expense.is_recurring and not expense.frequency:
+            raise ValueError("La fréquence est requise pour une dépense récurrente")
 
     def validate_user_id(self, user_id: str) -> None:
         """Valide l'id de l'utilisateur."""

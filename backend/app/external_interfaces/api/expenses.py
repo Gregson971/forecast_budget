@@ -1,13 +1,13 @@
 """Module contenant les routes pour les dépenses."""
 
+import uuid
 from datetime import date, datetime, UTC
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-import uuid
 
-from app.domain.entities.expense import Expense
+from app.domain.entities.expense import Expense, ExpenseCategory, ExpenseFrequency
 from app.domain.entities.user import User
 from app.infrastructure.db.database import SessionLocal
 from app.infrastructure.repositories.expense_repository import SQLExpenseRepository
@@ -28,10 +28,24 @@ class ExpenseCreateRequest(BaseModel):
     name: str
     amount: float
     date: date
-    category: str
+    category: ExpenseCategory
     description: Optional[str] = None
     is_recurring: Optional[bool] = False
-    frequency: Optional[str] = None
+    frequency: Optional[ExpenseFrequency] = None
+
+
+class ExpenseCategoryResponse(BaseModel):
+    """Modèle de réponse pour les catégories de dépenses."""
+
+    value: str
+    label: str
+
+
+class ExpenseFrequencyResponse(BaseModel):
+    """Modèle de réponse pour les fréquences de dépenses."""
+
+    value: str
+    label: str
 
 
 # Dépendance d'injection de session DB
@@ -42,6 +56,35 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@expense_router.get("/categories", response_model=list[ExpenseCategoryResponse])
+def get_expense_categories():
+    """Récupère la liste des catégories de dépenses disponibles."""
+
+    categories = []
+    for category in ExpenseCategory:
+        # Créer un label plus lisible pour l'affichage
+        label = category.value.replace("_", " ").title()
+        categories.append(ExpenseCategoryResponse(value=category.value, label=label))
+
+    return categories
+
+
+@expense_router.get("/frequencies", response_model=list[ExpenseFrequencyResponse])
+def get_expense_frequencies():
+    """Récupère la liste des fréquences de dépenses disponibles."""
+
+    frequencies = []
+    for frequency in ExpenseFrequency:
+        # Créer un label plus lisible pour l'affichage
+        if frequency.value == "one-time":
+            label = "Une fois"
+        else:
+            label = frequency.value.replace("-", " ").title()
+        frequencies.append(ExpenseFrequencyResponse(value=frequency.value, label=label))
+
+    return frequencies
 
 
 @expense_router.post("", response_model=Expense)

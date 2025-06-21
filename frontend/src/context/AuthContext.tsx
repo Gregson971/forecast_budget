@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { loginService, registerService, refreshTokenService, getSessionsService, revokeSessionService, getUserService } from '@/services/auth';
 import { getExpensesService, createExpenseService } from '@/services/expense';
 
-type User = { email: string };
+type User = { email: string; first_name: string; last_name: string };
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
@@ -29,24 +29,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const login = async (email: string, password: string) => {
-    const { access_token, refresh_token } = await loginService(email, password);
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('refresh_token', refresh_token);
-    setUser({ email });
-    router.push('/');
-    toast.success('Connexion réussie', {
-      description: "Vous allez être redirigé vers la page d'accueil.",
-      duration: 5000,
-    });
+    try {
+      const { access_token, refresh_token } = await loginService(email, password);
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+
+      // Récupérer les informations complètes de l'utilisateur après la connexion
+      const userData = await getUserService(access_token);
+      setUser(userData);
+
+      router.push('/');
+      toast.success('Connexion réussie', {
+        description: "Vous allez être redirigé vers la page d'accueil.",
+        duration: 5000,
+      });
+    } catch (error) {
+      toast.error('Erreur lors de la connexion');
+      throw error;
+    }
   };
 
   const register = async (email: string, password: string, first_name: string, last_name: string) => {
-    await registerService(email, password, first_name, last_name);
-    await login(email, password);
-    toast.success('Inscription réussie', {
-      description: "Vous allez être redirigé vers la page d'accueil.",
-      duration: 5000,
-    });
+    try {
+      await registerService(email, password, first_name, last_name);
+      const { access_token, refresh_token } = await loginService(email, password);
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+
+      // Récupérer les informations complètes de l'utilisateur après l'inscription
+      const userData = await getUserService(access_token);
+      setUser(userData);
+
+      router.push('/');
+      toast.success('Inscription réussie', {
+        description: "Vous allez être redirigé vers la page d'accueil.",
+        duration: 5000,
+      });
+    } catch (error) {
+      toast.error("Erreur lors de l'inscription");
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -93,9 +115,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const access_token = localStorage.getItem('access_token');
     if (!access_token) return null;
 
-    const user = await getUserService(access_token);
-    setUser(user);
-    return user;
+    try {
+      const user = await getUserService(access_token);
+      setUser(user);
+      return user;
+    } catch (error) {
+      toast.error('Erreur lors de la récupération des données utilisateur');
+      return null;
+    }
   };
 
   const getSessions = async () => {
@@ -125,9 +152,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const getExpenses = async () => {
     try {
-      const access_token = localStorage.getItem('access_token');
-      if (!access_token) return [];
-
       const expenses = await getExpensesService();
       return expenses;
     } catch (error) {
@@ -138,12 +162,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const createExpense = async (expense: any) => {
     try {
-      const access_token = localStorage.getItem('access_token');
-      if (!access_token) return;
-
       await createExpenseService(expense);
+      toast.success('Dépense créée avec succès');
     } catch (error: any) {
-      toast.error('Erreur lors de la création de la dépense', error.response.data.detail);
+      toast.error('Erreur lors de la création de la dépense', error.response?.data?.detail);
     }
   };
 
@@ -165,6 +187,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     return () => clearInterval(interval);
   }, []);
+
+  // Récupérer les informations de l'utilisateur au chargement si un token existe
+  useEffect(() => {
+    const initializeAuth = async () => {
+      const access_token = localStorage.getItem('access_token');
+      if (access_token && !user) {
+        try {
+          const userData = await getUserService(access_token);
+          setUser(userData);
+        } catch (error) {
+          console.error('Erreur lors de la récupération des informations utilisateur:', error);
+          // Si le token est invalide, on déconnecte l'utilisateur
+          forceLogout();
+        }
+      }
+    };
+
+    initializeAuth();
+  }, [user]);
 
   return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession, getUser, getExpenses, createExpense }}>{children}</AuthContext.Provider>;
 };
