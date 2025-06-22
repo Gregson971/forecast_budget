@@ -10,12 +10,22 @@ export default function RegisterPage() {
   const { register } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [first_name, setFirstName] = useState('');
   const [last_name, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validation des mots de passe
+    if (password !== confirmPassword) {
+      setPasswordError('Les mots de passe ne correspondent pas');
+      return;
+    }
+
+    setPasswordError('');
     setIsLoading(true);
     try {
       await register(email, password, first_name, last_name);
@@ -23,6 +33,18 @@ export default function RegisterPage() {
       console.error("Erreur d'inscription:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  // Validation en temps réel
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+
+    if (value && password !== value) {
+      setPasswordError('Les mots de passe ne correspondent pas');
+    } else {
+      setPasswordError('');
     }
   };
 
@@ -55,7 +77,19 @@ export default function RegisterPage() {
 
             <Input label='Mot de passe' type='password' placeholder='Votre mot de passe' value={password} onChange={(e) => setPassword(e.target.value)} required />
 
-            <Button type='submit' className='w-full' disabled={isLoading}>
+            <div className='space-y-2'>
+              <Input
+                label='Confirmer le mot de passe'
+                type='password'
+                placeholder='Confirmez votre mot de passe'
+                value={confirmPassword}
+                onChange={handleConfirmPasswordChange}
+                required
+              />
+              {passwordError && <p className='text-red-400 text-sm mt-1'>{passwordError}</p>}
+            </div>
+
+            <Button type='submit' className='w-full' disabled={isLoading || !!passwordError}>
               {isLoading ? (
                 <div className='flex items-center justify-center'>
                   <div className='w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2'></div>
