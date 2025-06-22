@@ -11,8 +11,11 @@ export default function ExpensesPage() {
     expensesError,
     fetchExpenses,
     createExpense,
+    deleteExpense,
     createExpenseLoading,
     createExpenseError,
+    deleteExpenseLoading,
+    deleteExpenseError,
     categories,
     frequencies,
     expenseDataLoading,
@@ -25,6 +28,15 @@ export default function ExpensesPage() {
       // La liste sera automatiquement rafraîchie grâce au hook
     } catch (error) {
       console.error('Erreur lors de la création de la dépense:', error);
+    }
+  };
+
+  const handleDeleteExpense = async (expenseId: string) => {
+    try {
+      await deleteExpense(expenseId);
+      // La liste sera automatiquement rafraîchie grâce au hook
+    } catch (error) {
+      console.error('Erreur lors de la suppression de la dépense:', error);
     }
   };
 
@@ -94,7 +106,18 @@ export default function ExpensesPage() {
 
           <div className='lg:col-span-2'>
             <div className='glass-card p-6 rounded-2xl'>
-              <ExpenseList expenses={expenses} />
+              <ExpenseList expenses={expenses} onDelete={handleDeleteExpense} />
+              {deleteExpenseLoading && (
+                <div className='mt-4 text-center'>
+                  <div className='w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin mx-auto'></div>
+                  <span className='text-sm text-gray-400 ml-2'>Suppression en cours...</span>
+                </div>
+              )}
+              {deleteExpenseError && (
+                <div className='mt-4 p-3 bg-red-500/20 border border-red-500/30 rounded-lg'>
+                  <p className='text-sm text-red-400'>{deleteExpenseError}</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

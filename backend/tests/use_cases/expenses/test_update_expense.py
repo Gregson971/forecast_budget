@@ -12,6 +12,14 @@ class InMemoryExpenseRepository:
     def __init__(self):
         self.expenses = {}
 
+    def get_by_id(self, expense_id: str, user_id: str) -> Expense | None:
+        """Récupère une dépense par son id."""
+
+        expense = self.expenses.get(expense_id)
+        if expense and expense.user_id == user_id:
+            return expense
+        return None
+
     def update(self, expense: Expense, user_id: str) -> Expense:
         """Mise à jour d'une dépense."""
 

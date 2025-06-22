@@ -149,7 +149,7 @@ def update_expense(
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
 
 
-@expense_router.delete("/{expense_id}", response_model=Expense)
+@expense_router.delete("/{expense_id}")
 def delete_expense(
     expense_id: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
 ):
@@ -157,6 +157,7 @@ def delete_expense(
 
     try:
         use_case = DeleteExpense(SQLExpenseRepository(db))
-        return use_case.execute(expense_id, current_user.id)
+        use_case.execute(expense_id, current_user.id)
+        return {"message": "Dépense supprimée avec succès"}
     except ValueError as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e

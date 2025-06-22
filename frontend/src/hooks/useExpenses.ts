@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getExpensesService, createExpenseService, getExpenseCategoriesService, getExpenseFrequenciesService } from '@/services/expense';
+import { getExpensesService, createExpenseService, getExpenseCategoriesService, getExpenseFrequenciesService, deleteExpenseService } from '@/services/expense';
 import { Expense, Category, Frequency } from '@/types/expense';
 
 // Données de fallback au cas où l'API ne répond pas
@@ -35,6 +35,12 @@ interface CreateExpenseState {
   data: Expense | null;
 }
 
+interface DeleteExpenseState {
+  loading: boolean;
+  error: string | null;
+  data: boolean | null;
+}
+
 interface ExpenseDataState {
   categories: Category[];
   frequencies: Frequency[];
@@ -49,6 +55,11 @@ export const useExpenses = () => {
     data: null 
   });
   const [createExpenseState, setCreateExpenseState] = useState<CreateExpenseState>({ 
+    loading: false, 
+    error: null, 
+    data: null 
+  });
+  const [deleteExpenseState, setDeleteExpenseState] = useState<DeleteExpenseState>({ 
     loading: false, 
     error: null, 
     data: null 
@@ -90,6 +101,23 @@ export const useExpenses = () => {
     }
   }, [fetchExpenses]);
 
+  const deleteExpense = useCallback(async (expenseId: string) => {
+    setDeleteExpenseState({ loading: true, error: null, data: null });
+    try {
+      await deleteExpenseService(expenseId);
+      setDeleteExpenseState({ loading: false, error: null, data: true });
+      
+      // Rafraîchir la liste des dépenses après suppression
+      await fetchExpenses();
+      
+      return true;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || 'Erreur lors de la suppression de la dépense';
+      setDeleteExpenseState({ loading: false, error: errorMessage, data: null });
+      throw error;
+    }
+  }, [fetchExpenses]);
+
   const fetchExpenseData = useCallback(async () => {
     try {
       setExpenseDataState(prev => ({ ...prev, error: null }));
@@ -125,6 +153,7 @@ export const useExpenses = () => {
     // Actions
     fetchExpenses,
     createExpense,
+    deleteExpense,
     fetchExpenseData,
     
     // États des dépenses
@@ -135,6 +164,10 @@ export const useExpenses = () => {
     createExpenseLoading: createExpenseState.loading,
     createExpenseError: createExpenseState.error,
     createExpenseData: createExpenseState.data,
+    
+    deleteExpenseLoading: deleteExpenseState.loading,
+    deleteExpenseError: deleteExpenseState.error,
+    deleteExpenseData: deleteExpenseState.data,
     
     // États des données (catégories et fréquences)
     categories: expenseDataState.categories,

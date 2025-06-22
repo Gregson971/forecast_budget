@@ -12,10 +12,13 @@ class InMemoryExpenseRepository:
     def __init__(self):
         self.expenses = {}
 
-    def get_by_id(self, expense_id: str) -> Expense | None:
+    def get_by_id(self, expense_id: str, user_id: str) -> Expense | None:
         """Récupère une dépense par son id."""
 
-        return self.expenses.get(expense_id)
+        expense = self.expenses.get(expense_id)
+        if expense and expense.user_id == user_id:
+            return expense
+        return None
 
     def delete(self, expense_id: str, user_id: str) -> None:
         """Supprime une dépense."""

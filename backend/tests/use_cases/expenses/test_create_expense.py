@@ -2,7 +2,7 @@
 
 from uuid import uuid4
 from datetime import datetime, UTC
-from app.domain.entities.expense import Expense
+from app.domain.entities.expense import Expense, ExpenseCategory
 from app.use_cases.expenses.create_expense import CreateExpense
 
 
@@ -31,7 +31,7 @@ def test_create_expense_success():
         date=datetime.now(UTC),
         created_at=datetime.now(UTC),
         updated_at=datetime.now(UTC),
-        category="Test",
+        category=ExpenseCategory.FOOD,
         description="Test",
         is_recurring=False,
         frequency=None,
@@ -65,7 +65,7 @@ def test_create_expense_with_invalid_user_id():
         date=datetime.now(UTC),
         created_at=datetime.now(UTC),
         updated_at=datetime.now(UTC),
-        category="Test",
+        category=ExpenseCategory.FOOD,
         description="Test",
         is_recurring=False,
         frequency=None,

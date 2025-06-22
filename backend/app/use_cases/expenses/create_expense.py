@@ -1,6 +1,5 @@
 """Module contenant le cas d'utilisation pour créer une dépense."""
 
-import uuid
 from datetime import datetime, UTC
 from app.domain.entities.expense import Expense, ExpenseCategory, ExpenseFrequency
 from app.domain.interfaces.expense_repository_interface import ExpenseRepository
@@ -18,7 +17,7 @@ class CreateExpense:
         try:
             self.validate_expense(expense)
             new_expense = Expense(
-                id=str(uuid.uuid4()),
+                id=expense.id,
                 user_id=expense.user_id,
                 name=expense.name,
                 amount=expense.amount,

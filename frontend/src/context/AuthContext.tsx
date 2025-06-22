@@ -3,8 +3,7 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
-import { loginService, registerService, refreshTokenService, getSessionsService, revokeSessionService, getUserService } from '@/services/auth';
-import { getExpensesService, createExpenseService } from '@/services/expense';
+import { loginService, registerService, refreshTokenService, getUserService } from '@/services/auth';
 
 type User = { email: string; first_name: string; last_name: string };
 type AuthContextType = {
@@ -12,12 +11,10 @@ type AuthContextType = {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, first_name: string, last_name: string) => Promise<void>;
   logout: () => void;
-  getSessions: () => Promise<any[]>;
-  revokeSession: (sessionId: string) => Promise<void>;
   getUser: () => Promise<User | null>;
-  getExpenses: () => Promise<any[]>;
-  createExpense: (expense: any) => Promise<void>;
+  isAuthenticated: boolean;
 };
+
 type JWTPayload = {
   exp: number; // timestamp en secondes
 };
@@ -43,8 +40,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Vous allez être redirigé vers la page d'accueil.",
         duration: 5000,
       });
-    } catch (error) {
-      toast.error('Erreur lors de la connexion');
+    } catch (error: any) {
+      console.error('Erreur de connexion:', error);
+
+      let errorMessage = 'Erreur lors de la connexion';
+
+      if (error.response?.status === 422) {
+        errorMessage = error.response?.data?.detail || 'Identifiants invalides';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Email ou mot de passe incorrect';
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Service non disponible';
+      } else if (!error.response) {
+        errorMessage = 'Impossible de se connecter au serveur';
+      }
+
+      toast.error(errorMessage);
       throw error;
     }
   };
@@ -125,50 +136,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const getSessions = async () => {
-    try {
-      const access_token = localStorage.getItem('access_token');
-      if (!access_token) return [];
-
-      const sessions = await getSessionsService(access_token);
-      return sessions;
-    } catch (error) {
-      toast.error('Erreur lors de la récupération des sessions');
-      return [];
-    }
-  };
-
-  const revokeSession = async (sessionId: string) => {
-    try {
-      const access_token = localStorage.getItem('access_token');
-      if (!access_token) return;
-
-      await revokeSessionService(sessionId, access_token);
-      toast.success('Session révoquée avec succès');
-    } catch (error) {
-      toast.error('Erreur lors de la révocation de la session');
-    }
-  };
-
-  const getExpenses = async () => {
-    try {
-      const expenses = await getExpensesService();
-      return expenses;
-    } catch (error) {
-      toast.error('Erreur lors de la récupération des dépenses');
-      return [];
-    }
-  };
-
-  const createExpense = async (expense: any) => {
-    try {
-      await createExpenseService(expense);
-      toast.success('Dépense créée avec succès');
-    } catch (error: any) {
-      toast.error('Erreur lors de la création de la dépense', error.response?.data?.detail);
-    }
-  };
-
+  // Gestion automatique du rafraîchissement des tokens
   useEffect(() => {
     const interval = setInterval(() => {
       const token = localStorage.getItem('access_token');
@@ -188,7 +156,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return () => clearInterval(interval);
   }, []);
 
-  // Récupérer les informations de l'utilisateur au chargement si un token existe
+  // Initialisation de l'authentification au chargement
   useEffect(() => {
     const initializeAuth = async () => {
       const access_token = localStorage.getItem('access_token');
@@ -205,9 +173,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     initializeAuth();
-  }, [user]);
+  }, []);
 
-  return <AuthContext.Provider value={{ user, login, register, logout, getSessions, revokeSession, getUser, getExpenses, createExpense }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        getUser,
+        isAuthenticated: !!user,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = () => useContext(AuthContext);

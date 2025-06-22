@@ -1,6 +1,7 @@
 """Module principal de l'application."""
 
 import os
+import json
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.infrastructure.db.database import Base, engine
@@ -19,7 +20,11 @@ app = FastAPI(
 )
 
 # Configuration CORS
-origins_allowed = os.getenv("ORIGINS_ALLOWED")
+origins_allowed_str = os.getenv("ORIGINS_ALLOWED", '["http://localhost:3000"]')
+try:
+    origins_allowed = json.loads(origins_allowed_str)
+except json.JSONDecodeError:
+    origins_allowed = ["http://localhost:3000"]
 
 app.add_middleware(
     CORSMiddleware,
