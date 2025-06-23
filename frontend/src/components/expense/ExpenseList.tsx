@@ -1,6 +1,6 @@
 import ExpenseItem from './ExpenseItem';
 
-export default function ExpenseList({ expenses, onDelete }: { expenses: any[]; onDelete?: (id: string) => void }) {
+export default function ExpenseList({ expenses, onDelete, onEdit }: { expenses: any[]; onDelete?: (id: string) => void; onEdit?: (expense: any) => void }) {
   if (expenses.length === 0) {
     return (
       <div className='text-center py-12'>
@@ -32,7 +32,7 @@ export default function ExpenseList({ expenses, onDelete }: { expenses: any[]; o
 
       <div className='space-y-3'>
         {expenses.map((exp) => (
-          <ExpenseItem key={exp.id} expense={exp} onDelete={onDelete} />
+          <ExpenseItem key={exp.id} expense={exp} onDelete={onDelete} onEdit={onEdit} />
         ))}
       </div>
     </div>

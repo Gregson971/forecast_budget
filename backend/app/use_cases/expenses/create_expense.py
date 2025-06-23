@@ -15,6 +15,12 @@ class CreateExpense:
         """Exécute le cas d'utilisation."""
 
         try:
+            # Forcer la cohérence de is_recurring
+            if expense.frequency and expense.frequency != ExpenseFrequency.ONE_TIME:
+                expense.is_recurring = True
+            else:
+                expense.is_recurring = False
+
             self.validate_expense(expense)
             new_expense = Expense(
                 id=expense.id,

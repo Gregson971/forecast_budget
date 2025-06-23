@@ -1,33 +1,14 @@
-export interface Category {
-  value: string;
-  label: string;
-}
+import type { BaseFinancialItem, BaseFinancialRequest } from './financial';
 
-export interface Frequency {
-  value: string;
-  label: string;
-}
+// Ré-export des types depuis le fichier générique
+export type { 
+  Category, 
+  Frequency 
+} from './financial';
 
-export interface Expense {
-  id: string;
-  user_id: string;
-  name: string;
-  amount: number;
-  date: string;
-  category: string;
-  description?: string;
-  is_recurring: boolean;
-  frequency?: string;
-  created_at: string;
-  updated_at: string;
-}
+// Types spécifiques pour les dépenses
+export interface Expense extends BaseFinancialItem {}
 
-export interface CreateExpenseRequest {
-  name: string;
-  amount: number;
-  date: string;
-  category: string;
-  description?: string;
-  is_recurring?: boolean;
-  frequency?: string;
-} 
+export interface CreateExpenseRequest extends BaseFinancialRequest {}
+
+export interface UpdateExpenseRequest extends BaseFinancialRequest {} 

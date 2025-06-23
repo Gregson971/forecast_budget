@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getExpensesService, createExpenseService, getExpenseCategoriesService, getExpenseFrequenciesService, deleteExpenseService } from '@/services/expense';
-import { Expense, Category, Frequency } from '@/types/expense';
+import { getExpensesService, createExpenseService, getExpenseCategoriesService, getExpenseFrequenciesService, deleteExpenseService, updateExpenseService } from '@/services/expense';
+import { Expense, Category, Frequency, UpdateExpenseRequest } from '@/types/expense';
 
 // Données de fallback au cas où l'API ne répond pas
 const fallbackCategories: Category[] = [
@@ -41,6 +41,12 @@ interface DeleteExpenseState {
   data: boolean | null;
 }
 
+interface UpdateExpenseState {
+  loading: boolean;
+  error: string | null;
+  data: Expense | null;
+}
+
 interface ExpenseDataState {
   categories: Category[];
   frequencies: Frequency[];
@@ -60,6 +66,11 @@ export const useExpenses = () => {
     data: null 
   });
   const [deleteExpenseState, setDeleteExpenseState] = useState<DeleteExpenseState>({ 
+    loading: false, 
+    error: null, 
+    data: null 
+  });
+  const [updateExpenseState, setUpdateExpenseState] = useState<UpdateExpenseState>({ 
     loading: false, 
     error: null, 
     data: null 
@@ -118,6 +129,23 @@ export const useExpenses = () => {
     }
   }, [fetchExpenses]);
 
+  const updateExpense = useCallback(async (expenseId: string, expense: UpdateExpenseRequest) => {
+    setUpdateExpenseState({ loading: true, error: null, data: null });
+    try {
+      const data = await updateExpenseService(expenseId, expense);
+      setUpdateExpenseState({ loading: false, error: null, data });
+      
+      // Rafraîchir la liste des dépenses après modification
+      await fetchExpenses();
+      
+      return data;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.detail || 'Erreur lors de la modification de la dépense';
+      setUpdateExpenseState({ loading: false, error: errorMessage, data: null });
+      throw error;
+    }
+  }, [fetchExpenses]);
+
   const fetchExpenseData = useCallback(async () => {
     try {
       setExpenseDataState(prev => ({ ...prev, error: null }));
@@ -154,6 +182,7 @@ export const useExpenses = () => {
     fetchExpenses,
     createExpense,
     deleteExpense,
+    updateExpense,
     fetchExpenseData,
     
     // États des dépenses
@@ -168,6 +197,10 @@ export const useExpenses = () => {
     deleteExpenseLoading: deleteExpenseState.loading,
     deleteExpenseError: deleteExpenseState.error,
     deleteExpenseData: deleteExpenseState.data,
+    
+    updateExpenseLoading: updateExpenseState.loading,
+    updateExpenseError: updateExpenseState.error,
+    updateExpenseData: updateExpenseState.data,
     
     // États des données (catégories et fréquences)
     categories: expenseDataState.categories,

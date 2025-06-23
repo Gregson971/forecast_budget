@@ -14,6 +14,12 @@ class UpdateExpense:
         """Exécute le cas d'utilisation."""
 
         try:
+            # Forcer la cohérence de is_recurring
+            if expense.frequency and expense.frequency != ExpenseFrequency.ONE_TIME:
+                expense.is_recurring = True
+            else:
+                expense.is_recurring = False
+
             self.validate_expense(expense)
             self.validate_user_id(user_id)
             return self.expense_repo.update(expense, user_id)
