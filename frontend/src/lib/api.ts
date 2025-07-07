@@ -43,6 +43,33 @@ instance.interceptors.response.use(
   async error => {
     console.error('❌ Response Error:', error.message, error.config?.url, error.response?.status)
     
+    // Gestion des erreurs de réseau
+    if (!error.response) {
+      console.error('🌐 Network Error - Impossible de se connecter au serveur')
+      // Si c'est une erreur de réseau, on peut essayer de rafraîchir le token
+      // mais seulement si on a un refresh token
+      const refreshToken = localStorage.getItem("refresh_token")
+      if (refreshToken && !error.config._retry) {
+        error.config._retry = true
+        try {
+          const res = await axios.post(`${baseURL}/auth/refresh`, {
+            refresh_token: refreshToken,
+          })
+          const newAccessToken = res.data.access_token
+          localStorage.setItem("access_token", newAccessToken)
+          error.config.headers.Authorization = `Bearer ${newAccessToken}`
+          return instance(error.config)
+        } catch (refreshError) {
+          // Si le refresh échoue aussi, on déconnecte l'utilisateur
+          localStorage.removeItem("access_token")
+          localStorage.removeItem('refresh_token')
+          window.location.href = '/auth/login'
+          return Promise.reject(error)
+        }
+      }
+      return Promise.reject(error)
+    }
+    
     const originalRequest = error.config
 
     // Si non 401, on ne fait rien

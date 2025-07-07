@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useExpenses } from '@/hooks/useExpenses';
 import ExpenseList from '@/components/expense/ExpenseList';
 import ExpenseModal from '@/components/expense/ExpenseModal';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { Expense } from '@/types/expense';
 import Button from '@/components/ui/Button';
 
@@ -115,39 +116,41 @@ export default function ExpensesPage() {
   }
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'>
-      <div className='container mx-auto px-4 py-8'>
-        {/* Header avec bouton d'ajout */}
-        <div className='flex items-center justify-between mb-8'>
-          <div>
-            <h1 className='text-3xl font-bold text-white mb-2'>Mes dépenses</h1>
-            <p className='text-gray-400'>Gérez et suivez vos dépenses en temps réel</p>
+    <ProtectedRoute>
+      <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'>
+        <div className='container mx-auto px-4 py-8'>
+          {/* Header avec bouton d'ajout */}
+          <div className='flex items-center justify-between mb-8'>
+            <div>
+              <h1 className='text-3xl font-bold text-white mb-2'>Mes dépenses</h1>
+              <p className='text-gray-400'>Gérez et suivez vos dépenses en temps réel</p>
+            </div>
+            <Button onClick={handleOpenAddModal} className='flex items-center space-x-2'>
+              <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
+              </svg>
+              <span>Nouvelle dépense</span>
+            </Button>
           </div>
-          <Button onClick={handleOpenAddModal} className='flex items-center space-x-2'>
-            <svg className='w-5 h-5' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M12 6v6m0 0v6m0-6h6m-6 0H6' />
-            </svg>
-            <span>Nouvelle dépense</span>
-          </Button>
+
+          {/* Liste des dépenses */}
+          <div className='glass-card p-6 rounded-2xl'>
+            <ExpenseList expenses={expenses} onDelete={handleDeleteExpense} onEdit={handleEditExpense} />
+          </div>
         </div>
 
-        {/* Liste des dépenses */}
-        <div className='glass-card p-6 rounded-2xl'>
-          <ExpenseList expenses={expenses} onDelete={handleDeleteExpense} onEdit={handleEditExpense} />
-        </div>
+        {/* Modal unifié pour ajout et édition */}
+        <ExpenseModal
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          expense={editingExpense}
+          onAdd={handleAddExpense}
+          onUpdate={handleUpdateExpense}
+          categories={categories}
+          frequencies={frequencies}
+          loading={false}
+        />
       </div>
-
-      {/* Modal unifié pour ajout et édition */}
-      <ExpenseModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        expense={editingExpense}
-        onAdd={handleAddExpense}
-        onUpdate={handleUpdateExpense}
-        categories={categories}
-        frequencies={frequencies}
-        loading={createExpenseLoading || updateExpenseLoading}
-      />
-    </div>
+    </ProtectedRoute>
   );
 }
