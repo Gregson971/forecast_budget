@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from app.domain.entities.user import User
 
 
-class UserRepository(ABC):
+class UserRepositoryInterface(ABC):
     """Interface pour les opérations liées aux utilisateurs."""
 
     @abstractmethod

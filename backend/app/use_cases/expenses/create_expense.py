@@ -2,13 +2,13 @@
 
 from datetime import datetime, UTC
 from app.domain.entities.expense import Expense, ExpenseCategory, ExpenseFrequency
-from app.domain.interfaces.expense_repository_interface import ExpenseRepository
+from app.domain.interfaces.expense_repository_interface import ExpenseRepositoryInterface
 
 
 class CreateExpense:
     """Cas d'utilisation pour créer une dépense."""
 
-    def __init__(self, expense_repo: ExpenseRepository):
+    def __init__(self, expense_repo: ExpenseRepositoryInterface):
         self.expense_repo = expense_repo
 
     def execute(self, expense: Expense) -> Expense | None:

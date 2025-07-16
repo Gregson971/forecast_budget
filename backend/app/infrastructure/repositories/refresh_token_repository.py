@@ -2,11 +2,11 @@
 
 from sqlalchemy.orm import Session
 from app.domain.entities.token import RefreshToken
-from app.domain.interfaces.token_repository_interface import RefreshTokenRepository
+from app.domain.interfaces.token_repository_interface import RefreshTokenRepositoryInterface
 from app.infrastructure.db.models.refresh_token_db import RefreshTokenDB
 
 
-class SQLRefreshTokenRepository(RefreshTokenRepository):
+class SQLRefreshTokenRepository(RefreshTokenRepositoryInterface):
     """Repository pour les opérations liées aux tokens de rafraîchissement."""
 
     def __init__(self, db: Session):

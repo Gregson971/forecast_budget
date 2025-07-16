@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from app.domain.entities.token import RefreshToken
 
 
-class RefreshTokenRepository(ABC):
+class RefreshTokenRepositoryInterface(ABC):
     """Interface pour les opérations liées aux tokens de rafraîchissement."""
 
     @abstractmethod

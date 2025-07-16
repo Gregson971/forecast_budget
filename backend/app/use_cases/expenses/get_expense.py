@@ -1,13 +1,13 @@
 """Module contenant le cas d'utilisation de récupération d'une dépense."""
 
-from app.domain.interfaces.expense_repository_interface import ExpenseRepository
+from app.domain.interfaces.expense_repository_interface import ExpenseRepositoryInterface
 from app.domain.entities.expense import Expense
 
 
 class GetExpense:
     """Cas d'utilisation de récupération d'une dépense."""
 
-    def __init__(self, expense_repo: ExpenseRepository):
+    def __init__(self, expense_repo: ExpenseRepositoryInterface):
         self.expense_repo = expense_repo
 
     def execute(self, expense_id: str, user_id: str) -> Expense | None:

@@ -1,13 +1,13 @@
 """Module contenant le cas d'utilisation pour récupérer un utilisateur."""
 
-from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 from app.domain.entities.user import User
 
 
 class GetUser:
     """Cas d'utilisation pour récupérer un utilisateur."""
 
-    def __init__(self, user_repo: UserRepository):
+    def __init__(self, user_repo: UserRepositoryInterface):
         self.user_repo = user_repo
 
     def execute(self, user_id: str) -> User:

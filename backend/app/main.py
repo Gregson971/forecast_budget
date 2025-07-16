@@ -9,6 +9,7 @@ from app.external_interfaces.api.auth import auth_router
 from app.external_interfaces.api.user import user_router
 from app.external_interfaces.api.expenses import expense_router
 from app.external_interfaces.api.income import router as income_router
+from app.external_interfaces.api.forecast import router as forecast_router
 
 # Création automatique des tables
 Base.metadata.create_all(bind=engine)
@@ -48,3 +49,4 @@ app.include_router(auth_router)
 app.include_router(user_router)
 app.include_router(expense_router)
 app.include_router(income_router)
+app.include_router(forecast_router)

@@ -5,13 +5,13 @@ import uuid
 from datetime import datetime, UTC
 from passlib.hash import bcrypt
 from app.domain.entities.user import User
-from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 
 
 class RegisterUser:
     """Cas d'utilisation de création d'un utilisateur."""
 
-    def __init__(self, user_repo: UserRepository):
+    def __init__(self, user_repo: UserRepositoryInterface):
         self.user_repo = user_repo
 
     def execute(self, data: dict):

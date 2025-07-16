@@ -44,14 +44,14 @@ class TestListIncomes:
                 frequency=None,
             ),
         ]
-        mock_repository.get_by_user_id.return_value = expected_incomes
+        mock_repository.get_all_by_user_id.return_value = expected_incomes
 
         # Act
         response = use_case.execute("user-123")
 
         # Assert
         assert response == expected_incomes
-        mock_repository.get_by_user_id.assert_called_once_with("user-123")
+        mock_repository.get_all_by_user_id.assert_called_once_with("user-123")
 
     def test_list_incomes_empty(self):
         """Test de récupération d'une liste vide de revenus."""
@@ -59,14 +59,14 @@ class TestListIncomes:
         mock_repository = Mock()
         use_case = ListIncomes(mock_repository)
 
-        mock_repository.get_by_user_id.return_value = []
+        mock_repository.get_all_by_user_id.return_value = []
 
         # Act
         response = use_case.execute("user-123")
 
         # Assert
         assert response == []
-        mock_repository.get_by_user_id.assert_called_once_with("user-123")
+        mock_repository.get_all_by_user_id.assert_called_once_with("user-123")
 
     def test_list_incomes_empty_user_id(self):
         """Test de récupération avec un ID d'utilisateur vide."""
@@ -79,4 +79,4 @@ class TestListIncomes:
 
         # Assert
         assert response == []
-        mock_repository.get_by_user_id.assert_not_called()
+        mock_repository.get_all_by_user_id.assert_not_called()

@@ -1,13 +1,13 @@
 """Module contenant le cas d'utilisation de mise à jour d'une dépense."""
 
 from app.domain.entities.expense import Expense, ExpenseCategory, ExpenseFrequency
-from app.domain.interfaces.expense_repository_interface import ExpenseRepository
+from app.domain.interfaces.expense_repository_interface import ExpenseRepositoryInterface
 
 
 class UpdateExpense:
     """Cas d'utilisation de mise à jour d'une dépense."""
 
-    def __init__(self, expense_repo: ExpenseRepository):
+    def __init__(self, expense_repo: ExpenseRepositoryInterface):
         self.expense_repo = expense_repo
 
     def execute(self, expense: Expense, user_id: str) -> Expense | None:

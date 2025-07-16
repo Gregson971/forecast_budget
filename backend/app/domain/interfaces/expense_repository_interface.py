@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from app.domain.entities.expense import Expense
 
 
-class ExpenseRepository(ABC):
+class ExpenseRepositoryInterface(ABC):
     """Interface pour les opérations liées aux dépenses."""
 
     @abstractmethod

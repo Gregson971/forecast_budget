@@ -1,12 +1,12 @@
 """Module contenant le cas d'utilisation de suppression d'une dépense."""
 
-from app.domain.interfaces.expense_repository_interface import ExpenseRepository
+from app.domain.interfaces.expense_repository_interface import ExpenseRepositoryInterface
 
 
 class DeleteExpense:
     """Cas d'utilisation de suppression d'une dépense."""
 
-    def __init__(self, expense_repo: ExpenseRepository):
+    def __init__(self, expense_repo: ExpenseRepositoryInterface):
         self.expense_repo = expense_repo
 
     def execute(self, expense_id: str, user_id: str) -> None:

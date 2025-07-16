@@ -2,15 +2,17 @@
 
 from datetime import timedelta
 from fastapi import HTTPException
-from app.domain.interfaces.session_repository_interface import SessionRepository
-from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.interfaces.session_repository_interface import SessionRepositoryInterface
+from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 from app.infrastructure.security.token_service import TokenService
 
 
 class RefreshToken:
     """Cas d'utilisation pour le rafraîchissement du token d'accès."""
 
-    def __init__(self, session_repo: SessionRepository, user_repo: UserRepository):
+    def __init__(
+        self, session_repo: SessionRepositoryInterface, user_repo: UserRepositoryInterface
+    ):
         self.session_repo = session_repo
         self.user_repo = user_repo
 

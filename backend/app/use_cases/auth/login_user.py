@@ -3,18 +3,22 @@
 import uuid
 from datetime import datetime, UTC
 from passlib.hash import bcrypt
-from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 from app.domain.entities.token import RefreshToken
-from app.domain.interfaces.token_repository_interface import RefreshTokenRepository
+from app.domain.interfaces.token_repository_interface import RefreshTokenRepositoryInterface
 from app.domain.entities.session import Session
-from app.domain.interfaces.session_repository_interface import SessionRepository
+from app.domain.interfaces.session_repository_interface import SessionRepositoryInterface
 from app.infrastructure.security.token_service import TokenService
 
 
 class LoginUser:
     """Cas d'utilisation de login d'un utilisateur."""
 
-    def __init__(self, user_repo: UserRepository, refresh_token_repo: RefreshTokenRepository):
+    def __init__(
+        self,
+        user_repo: UserRepositoryInterface,
+        refresh_token_repo: RefreshTokenRepositoryInterface,
+    ):
         self.user_repo = user_repo
         self.refresh_token_repo = refresh_token_repo
 
@@ -54,7 +58,7 @@ class LoginUser:
         refresh_token: str,
         user_agent: str,
         ip: str,
-        repo: SessionRepository,
+        repo: SessionRepositoryInterface,
     ) -> None:
         """Crée une session."""
 

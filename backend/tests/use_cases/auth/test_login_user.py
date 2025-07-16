@@ -5,12 +5,12 @@ from datetime import datetime
 from passlib.hash import bcrypt
 from app.use_cases.auth.login_user import LoginUser
 from app.domain.entities.user import User
-from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 from app.domain.entities.token import RefreshToken
-from app.domain.interfaces.token_repository_interface import RefreshTokenRepository
+from app.domain.interfaces.token_repository_interface import RefreshTokenRepositoryInterface
 
 
-class InMemoryUserRepository(UserRepository):
+class InMemoryUserRepository(UserRepositoryInterface):
     """Implémentation en mémoire d'un repository d'utilisateurs."""
 
     def __init__(self):
@@ -30,7 +30,7 @@ class InMemoryUserRepository(UserRepository):
         return list(self.users.values())
 
 
-class InMemoryRefreshTokenRepository(RefreshTokenRepository):
+class InMemoryRefreshTokenRepository(RefreshTokenRepositoryInterface):
     """Implémentation en mémoire d'un repository de refresh tokens."""
 
     def __init__(self):

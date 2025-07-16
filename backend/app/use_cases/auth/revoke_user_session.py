@@ -1,13 +1,13 @@
 """Cas d'utilisation pour révoquer une session d'un utilisateur."""
 
 from fastapi import HTTPException
-from app.domain.interfaces.session_repository_interface import SessionRepository
+from app.domain.interfaces.session_repository_interface import SessionRepositoryInterface
 
 
 class RevokeUserSession:
     """Cas d'utilisation pour révoquer une session d'un utilisateur."""
 
-    def __init__(self, session_repository: SessionRepository):
+    def __init__(self, session_repository: SessionRepositoryInterface):
         self.session_repository = session_repository
 
     def execute(self, session_id: str, user_id: str) -> None:

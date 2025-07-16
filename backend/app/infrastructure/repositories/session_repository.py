@@ -2,11 +2,11 @@
 
 from sqlalchemy.orm import Session as DBSession
 from app.domain.entities.session import Session
-from app.domain.interfaces.session_repository_interface import SessionRepository
+from app.domain.interfaces.session_repository_interface import SessionRepositoryInterface
 from app.infrastructure.db.models.session_db import SessionDB
 
 
-class SQLSessionRepository(SessionRepository):
+class SQLSessionRepository(SessionRepositoryInterface):
     """Repository des sessions."""
 
     def __init__(self, db: DBSession):

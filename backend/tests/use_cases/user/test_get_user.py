@@ -4,10 +4,10 @@ import uuid
 from datetime import datetime
 from app.use_cases.user.get_user import GetUser
 from app.domain.entities.user import User
-from app.domain.interfaces.user_repository_interface import UserRepository
+from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 
 
-class InMemoryUserRepository(UserRepository):
+class InMemoryUserRepository(UserRepositoryInterface):
     """Implémentation en mémoire d'un repository d'utilisateurs."""
 
     def __init__(self):

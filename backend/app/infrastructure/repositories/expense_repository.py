@@ -2,11 +2,11 @@
 
 from sqlalchemy.orm import Session
 from app.domain.entities.expense import Expense
-from app.domain.interfaces.expense_repository_interface import ExpenseRepository
+from app.domain.interfaces.expense_repository_interface import ExpenseRepositoryInterface
 from app.infrastructure.db.models.expense_db import ExpenseDB
 
 
-class SQLExpenseRepository(ExpenseRepository):
+class SQLExpenseRepository(ExpenseRepositoryInterface):
     """Repository pour les opérations liées aux dépenses."""
 
     def __init__(self, db: Session):

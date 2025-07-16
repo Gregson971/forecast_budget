@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from app.domain.entities.session import Session
 
 
-class SessionRepository(ABC):
+class SessionRepositoryInterface(ABC):
     """Interface pour les opérations liées aux sessions."""
 
     @abstractmethod

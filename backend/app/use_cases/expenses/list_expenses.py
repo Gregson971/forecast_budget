@@ -2,13 +2,13 @@
 
 from typing import List
 from app.domain.entities.expense import Expense
-from app.domain.interfaces.expense_repository_interface import ExpenseRepository
+from app.domain.interfaces.expense_repository_interface import ExpenseRepositoryInterface
 
 
 class ListExpenses:
     """Cas d'utilisation pour lister les dépenses."""
 
-    def __init__(self, expense_repo: ExpenseRepository):
+    def __init__(self, expense_repo: ExpenseRepositoryInterface):
         self.expense_repo = expense_repo
 
     def execute(self, user_id: str) -> List[Expense]:
