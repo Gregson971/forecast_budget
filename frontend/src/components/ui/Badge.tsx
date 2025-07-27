@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 
 type BadgeProps = {
   children: React.ReactNode;
-  variant?: 'default' | 'success' | 'warning' | 'error' | 'info';
+  variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'destructive';
   size?: 'sm' | 'md' | 'lg';
   className?: string;
 };
@@ -14,6 +14,8 @@ export default function Badge({ children, variant = 'default', size = 'md', clas
     warning: 'bg-gradient-to-r from-amber-600 to-orange-600 text-white',
     error: 'bg-gradient-to-r from-red-600 to-pink-600 text-white',
     info: 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white',
+    outline: 'border border-gray-400 text-gray-400 bg-transparent',
+    destructive: 'bg-gradient-to-r from-red-600 to-pink-600 text-white',
   };
 
   const sizeClasses = {

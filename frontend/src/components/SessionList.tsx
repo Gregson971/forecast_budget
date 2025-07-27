@@ -14,8 +14,6 @@ export default function SessionList() {
     }
   };
 
-  const currentRefresh = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
-
   if (sessionsLoading) {
     return (
       <div className='flex items-center justify-center py-8'>
@@ -64,7 +62,7 @@ export default function SessionList() {
       )}
 
       {sessions.map((session) => (
-        <SessionItem key={session.id} session={session} isCurrent={session.refresh_token === currentRefresh} onRevoke={() => handleRevoke(session.id)} isRevoking={revokeLoading} />
+        <SessionItem key={session.id} session={session} isCurrent={session.is_current} onRevoke={() => handleRevoke(session.id)} />
       ))}
     </div>
   );

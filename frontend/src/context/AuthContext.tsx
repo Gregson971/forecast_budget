@@ -13,6 +13,7 @@ type AuthContextType = {
   logout: () => void;
   getUser: () => Promise<User | null>;
   isAuthenticated: boolean;
+  isLoading: boolean;
 };
 
 type JWTPayload = {
@@ -23,6 +24,7 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   const login = async (email: string, password: string) => {
@@ -170,6 +172,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           forceLogout();
         }
       }
+      setIsLoading(false);
     };
 
     initializeAuth();
@@ -184,6 +187,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         logout,
         getUser,
         isAuthenticated: !!user,
+        isLoading,
       }}
     >
       {children}

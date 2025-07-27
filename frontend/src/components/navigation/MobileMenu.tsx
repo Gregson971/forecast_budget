@@ -42,8 +42,8 @@ export default function MobileMenu({ open, onClose, user, logout }: MobileMenuPr
           <MenuItem href='/incomes' onClick={onClose}>
             Revenus
           </MenuItem>
-          <MenuItem href='/budgets' onClick={onClose}>
-            Budget
+          <MenuItem href='/forecasts' onClick={onClose}>
+            Prévisions
           </MenuItem>
           <MenuItem href='/about' onClick={onClose}>
             À propos

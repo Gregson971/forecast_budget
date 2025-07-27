@@ -4,22 +4,22 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
-interface ProtectedRouteProps {
+type ProtectedRouteProps = {
   children: React.ReactNode;
-}
+};
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated && !user) {
+    if (!isLoading && !isAuthenticated && !user) {
       router.push('/auth/login');
     }
-  }, [isAuthenticated, user, router]);
+  }, [isAuthenticated, user, router, isLoading]);
 
   // Afficher un loader pendant la vérification de l'authentification
-  if (!isAuthenticated && !user) {
+  if (isLoading) {
     return (
       <div className='min-h-screen flex items-center justify-center'>
         <div className='glass-card p-8 rounded-2xl'>
@@ -30,6 +30,11 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         </div>
       </div>
     );
+  }
+
+  // Si pas authentifié et pas en cours de chargement, ne rien afficher (redirection en cours)
+  if (!isAuthenticated && !user) {
+    return null;
   }
 
   return <>{children}</>;

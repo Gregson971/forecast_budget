@@ -77,13 +77,13 @@ export default function Home() {
                 />
               </svg>
             </div>
-            <h2 className='text-3xl font-semibold mb-4 text-white'>Budget</h2>
+            <h2 className='text-3xl font-semibold mb-4 text-white'>Prévisions</h2>
             <p className='text-gray-400 mb-6 leading-relaxed'>Visualisez vos dépenses et revenues dans un tableau de bord complet</p>
             <Link
               href='/forecasts'
               className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium group-hover:shadow-lg group-hover:shadow-blue-500/25'
             >
-              Voir le budget
+              Voir les prévisions
               <svg className='w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
               </svg>
