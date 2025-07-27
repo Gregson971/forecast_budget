@@ -1,137 +1,375 @@
 # Forecast Budget - Backend
 
-## Description
+## 📋 Description
 
-Ceci est le backend pour l'application Forecast Budget. C'est une application FastAPI qui fournit une API RESTful pour l'application.
+Ceci est le backend pour l'application **Forecast Budget**, une solution complète de gestion de budget avec prévisions financières. C'est une application FastAPI qui fournit une API RESTful moderne et sécurisée pour la gestion des dépenses, revenus et prévisions budgétaires.
 
-## Prérequis
+## ✨ Fonctionnalités
 
-- Python 3.11+
-- Docker et Docker Compose
-- PostgreSQL (si exécution locale)
+- 🔐 **Authentification JWT** avec refresh tokens
+- 👤 **Gestion des utilisateurs** et sessions
+- 💰 **Gestion des dépenses** avec catégories et fréquences
+- 💵 **Gestion des revenus**
+- 📊 **Prévisions budgétaires** intelligentes
+- 🗄️ **Base de données PostgreSQL** avec migrations Alembic
+- 🐳 **Déploiement Docker** prêt à l'emploi
+- 📚 **Documentation API** automatique (Swagger/ReDoc)
+- 🧪 **Tests unitaires** et d'intégration complets
 
-## Configuration
+## 🛠️ Prérequis
 
-1. Cloner le dépôt
+- **Python** 3.11+
+- **Docker** et **Docker Compose**
+- **PostgreSQL** (si exécution locale)
+- **Git**
+
+## ⚙️ Configuration
+
+### 1. Cloner le dépôt
 
 ```bash
-git clone https://github.com/yourusername/forecast-budget.git
-cd backend
+git clone https://github.com/Gregson971/forecast_budget.git
+cd forecast_budget/backend
 ```
 
-2. Copier le fichier d'environnement
+### 2. Configuration de l'environnement
 
 ```bash
+# Copier le fichier d'environnement
 cp .env_example .env
+
+# Éditer le fichier .env avec vos valeurs
+nano .env
 ```
 
-3. Configurer les variables d'environnement dans le fichier `.env`
+#### Variables d'environnement requises
 
-## Installation
+```env
+# Base de données
+DATABASE_URL=postgresql://user:password@localhost:5432/forecast_budget
+POSTGRES_DB=forecast_budget
+POSTGRES_USER=your_username
+POSTGRES_PASSWORD=your_secure_password
+
+# Sécurité
+SECRET_KEY=your_super_secret_key_here
+
+# CORS
+ORIGINS_ALLOWED=["http://localhost:3000", "http://127.0.0.1:3000"]
+```
+
+## 🚀 Installation et Démarrage
 
 ### Option 1 : Avec Docker (Recommandé)
 
-1. Construire et démarrer les conteneurs
+#### Démarrage rapide
 
 ```bash
+# Construire et démarrer tous les services
 docker-compose up -d --build
+
+# Vérifier le statut des conteneurs
+docker-compose ps
+
+# Voir les logs
+docker-compose logs -f api
 ```
 
-2. Vérifier que les conteneurs sont en cours d'exécution
+#### Commandes Docker utiles
 
 ```bash
-docker-compose ps
+# Arrêter les services
+docker-compose down
+
+# Redémarrer un service spécifique
+docker-compose restart api
+
+# Reconstruire après modification du code
+docker-compose up -d --build api
+
+# Accéder au shell du conteneur
+docker-compose exec api bash
 ```
 
 ### Option 2 : Installation locale
 
-1. Créer un environnement virtuel
+#### 1. Créer un environnement virtuel
 
 ```bash
 python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# ou
+venv\Scripts\activate     # Windows
 ```
 
-2. Activer l'environnement virtuel
-
-```bash
-source venv/bin/activate
-```
-
-3. Installer les dépendances
+#### 2. Installer les dépendances
 
 ```bash
 pip install -r requirements.txt
 ```
 
-4. Lancer l'application
+#### 3. Configurer la base de données
 
 ```bash
-uvicorn app.main:app --reload
-```
+# Démarrer PostgreSQL localement ou via Docker
+docker run -d --name postgres \
+  -e POSTGRES_DB=forecast_budget \
+  -e POSTGRES_USER=your_username \
+  -e POSTGRES_PASSWORD=your_password \
+  -p 5432:5432 \
+  postgres:latest
 
-## Structure du Projet
-
-```
-.
-├── app/                    # Code source de l'application
-│   ├── domain/              # Domaines de l'application
-│   ├── interfaces/          # Interfaces de l'application
-│   │   └── api/             # API
-│   ├── use_cases/           # Cas d'utilisation de l'application
-│   ├── infrastructure/      # Configuration et utilitaires
-│   │   ├── db/              # Base de données
-│   │   ├── repositories/    # Repositories
-│   │   └── security/        # JWT
-│   └── main.py              # Point d'entrée de l'application
-├── migrations/              # Scripts de migration de la base de données
-├── tests/                   # Tests unitaires et d'intégration
-├── Dockerfile               # Configuration pour la conteneurisation
-├── docker-compose.yml   # Configuration des services
-├── requirements.txt     # Dépendances Python
-└── .env                 # Variables d'environnement
-```
-
-## Documentation de l'API
-
-La documentation de l'API est disponible à :
-
-- http://localhost:8000/docs
-- http://localhost:8000/redoc
-
-## Base de données
-
-La base de données est une base PostgreSQL. Les détails de connexion sont dans le fichier `.env`.
-
-### Migrations
-
-Pour appliquer les migrations de la base de données :
-
-```bash
+# Appliquer les migrations
 alembic upgrade head
 ```
 
-## Tests
-
-Pour exécuter les tests :
+#### 4. Lancer l'application
 
 ```bash
+# Mode développement avec rechargement automatique
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Mode production
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+## 📁 Structure du Projet
+
+```
+backend/
+├── app/                          # Code source principal
+│   ├── domain/                   # Domaines métier (Clean Architecture)
+│   │   ├── entities/             # Entités du domaine
+│   │   ├── interfaces/           # Interfaces des repositories
+│   │   └── services/             # Services métier
+│   ├── external_interfaces/      # Interfaces externes
+│   │   └── api/                  # Routes API REST
+│   ├── infrastructure/           # Infrastructure technique
+│   │   ├── db/                   # Configuration base de données
+│   │   │   └── models/           # Modèles SQLAlchemy
+│   │   ├── repositories/         # Implémentation des repositories
+│   │   └── security/             # Sécurité et JWT
+│   ├── use_cases/                # Cas d'utilisation
+│   │   ├── auth/                 # Authentification
+│   │   ├── expenses/             # Gestion des dépenses
+│   │   ├── income/               # Gestion des revenus
+│   │   ├── forecast/             # Prévisions
+│   │   └── user/                 # Gestion utilisateurs
+│   ├── main.py                   # Point d'entrée FastAPI
+│   └── startup.py                # Configuration au démarrage
+├── migrations/                   # Migrations Alembic
+├── tests/                        # Tests unitaires et d'intégration
+├── Dockerfile                    # Configuration Docker
+├── docker-compose.yml            # Orchestration des services
+├── requirements.txt              # Dépendances Python
+├── alembic.ini                   # Configuration Alembic
+└── .env                          # Variables d'environnement
+```
+
+## 📚 Documentation de l'API
+
+Une fois l'application démarrée, la documentation interactive est disponible :
+
+- **Swagger UI** : http://localhost:8000/docs
+- **ReDoc** : http://localhost:8000/redoc
+- **OpenAPI JSON** : http://localhost:8000/openapi.json
+
+### Endpoints principaux
+
+- `POST /auth/register` - Inscription utilisateur
+- `POST /auth/login` - Connexion
+- `POST /auth/refresh` - Rafraîchir le token
+- `GET /users/me` - Profil utilisateur
+- `GET /expenses/` - Liste des dépenses
+- `POST /expenses/` - Créer une dépense
+- `GET /income/` - Liste des revenus
+- `POST /income/` - Créer un revenu
+- `GET /forecast/` - Prévisions budgétaires
+
+## 🗄️ Base de données
+
+### Configuration PostgreSQL
+
+L'application utilise PostgreSQL avec les configurations suivantes :
+
+- **Port** : 5432
+- **Base de données** : `forecast_budget` (configurable)
+- **ORM** : SQLAlchemy 2.0
+- **Migrations** : Alembic
+
+### Gestion des migrations
+
+```bash
+# Créer une nouvelle migration
+alembic revision --autogenerate -m "Description de la migration"
+
+# Appliquer toutes les migrations
+alembic upgrade head
+
+# Revenir à une version précédente
+alembic downgrade -1
+
+# Voir l'historique des migrations
+alembic history
+```
+
+## 🧪 Tests
+
+### Exécution des tests
+
+```bash
+# Tous les tests
 pytest
+
+# Tests avec couverture
+pytest --cov=app
+
+# Tests spécifiques
+pytest tests/use_cases/auth/
+pytest tests/domain/services/
+
+# Tests en mode verbose
+pytest -v
+
+# Tests avec rapport HTML
+pytest --cov=app --cov-report=html
 ```
 
-## Développement
+### Structure des tests
 
-### Formatage du code
+```
+tests/
+├── domain/                       # Tests des domaines
+├── use_cases/                    # Tests des cas d'utilisation
+│   ├── auth/                     # Tests d'authentification
+│   ├── expenses/                 # Tests des dépenses
+│   ├── income/                   # Tests des revenus
+│   ├── forecast/                 # Tests des prévisions
+│   └── user/                     # Tests utilisateurs
+└── conftest.py                   # Configuration pytest
+```
+
+## 🛠️ Développement
+
+### Outils de qualité du code
 
 ```bash
+# Formatage automatique
 black .
+
+# Vérification du style (PEP 8)
+flake8
+
+# Vérification des types (optionnel)
+mypy app/
+
+# Tri des imports
+isort .
 ```
 
-### Vérification du code
+### Workflow de développement
+
+1. **Créer une branche** pour votre fonctionnalité
+2. **Développer** avec les tests
+3. **Formater** le code avec `black`
+4. **Vérifier** avec `flake8`
+5. **Tester** avec `pytest`
+6. **Créer une PR** avec description détaillée
+
+### Variables d'environnement de développement
+
+```env
+# Mode debug
+DEBUG=true
+
+# Logs détaillés
+LOG_LEVEL=DEBUG
+
+# Base de données de test
+TEST_DATABASE_URL=postgresql://test_user:test_pass@localhost:5432/test_db
+```
+
+## 🚀 Déploiement
+
+### Production avec Docker
 
 ```bash
-flake8
+# Build de production
+docker build -t forecast-budget-api .
+
+# Démarrage avec variables d'environnement
+docker run -d \
+  -p 8000:8000 \
+  -e DATABASE_URL=your_production_db_url \
+  -e SECRET_KEY=your_production_secret \
+  forecast-budget-api
 ```
 
-## Licence
+### Variables d'environnement de production
 
-MIT
+```env
+# Sécurité renforcée
+SECRET_KEY=your_very_long_and_secure_secret_key
+DEBUG=false
+
+# Base de données de production
+DATABASE_URL=postgresql://prod_user:prod_pass@prod_host:5432/prod_db
+
+# CORS restrictif
+ORIGINS_ALLOWED=["https://yourdomain.com"]
+```
+
+## 🔧 Dépannage
+
+### Problèmes courants
+
+#### Erreur de connexion à la base de données
+
+```bash
+# Vérifier que PostgreSQL est démarré
+docker-compose ps postgres
+
+# Vérifier les logs
+docker-compose logs postgres
+```
+
+#### Erreur de migration
+
+```bash
+# Réinitialiser les migrations
+alembic downgrade base
+alembic upgrade head
+```
+
+#### Problème de permissions
+
+```bash
+# Vérifier les permissions du dossier
+chmod -R 755 .
+
+# Réinitialiser les conteneurs
+docker-compose down -v
+docker-compose up -d --build
+```
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](../LICENSE) pour plus de détails.
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Veuillez :
+
+1. Fork le projet
+2. Créer une branche pour votre fonctionnalité
+3. Commiter vos changements
+4. Pousser vers la branche
+5. Ouvrir une Pull Request
+
+## 📞 Support
+
+Pour toute question ou problème :
+
+- Ouvrir une issue sur GitHub
+- Consulter la documentation de l'API
+- Vérifier les logs de l'application
