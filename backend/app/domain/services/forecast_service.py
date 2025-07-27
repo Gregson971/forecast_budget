@@ -9,6 +9,13 @@ from app.domain.interfaces.expense_repository_interface import ExpenseRepository
 from app.domain.interfaces.income_repository_interface import IncomeRepositoryInterface
 
 
+def ensure_utc(dt):
+    """Convertit une date en UTC si elle n'a pas de timezone."""
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=UTC)
+    return dt.astimezone(UTC)
+
+
 class ForecastService:
     """Service pour calculer les prévisions financières."""
 
@@ -83,14 +90,20 @@ class ForecastService:
     ) -> List[Expense]:
         """Récupère les dépenses historiques."""
         all_expenses = self.expense_repo.get_by_user_id(user_id)
-        return [expense for expense in all_expenses if start_date <= expense.date <= end_date]
+        return [
+            expense
+            for expense in all_expenses
+            if start_date <= ensure_utc(expense.date) <= end_date
+        ]
 
     def _get_historical_incomes(
         self, user_id: str, start_date: datetime, end_date: datetime
     ) -> List[Income]:
         """Récupère les revenus historiques."""
         all_incomes = self.income_repo.get_all_by_user_id(user_id)
-        return [income for income in all_incomes if start_date <= income.date <= end_date]
+        return [
+            income for income in all_incomes if start_date <= ensure_utc(income.date) <= end_date
+        ]
 
     def _aggregate_data(self, items: List) -> List[DataPoint]:
         """Agrège les données par date."""

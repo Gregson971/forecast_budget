@@ -2,14 +2,20 @@
 
 import os
 import json
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.infrastructure.db.database import Base, engine
 from app.external_interfaces.api.auth import auth_router
 from app.external_interfaces.api.user import user_router
 from app.external_interfaces.api.expenses import expense_router
 from app.external_interfaces.api.income import router as income_router
 from app.external_interfaces.api.forecast import router as forecast_router
+
+# Configuration du logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Création automatique des tables
 Base.metadata.create_all(bind=engine)
@@ -36,6 +42,17 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """Middleware pour logger les requêtes et les erreurs."""
+    try:
+        response = await call_next(request)
+        return response
+    except Exception as e:
+        logger.error("Erreur lors du traitement de %s: %s", request.url, str(e), exc_info=True)
+        return JSONResponse(status_code=500, content={"detail": "Erreur interne du serveur"})
 
 
 @app.get("/")

@@ -1,7 +1,8 @@
 """API pour les prévisions."""
 
+import logging
 from datetime import datetime
-from typing import List
+from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -14,6 +15,8 @@ from app.infrastructure.repositories.income_repository import SQLIncomeRepositor
 from app.infrastructure.security.dependencies import get_current_user
 from app.use_cases.forecast.get_forecast import GetForecast
 
+# Configuration du logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/forecasts", tags=["forecasts"])
 
@@ -23,7 +26,7 @@ class DataPointResponse(BaseModel):
 
     date: datetime
     amount: float
-    category: str = None
+    category: Optional[str] = None
 
 
 class ForecastDataResponse(BaseModel):
@@ -75,19 +78,27 @@ def get_forecast(
     """Récupère les données de prévision pour une période donnée."""
 
     try:
+        logger.info(
+            "🔍 Début de la requête forecast pour l'utilisateur %s avec la période %s",
+            current_user.id,
+            period,
+        )
+
         # Convertir la période string en enum
         period_enum = ForecastPeriod(period)
 
         # Initialiser les repositories
         expense_repository = SQLExpenseRepository(db)
         income_repository = SQLIncomeRepository(db)
+        logger.info("✅ Repositories initialisés")
 
         # Exécuter le cas d'usage
         use_case = GetForecast(expense_repository, income_repository)
+
         forecast_data = use_case.execute(current_user.id, period_enum)
 
         # Convertir en réponse
-        return ForecastDataResponse(
+        response = ForecastDataResponse(
             user_id=forecast_data.user_id,
             period=forecast_data.period.value,
             start_date=forecast_data.start_date,
@@ -118,10 +129,17 @@ def get_forecast(
             updated_at=forecast_data.updated_at,
         )
 
+        logger.info("✅ Réponse formatée avec succès")
+        return response
+
     except ValueError as e:
+        logger.error("❌ Erreur de validation: %s", str(e))
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     except Exception as e:
+        error_msg = f"❌ Erreur lors du calcul des prévisions: {str(e)}"
+        print(error_msg)  # Print direct pour capturer l'erreur
+        logger.error("❌ Erreur lors du calcul des prévisions: %s", str(e), exc_info=True)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Erreur lors du calcul des prévisions",
+            detail=f"Erreur lors du calcul des prévisions: {str(e)}",
         ) from e
