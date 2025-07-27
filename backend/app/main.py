@@ -6,19 +6,19 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.infrastructure.db.database import Base, engine
 from app.external_interfaces.api.auth import auth_router
 from app.external_interfaces.api.user import user_router
 from app.external_interfaces.api.expenses import expense_router
 from app.external_interfaces.api.income import router as income_router
 from app.external_interfaces.api.forecast import router as forecast_router
+from app.external_interfaces.api.health import health_router
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Création automatique des tables
-Base.metadata.create_all(bind=engine)
+# Les tables sont créées par le script d'initialisation
+# Base.metadata.create_all(bind=engine)
 
 # Création de l'application FastAPI
 app = FastAPI(
@@ -67,3 +67,4 @@ app.include_router(user_router)
 app.include_router(expense_router)
 app.include_router(income_router)
 app.include_router(forecast_router)
+app.include_router(health_router)

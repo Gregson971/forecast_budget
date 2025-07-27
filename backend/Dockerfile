@@ -22,6 +22,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY app/ app/
 COPY migrations/ migrations/
 COPY entrypoint.sh .
+COPY init_db.py .
+COPY run_migrations.py .
 
 # Rendre le script exécutable
 RUN chmod +x entrypoint.sh
