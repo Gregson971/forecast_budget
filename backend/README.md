@@ -11,6 +11,7 @@ Ceci est le backend pour l'application **Forecast Budget**, une solution complè
 - 💰 **Gestion des dépenses** avec catégories et fréquences
 - 💵 **Gestion des revenus**
 - 📊 **Prévisions budgétaires** intelligentes
+- 📥 **Import CSV** depuis exports bancaires (détection automatique doublons, catégorisation)
 - 🗄️ **Base de données PostgreSQL** avec migrations Alembic
 - 🐳 **Déploiement Docker** prêt à l'emploi
 - 📚 **Documentation API** automatique (Swagger/ReDoc)
@@ -46,16 +47,21 @@ nano .env
 
 ```env
 # Base de données
-DATABASE_URL=postgresql://user:password@localhost:5432/forecast_budget
 POSTGRES_DB=forecast_budget
-POSTGRES_USER=your_username
-POSTGRES_PASSWORD=your_secure_password
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
+
+# DATABASE_URL pour développement local (se connecte au PostgreSQL Docker sur localhost):
+DATABASE_URL=postgresql://postgres:password@localhost:5432/forecast_budget
+# Note: Pour Docker, DATABASE_URL sera automatiquement écrasé dans docker-compose.yml pour utiliser "postgres" au lieu de "localhost"
 
 # Sécurité
 SECRET_KEY=your_super_secret_key_here
 
 # CORS
-ORIGINS_ALLOWED=["http://localhost:3000", "http://127.0.0.1:3000"]
+ORIGINS_ALLOWED=["http://localhost:3000"]
+DEBUG=true
+ENVIRONMENT=development
 ```
 
 ## 🚀 Installation et Démarrage
@@ -176,15 +182,35 @@ Une fois l'application démarrée, la documentation interactive est disponible :
 
 ### Endpoints principaux
 
+#### Authentification
 - `POST /auth/register` - Inscription utilisateur
 - `POST /auth/login` - Connexion
 - `POST /auth/refresh` - Rafraîchir le token
-- `GET /users/me` - Profil utilisateur
+- `GET /auth/me` - Profil utilisateur
+- `GET /auth/me/sessions` - Liste des sessions actives
+- `DELETE /auth/me/sessions/{session_id}` - Révoquer une session
+
+#### Dépenses
 - `GET /expenses/` - Liste des dépenses
 - `POST /expenses/` - Créer une dépense
+- `GET /expenses/{expense_id}` - Récupérer une dépense
+- `PUT /expenses/{expense_id}` - Modifier une dépense
+- `DELETE /expenses/{expense_id}` - Supprimer une dépense
+- `GET /expenses/categories` - Liste des catégories disponibles
+- `GET /expenses/frequencies` - Liste des fréquences disponibles
+
+#### Revenus
 - `GET /income/` - Liste des revenus
 - `POST /income/` - Créer un revenu
+- `GET /income/{income_id}` - Récupérer un revenu
+- `PUT /income/{income_id}` - Modifier un revenu
+- `DELETE /income/{income_id}` - Supprimer un revenu
+
+#### Prévisions
 - `GET /forecast/` - Prévisions budgétaires
+
+#### Import
+- `POST /imports/csv` - Importer des transactions depuis un fichier CSV
 
 ## 🗄️ Base de données
 
@@ -245,8 +271,49 @@ tests/
 │   ├── expenses/                 # Tests des dépenses
 │   ├── income/                   # Tests des revenus
 │   ├── forecast/                 # Tests des prévisions
+│   ├── imports/                  # Tests des imports CSV
 │   └── user/                     # Tests utilisateurs
 └── conftest.py                   # Configuration pytest
+```
+
+## 📥 Import CSV
+
+L'application supporte l'import de transactions depuis des fichiers CSV d'exports bancaires.
+
+### Format CSV supporté
+
+- **Séparateur** : point-virgule (`;`)
+- **Encodage** : UTF-8 (BOM optionnel)
+- **Format décimal** : virgule (`,`) - format français
+- **Colonnes requises** : `dateOp`, `dateVal`, `label`, `category`, `amount`, `supplierFound`
+
+### Fonctionnalités de l'import
+
+- ✅ **Détection automatique des doublons** (par date + montant + description)
+- ✅ **Catégorisation automatique** basée sur les catégories bancaires
+- ✅ **Détection des transactions récurrentes** (PRLV SEPA, VIR SEPA, etc.)
+- ✅ **Séparation automatique** dépenses (montants négatifs) / revenus (montants positifs)
+- ✅ **Mapping des catégories** françaises vers les catégories de l'application
+
+### Exemple d'utilisation
+
+```bash
+curl -X POST http://localhost:8000/imports/csv \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "file=@export_bancaire.csv"
+```
+
+### Format de réponse
+
+```json
+{
+  "total_transactions": 74,
+  "expenses_created": 65,
+  "incomes_created": 9,
+  "skipped": 0,
+  "errors": [],
+  "success": true
+}
 ```
 
 ## 🛠️ Développement

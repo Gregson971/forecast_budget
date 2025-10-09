@@ -12,6 +12,7 @@ Ceci est le frontend pour l'application **Forecast Budget**, une interface moder
 - 💰 **Gestion des dépenses** avec catégories et filtres
 - 💵 **Gestion des revenus** avec suivi détaillé
 - 📊 **Tableaux de bord** avec graphiques interactifs
+- 📥 **Import CSV** avec drag & drop depuis exports bancaires
 - 🔄 **Synchronisation temps réel** avec l'API backend
 - 🌙 **Mode sombre** par défaut avec thème personnalisé
 - ⚡ **Performance optimisée** avec Next.js 15 et Turbopack
@@ -105,6 +106,7 @@ frontend/
 │   │   ├── expenses/            # Gestion des dépenses
 │   │   ├── incomes/             # Gestion des revenus
 │   │   ├── forecasts/           # Prévisions et tableaux de bord
+│   │   ├── import/              # Import de transactions CSV
 │   │   ├── settings/            # Paramètres utilisateur
 │   │   │   └── sessions/        # Gestion des sessions
 │   │   ├── about/               # Page à propos
@@ -117,6 +119,8 @@ frontend/
 │   │   ├── expense/             # Composants pour les dépenses
 │   │   ├── income/              # Composants pour les revenus
 │   │   ├── financial/           # Composants financiers
+│   │   ├── import/              # Composants pour l'import CSV
+│   │   │   └── CSVUploader.tsx  # Composant d'upload CSV
 │   │   ├── AuthForm.tsx         # Formulaire d'authentification
 │   │   ├── ProtectedRoute.tsx   # Protection des routes
 │   │   └── ErrorNotification.tsx # Notifications d'erreur
@@ -131,13 +135,15 @@ frontend/
 │   │   ├── auth.ts              # Service d'authentification
 │   │   ├── expense.ts           # Service des dépenses
 │   │   ├── income.ts            # Service des revenus
-│   │   └── forecast.ts          # Service des prévisions
+│   │   ├── forecast.ts          # Service des prévisions
+│   │   └── import.ts            # Service d'import CSV
 │   ├── lib/                     # Utilitaires et configurations
 │   │   ├── api.ts               # Configuration Axios
 │   │   └── utils.ts             # Fonctions utilitaires
 │   └── types/                   # Types TypeScript
 │       ├── expense.ts           # Types pour les dépenses
 │       ├── income.ts            # Types pour les revenus
+│       ├── import.ts            # Types pour l'import
 │       └── financial.ts         # Types financiers généraux
 ├── public/                      # Assets statiques
 ├── package.json                 # Dépendances et scripts
@@ -216,6 +222,14 @@ npm run test:coverage # Tests avec couverture
 - **Tableaux de bord** personnalisés
 - **Export des données** (à implémenter)
 
+### 📥 Import CSV
+
+- **Upload drag & drop** de fichiers CSV
+- **Détection automatique** des doublons
+- **Catégorisation intelligente** des transactions
+- **Statistiques d'import** en temps réel (succès, erreurs, ignorés)
+- **Support multi-formats** d'exports bancaires
+
 ### ⚙️ Paramètres
 
 - **Profil utilisateur** : Modification des informations
@@ -256,6 +270,7 @@ api.interceptors.request.use((config) => {
 - `GET /income/` - Liste des revenus
 - `POST /income/` - Créer un revenu
 - `GET /forecast/` - Prévisions budgétaires
+- `POST /imports/csv` - Importer des transactions depuis CSV
 
 ## 🧪 Tests
 

@@ -28,6 +28,7 @@
 - **Suivi des dépenses** avec catégories et filtres
 - **Gestion des revenus** avec sources multiples
 - **Historique détaillé** avec recherche et tri
+- **Import CSV** depuis exports bancaires (Boursorama, etc.)
 - **Export des données** (à venir)
 
 ### 📊 Analyses et prévisions
@@ -177,17 +178,19 @@ forecast_budget/
 ### Variables d'environnement Backend
 
 ```env
-# Base de données
-DATABASE_URL=postgresql://user:password@localhost:5432/forecast_budget
+# Base de données (pour développement local, se connecte au PostgreSQL Docker)
+DATABASE_URL=postgresql://postgres:password@localhost:5432/forecast_budget
 POSTGRES_DB=forecast_budget
-POSTGRES_USER=your_username
-POSTGRES_PASSWORD=your_password
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=password
 
 # Sécurité
 SECRET_KEY=your_super_secret_key_here
 
 # CORS
 ORIGINS_ALLOWED=["http://localhost:3000"]
+
+# Note: Pour Docker, DATABASE_URL sera automatiquement configuré pour utiliser "postgres" au lieu de "localhost"
 ```
 
 ### Variables d'environnement Frontend
@@ -356,6 +359,7 @@ cd frontend && npm run test
 
 ### 🚀 Version 1.1 (En cours)
 
+- [x] Import des transactions depuis fichiers CSV
 - [ ] Export des données (CSV, PDF)
 - [ ] Notifications push
 - [ ] Mode hors ligne
