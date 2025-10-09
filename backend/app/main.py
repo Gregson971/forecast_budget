@@ -12,6 +12,7 @@ from app.external_interfaces.api.expenses import expense_router
 from app.external_interfaces.api.income import router as income_router
 from app.external_interfaces.api.forecast import router as forecast_router
 from app.external_interfaces.api.health import health_router
+from app.external_interfaces.api.imports import import_router
 
 # Configuration du logging
 logging.basicConfig(level=logging.INFO)
@@ -68,3 +69,4 @@ app.include_router(expense_router)
 app.include_router(income_router)
 app.include_router(forecast_router)
 app.include_router(health_router)
+app.include_router(import_router)
