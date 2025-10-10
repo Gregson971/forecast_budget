@@ -36,11 +36,8 @@ export default function MobileMenu({ open, onClose, user, logout }: MobileMenuPr
           ) : null}
         </div>
         <nav className='flex flex-col space-y-2 mb-6'>
-          <MenuItem href='/expenses' onClick={onClose}>
-            Dépenses
-          </MenuItem>
-          <MenuItem href='/incomes' onClick={onClose}>
-            Revenus
+          <MenuItem href='/transactions' onClick={onClose}>
+            Transactions
           </MenuItem>
           <MenuItem href='/forecasts' onClick={onClose}>
             Prévisions

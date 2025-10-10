@@ -2,12 +2,8 @@ import Link from 'next/link';
 
 export default function AboutPage() {
   return (
-    <div className='min-h-screen relative overflow-hidden'>
-      {/* Arrière-plan avec effet de particules */}
-      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900'></div>
-      <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)]'></div>
-
-      <main className='relative z-10 container mx-auto px-4 py-16'>
+    <div className='page-container'>
+      <main className='container mx-auto max-w-7xl'>
         {/* En-tête */}
         <div className='text-center mb-16 fade-in'>
           <h1 className='text-5xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-indigo-200 bg-clip-text text-transparent'>À propos de Forecast Budget</h1>
@@ -15,7 +11,7 @@ export default function AboutPage() {
         </div>
 
         {/* Section Mission */}
-        <div className='glass-card p-8 rounded-2xl mb-12 fade-in'>
+        <div className='glass-card p-8 rounded-lg mb-12 fade-in elevation-2'>
           <div className='flex items-center mb-6'>
             <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-4'>
               <svg className='w-6 h-6 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -32,7 +28,7 @@ export default function AboutPage() {
 
         {/* Section Fonctionnalités */}
         <div className='grid grid-cols-1 md:grid-cols-2 gap-8 mb-12'>
-          <div className='glass-card p-6 rounded-2xl fade-in'>
+          <div className='glass p-6 rounded-lg fade-in elevation-1'>
             <div className='w-12 h-12 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-4'>
               <svg className='w-6 h-6 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' />
@@ -44,7 +40,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className='glass-card p-6 rounded-2xl fade-in'>
+          <div className='glass p-6 rounded-lg fade-in elevation-1'>
             <div className='w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4'>
               <svg className='w-6 h-6 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
@@ -59,7 +55,7 @@ export default function AboutPage() {
             <p className='text-gray-400 leading-relaxed'>Gérez toutes vos sources de revenus en un seul endroit. Visualisez vos flux de trésorerie et optimisez votre budget.</p>
           </div>
 
-          <div className='glass-card p-6 rounded-2xl fade-in'>
+          <div className='glass p-6 rounded-lg fade-in elevation-1'>
             <div className='w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mb-4'>
               <svg className='w-6 h-6 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
@@ -76,7 +72,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className='glass-card p-6 rounded-2xl fade-in'>
+          <div className='glass p-6 rounded-lg fade-in elevation-1'>
             <div className='w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center mb-4'>
               <svg className='w-6 h-6 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
@@ -93,7 +89,7 @@ export default function AboutPage() {
         </div>
 
         {/* Section Technologie */}
-        <div className='glass-card p-8 rounded-2xl mb-12 fade-in'>
+        <div className='glass-card p-8 rounded-lg mb-12 fade-in elevation-2'>
           <h2 className='text-3xl font-semibold text-white mb-6'>Technologies Utilisées</h2>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-6'>
             <div className='text-center'>
@@ -124,7 +120,7 @@ export default function AboutPage() {
         </div>
 
         {/* Section Contact */}
-        <div className='glass-card p-8 rounded-2xl mb-12 fade-in'>
+        <div className='glass-card p-8 rounded-lg mb-12 fade-in elevation-2'>
           <h2 className='text-3xl font-semibold text-white mb-6'>Contact</h2>
           <p className='text-gray-300 leading-relaxed mb-6'>Vous avez des questions, des suggestions ou besoin d'aide ? N'hésitez pas à nous contacter.</p>
           <div className='flex flex-col sm:flex-row gap-4'>
@@ -138,7 +134,7 @@ export default function AboutPage() {
               </svg>
             </Link>
             <Link
-              href='/expenses'
+              href='/transactions'
               className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-xl hover:from-emerald-700 hover:to-teal-700 transition-all duration-300 font-medium'
             >
               Commencer à utiliser

@@ -49,13 +49,13 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className='min-h-screen relative overflow-hidden flex items-center justify-center'>
+    <div className='min-h-screen flex items-center justify-center px-4'>
       {/* Arrière-plan avec effet de particules */}
       <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900'></div>
       <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)]'></div>
 
       <div className='relative z-10 w-full max-w-md'>
-        <div className='glass-card p-8 rounded-2xl shadow-2xl fade-in'>
+        <div className='glass-card p-8 rounded-lg elevation-3 fade-in'>
           <div className='text-center mb-8'>
             <div className='w-16 h-16 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
               <svg className='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -63,7 +63,7 @@ export default function RegisterPage() {
               </svg>
             </div>
             <h1 className='text-3xl font-bold text-white mb-2'>Créer un compte</h1>
-            <p className='text-gray-400'>Rejoignez Forecast Budget dès aujourd'hui</p>
+            <p className='text-muted-foreground'>Rejoignez Forecast Budget dès aujourd'hui</p>
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
@@ -86,7 +86,7 @@ export default function RegisterPage() {
                 onChange={handleConfirmPasswordChange}
                 required
               />
-              {passwordError && <p className='text-red-400 text-sm mt-1'>{passwordError}</p>}
+              {passwordError && <p className='text-destructive text-sm mt-1'>{passwordError}</p>}
             </div>
 
             <Button type='submit' className='w-full' disabled={isLoading || !!passwordError}>
@@ -102,9 +102,9 @@ export default function RegisterPage() {
           </form>
 
           <div className='mt-8 text-center'>
-            <p className='text-gray-400'>
+            <p className='text-muted-foreground'>
               Déjà un compte ?{' '}
-              <Link href='/auth/login' className='text-indigo-400 hover:text-indigo-300 font-medium transition-colors'>
+              <Link href='/auth/login' className='text-primary hover:text-accent font-medium transition-colors'>
                 Se connecter
               </Link>
             </p>

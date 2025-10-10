@@ -18,10 +18,10 @@ export default function SessionsPage() {
 
   if (sessionsLoading) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <div className='glass-card p-8 rounded-2xl'>
+      <div className='min-h-screen flex items-center justify-center px-4'>
+        <div className='glass-card p-8 rounded-lg elevation-2'>
           <div className='flex items-center space-x-4'>
-            <div className='w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin'></div>
+            <div className='w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin'></div>
             <span className='text-white text-lg'>Chargement des sessions...</span>
           </div>
         </div>
@@ -31,10 +31,10 @@ export default function SessionsPage() {
 
   if (sessionsError) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
-        <div className='glass-card p-8 rounded-2xl'>
+      <div className='min-h-screen flex items-center justify-center px-4'>
+        <div className='glass-card p-8 rounded-lg elevation-2'>
           <div className='text-center'>
-            <div className='w-16 h-16 bg-gradient-to-r from-red-500 to-red-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
+            <div className='w-16 h-16 bg-gradient-to-r from-destructive to-red-600 rounded-xl flex items-center justify-center mx-auto mb-4'>
               <svg className='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
                   strokeLinecap='round'
@@ -45,8 +45,8 @@ export default function SessionsPage() {
               </svg>
             </div>
             <h3 className='text-xl font-semibold text-white mb-2'>Erreur de chargement</h3>
-            <p className='text-gray-400 mb-4'>{sessionsError}</p>
-            <button onClick={fetchSessions} className='px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors'>
+            <p className='text-muted-foreground mb-4'>{sessionsError}</p>
+            <button onClick={fetchSessions} className='ripple px-4 py-2 bg-success hover:bg-green-700 text-white rounded transition-all elevation-1'>
               Réessayer
             </button>
           </div>
@@ -57,16 +57,16 @@ export default function SessionsPage() {
 
   return (
     <ProtectedRoute>
-      <div className='min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900'>
-        <div className='container mx-auto px-4 py-8'>
+      <div className='page-container'>
+        <div className='container mx-auto max-w-7xl'>
           {/* Header */}
           <div className='mb-8'>
-            <h1 className='text-3xl font-bold text-white mb-2'>Sessions actives</h1>
-            <p className='text-gray-400'>Gérez vos sessions de connexion</p>
+            <h1 className='text-4xl font-bold text-white mb-2'>Sessions actives</h1>
+            <p className='text-muted-foreground'>Gérez vos sessions de connexion</p>
           </div>
 
           {/* Liste des sessions */}
-          <div className='glass-card p-6 rounded-2xl'>
+          <div className='glass-card p-6 rounded-lg elevation-2'>
             <SessionList />
           </div>
         </div>

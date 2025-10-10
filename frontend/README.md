@@ -6,15 +6,16 @@ Ceci est le frontend pour l'application **Forecast Budget**, une interface moder
 
 ## ✨ Fonctionnalités
 
-- 🎨 **Interface moderne** avec design glassmorphism et animations fluides
+- 🎨 **Interface Material UI** sobre et lisible avec système d'élévation
 - 📱 **Responsive design** optimisé pour tous les appareils
 - 🔐 **Authentification sécurisée** avec JWT
-- 💰 **Gestion des dépenses** avec catégories et filtres
-- 💵 **Gestion des revenus** avec suivi détaillé
-- 📊 **Tableaux de bord** avec graphiques interactifs
+- 💰 **Gestion unifiée des transactions** (dépenses et revenus) en une seule page
+- 📅 **Filtres avancés** par type, mois et année
+- 📄 **Pagination intelligente** (20 transactions par page)
+- 📊 **Tableaux de bord** avec graphiques interactifs Chart.js
 - 📥 **Import CSV** avec drag & drop depuis exports bancaires
 - 🔄 **Synchronisation temps réel** avec l'API backend
-- 🌙 **Mode sombre** par défaut avec thème personnalisé
+- 🌙 **Mode sombre Material UI** par défaut
 - ⚡ **Performance optimisée** avec Next.js 15 et Turbopack
 
 ## 🛠️ Technologies utilisées

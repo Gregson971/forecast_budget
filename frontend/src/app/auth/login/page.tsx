@@ -29,13 +29,9 @@ export default function LoginPage() {
   };
 
   return (
-    <div className='min-h-screen relative overflow-hidden flex items-center justify-center'>
-      {/* Arrière-plan avec effet de particules */}
-      <div className='absolute inset-0 bg-gradient-to-br from-slate-900 via-purple-900/20 to-slate-900'></div>
-      <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.1),transparent_50%)]'></div>
-
-      <div className='relative z-10 w-full max-w-md'>
-        <div className='glass-card p-8 rounded-2xl shadow-2xl fade-in'>
+    <div className='min-h-screen flex items-center justify-center px-4'>
+      <div className='w-full max-w-md'>
+        <div className='glass-card p-8 rounded-lg elevation-3 fade-in'>
           <div className='text-center mb-8'>
             <div className='w-16 h-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4'>
               <svg className='w-8 h-8 text-white' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -48,7 +44,7 @@ export default function LoginPage() {
               </svg>
             </div>
             <h1 className='text-3xl font-bold text-white mb-2'>Connexion</h1>
-            <p className='text-gray-400'>Accédez à votre compte Forecast Budget</p>
+            <p className='text-muted-foreground'>Accédez à votre compte Forecast Budget</p>
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
@@ -57,8 +53,8 @@ export default function LoginPage() {
             <Input label='Mot de passe' type='password' placeholder='Votre mot de passe' value={password} onChange={(e) => setPassword(e.target.value)} required />
 
             {error && (
-              <div className='p-3 bg-red-500/20 border border-red-500/30 rounded-lg'>
-                <p className='text-sm text-red-400'>{error}</p>
+              <div className='p-3 bg-destructive/10 border border-destructive/30 rounded elevation-1'>
+                <p className='text-sm text-destructive'>{error}</p>
               </div>
             )}
 
@@ -75,9 +71,9 @@ export default function LoginPage() {
           </form>
 
           <div className='mt-8 text-center'>
-            <p className='text-gray-400'>
+            <p className='text-muted-foreground'>
               Pas encore de compte ?{' '}
-              <Link href='/auth/register' className='text-indigo-400 hover:text-indigo-300 font-medium transition-colors'>
+              <Link href='/auth/register' className='text-primary hover:text-accent font-medium transition-colors'>
                 Créer un compte
               </Link>
             </p>

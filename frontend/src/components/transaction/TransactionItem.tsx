@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import Badge from '@/components/ui/Badge';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import { Transaction } from '@/types/transaction';
 
-const categoryIcons: { [key: string]: string } = {
+// Icônes pour les catégories de dépenses
+const expenseCategoryIcons: { [key: string]: string } = {
   food: '🍽️',
   transport: '🚗',
   entertainment: '🎮',
@@ -15,7 +17,22 @@ const categoryIcons: { [key: string]: string } = {
   other: '📦',
 };
 
-const categoryColors: { [key: string]: string } = {
+// Icônes pour les catégories de revenus
+const incomeCategoryIcons: { [key: string]: string } = {
+  salary: '💰',
+  freelance: '💼',
+  investment: '📈',
+  rental: '🏠',
+  business: '🏢',
+  bonus: '🎁',
+  commission: '💸',
+  royalties: '📚',
+  pension: '👴',
+  other: '💵',
+};
+
+// Couleurs pour les catégories de dépenses
+const expenseCategoryColors: { [key: string]: string } = {
   food: 'from-orange-500 to-red-500',
   transport: 'from-blue-500 to-indigo-500',
   entertainment: 'from-purple-500 to-pink-500',
@@ -28,20 +45,48 @@ const categoryColors: { [key: string]: string } = {
   other: 'from-gray-500 to-slate-500',
 };
 
-export default function ExpenseItem({ expense, onDelete, onEdit }: { expense: any; onDelete?: (id: string) => void; onEdit?: (expense: any) => void }) {
+// Couleurs pour les catégories de revenus
+const incomeCategoryColors: { [key: string]: string } = {
+  salary: 'from-green-500 to-emerald-500',
+  freelance: 'from-blue-500 to-indigo-500',
+  investment: 'from-purple-500 to-pink-500',
+  rental: 'from-yellow-500 to-orange-500',
+  business: 'from-cyan-500 to-blue-500',
+  bonus: 'from-pink-500 to-rose-500',
+  commission: 'from-indigo-500 to-purple-500',
+  royalties: 'from-violet-500 to-purple-500',
+  pension: 'from-gray-500 to-slate-500',
+  other: 'from-green-400 to-teal-500',
+};
+
+interface TransactionItemProps {
+  transaction: Transaction;
+  onDelete?: (id: string) => void;
+  onEdit?: (transaction: Transaction) => void;
+}
+
+export default function TransactionItem({ transaction, onDelete, onEdit }: TransactionItemProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const categoryIcon = categoryIcons[expense.category] || '📦';
-  const categoryColor = categoryColors[expense.category] || 'from-gray-500 to-slate-500';
+
+  const isExpense = transaction.type === 'expense';
+  const categoryIcon = isExpense
+    ? (expenseCategoryIcons[transaction.category] || '📦')
+    : (incomeCategoryIcons[transaction.category] || '💵');
+  const categoryColor = isExpense
+    ? (expenseCategoryColors[transaction.category] || 'from-gray-500 to-slate-500')
+    : (incomeCategoryColors[transaction.category] || 'from-green-400 to-teal-500');
+  const amountColor = isExpense ? 'text-red-400 group-hover:text-red-300' : 'text-green-400 group-hover:text-green-300';
+  const amountSign = isExpense ? '–' : '+';
 
   const handleDelete = () => {
     if (onDelete) {
-      onDelete(expense.id);
+      onDelete(transaction.id);
     }
   };
 
   const handleEdit = () => {
     if (onEdit) {
-      onEdit(expense);
+      onEdit(transaction);
     }
   };
 
@@ -57,38 +102,40 @@ export default function ExpenseItem({ expense, onDelete, onEdit }: { expense: an
             </div>
 
             <div className='space-y-1 overflow-hidden'>
-              <h3 className='text-lg font-semibold text-white group-hover:text-gray-200 transition-colors truncate'>{expense.name}</h3>
+              <h3 className='text-lg font-semibold text-white group-hover:text-gray-200 transition-colors truncate'>{transaction.name}</h3>
               <div className='flex flex-wrap items-center gap-x-3 gap-y-1'>
                 <span className='text-sm text-gray-400'>
-                  {new Date(expense.date).toLocaleDateString('fr-FR', {
+                  {new Date(transaction.date).toLocaleDateString('fr-FR', {
                     day: 'numeric',
                     month: 'short',
                     year: 'numeric',
                   })}
                 </span>
-                {expense.category && (
+                {transaction.category && (
                   <Badge variant='info' size='sm'>
-                    {expense.category}
+                    {transaction.category}
                   </Badge>
                 )}
-                {expense.frequency && (
+                {transaction.frequency && (
                   <Badge variant='warning' size='sm'>
-                    {expense.frequency}
+                    {transaction.frequency}
                   </Badge>
                 )}
               </div>
-              {expense.description && <p className='text-sm text-gray-500 truncate'>{expense.description}</p>}
+              {transaction.description && <p className='text-sm text-gray-500 truncate'>{transaction.description}</p>}
             </div>
           </div>
 
           <div className='self-end sm:self-center text-right flex items-center gap-3'>
-            <div className='text-xl sm:text-2xl font-bold text-red-400 group-hover:text-red-300 transition-colors'>– {expense.amount.toFixed(2)} €</div>
+            <div className={`text-xl sm:text-2xl font-bold ${amountColor} transition-colors`}>
+              {amountSign} {transaction.amount.toFixed(2)} €
+            </div>
             <div className='flex items-center gap-2'>
               {onEdit && (
                 <button
                   onClick={handleEdit}
                   className='p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-all duration-200 group/edit'
-                  title='Modifier cette dépense'
+                  title={`Modifier ${isExpense ? 'cette dépense' : 'ce revenu'}`}
                 >
                   <svg className='w-5 h-5 group-hover/edit:scale-110 transition-transform' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path
@@ -104,7 +151,7 @@ export default function ExpenseItem({ expense, onDelete, onEdit }: { expense: an
                 <button
                   onClick={() => setShowDeleteModal(true)}
                   className='p-2 text-gray-400 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-all duration-200 group/delete'
-                  title='Supprimer cette dépense'
+                  title={`Supprimer ${isExpense ? 'cette dépense' : 'ce revenu'}`}
                 >
                   <svg className='w-5 h-5 group-hover/delete:scale-110 transition-transform' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                     <path
@@ -125,8 +172,8 @@ export default function ExpenseItem({ expense, onDelete, onEdit }: { expense: an
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={handleDelete}
-        title='Supprimer la dépense'
-        message={`Êtes-vous sûr de vouloir supprimer la dépense "${expense.name}" ? Cette action est irréversible.`}
+        title={`Supprimer ${isExpense ? 'la dépense' : 'le revenu'}`}
+        message={`Êtes-vous sûr de vouloir supprimer ${isExpense ? 'la dépense' : 'le revenu'} "${transaction.name}" ? Cette action est irréversible.`}
         confirmText='Supprimer'
         cancelText='Annuler'
         variant='danger'

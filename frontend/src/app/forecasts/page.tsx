@@ -29,9 +29,12 @@ export default function ForecastsPage() {
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className='container mx-auto px-4 py-8'>
-          <div className='flex items-center justify-center h-64'>
-            <div className='animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600'></div>
+        <div className='page-container'>
+          <div className='max-w-7xl mx-auto'>
+            <div className='glass p-12 rounded-lg elevation-2 text-center'>
+              <div className='inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent'></div>
+              <p className='text-muted-foreground mt-4'>Chargement des prévisions...</p>
+            </div>
           </div>
         </div>
       </ProtectedRoute>
@@ -41,8 +44,10 @@ export default function ForecastsPage() {
   if (error) {
     return (
       <ProtectedRoute>
-        <div className='container mx-auto px-4 py-8'>
-          <ErrorNotification error={error} />
+        <div className='page-container'>
+          <div className='max-w-7xl mx-auto'>
+            <ErrorNotification error={error} />
+          </div>
         </div>
       </ProtectedRoute>
     );
@@ -51,8 +56,12 @@ export default function ForecastsPage() {
   if (!data) {
     return (
       <ProtectedRoute>
-        <div className='container mx-auto px-4 py-8'>
-          <div className='text-center text-gray-500'>Aucune donnée disponible</div>
+        <div className='page-container'>
+          <div className='max-w-7xl mx-auto'>
+            <div className='glass p-8 rounded-lg elevation-1 text-center'>
+              <p className='text-muted-foreground'>Aucune donnée disponible</p>
+            </div>
+          </div>
         </div>
       </ProtectedRoute>
     );
@@ -109,17 +118,27 @@ export default function ForecastsPage() {
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: '#e0e0e0',
+        },
       },
       title: {
         display: true,
         text: `Prévisions financières - ${periodOptions.find((p) => p.value === selectedPeriod)?.label}`,
+        color: '#ffffff',
         font: {
-          size: 16,
+          size: 18,
+          weight: 500,
         },
       },
       tooltip: {
         mode: 'index' as const,
         intersect: false,
+        backgroundColor: 'rgba(30, 30, 30, 0.95)',
+        titleColor: '#ffffff',
+        bodyColor: '#e0e0e0',
+        borderColor: '#383838',
+        borderWidth: 1,
         callbacks: {
           title: (context: any) => {
             const date = new Date(context[0].parsed.x);
@@ -150,20 +169,32 @@ export default function ForecastsPage() {
         title: {
           display: true,
           text: 'Date',
+          color: '#9e9e9e',
+        },
+        ticks: {
+          color: '#9e9e9e',
+        },
+        grid: {
+          color: '#383838',
         },
       },
       y: {
         title: {
           display: true,
           text: 'Montant (€)',
+          color: '#9e9e9e',
         },
         ticks: {
+          color: '#9e9e9e',
           callback: (value: any) => {
             return value.toLocaleString('fr-FR', {
               style: 'currency',
               currency: 'EUR',
             });
           },
+        },
+        grid: {
+          color: '#383838',
         },
       },
     },
@@ -176,76 +207,86 @@ export default function ForecastsPage() {
 
   return (
     <ProtectedRoute>
-      <div className='container mx-auto px-4 py-8'>
-        <div className='mb-8'>
-          <h1 className='text-3xl font-bold text-gray-900 mb-4'>Prévisions financières</h1>
-          <p className='text-gray-600 mb-6'>Visualisez vos dépenses, revenus et prévisions sur différentes périodes.</p>
+      <div className='page-container'>
+        <div className='max-w-7xl mx-auto'>
+          <div className='mb-8'>
+            <h1 className='text-4xl font-bold text-white mb-4'>Prévisions financières</h1>
+            <p className='text-muted-foreground mb-6'>Visualisez vos dépenses, revenus et prévisions sur différentes périodes.</p>
 
-          {/* Sélecteur de période */}
-          <div className='flex flex-wrap gap-2 mb-6'>
-            {periodOptions.map((option) => (
-              <Button key={option.value} onClick={() => setSelectedPeriod(option.value)} variant={selectedPeriod === option.value ? 'default' : 'outline'} size='sm'>
-                {option.label}
-              </Button>
-            ))}
+            {/* Sélecteur de période */}
+            <div className='flex flex-wrap gap-2 mb-6'>
+              {periodOptions.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => setSelectedPeriod(option.value)}
+                  className={`ripple px-4 py-2 rounded font-medium transition-all ${
+                    selectedPeriod === option.value
+                      ? 'bg-primary text-primary-foreground elevation-2'
+                      : 'bg-secondary text-white hover:bg-muted elevation-1'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Résumé des totaux */}
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
+              <div className='glass p-6 rounded-lg elevation-1'>
+                <h3 className='text-sm font-medium text-muted-foreground mb-2'>Dépenses totales</h3>
+                <p className='text-2xl font-bold text-red-400'>
+                  {data.total_expenses.toLocaleString('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
+                </p>
+              </div>
+              <div className='glass p-6 rounded-lg elevation-1'>
+                <h3 className='text-sm font-medium text-muted-foreground mb-2'>Revenus totaux</h3>
+                <p className='text-2xl font-bold text-green-400'>
+                  {data.total_income.toLocaleString('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
+                </p>
+              </div>
+              <div className='glass p-6 rounded-lg elevation-1'>
+                <h3 className='text-sm font-medium text-muted-foreground mb-2'>Solde net</h3>
+                <p className={`text-2xl font-bold ${data.net_balance >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  {data.net_balance.toLocaleString('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
+                </p>
+              </div>
+              <div className='glass p-6 rounded-lg elevation-1'>
+                <h3 className='text-sm font-medium text-muted-foreground mb-2'>Solde prévisionnel</h3>
+                <p className={`text-2xl font-bold ${data.forecast_net_balance >= 0 ? 'text-success' : 'text-destructive'}`}>
+                  {data.forecast_net_balance.toLocaleString('fr-FR', {
+                    style: 'currency',
+                    currency: 'EUR',
+                  })}
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Résumé des totaux */}
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8'>
-            <div className='bg-white p-4 rounded-lg shadow'>
-              <h3 className='text-sm font-medium text-gray-500'>Dépenses totales</h3>
-              <p className='text-2xl font-bold text-red-600'>
-                {data.total_expenses.toLocaleString('fr-FR', {
-                  style: 'currency',
-                  currency: 'EUR',
-                })}
-              </p>
-            </div>
-            <div className='bg-white p-4 rounded-lg shadow'>
-              <h3 className='text-sm font-medium text-gray-500'>Revenus totaux</h3>
-              <p className='text-2xl font-bold text-green-600'>
-                {data.total_income.toLocaleString('fr-FR', {
-                  style: 'currency',
-                  currency: 'EUR',
-                })}
-              </p>
-            </div>
-            <div className='bg-white p-4 rounded-lg shadow'>
-              <h3 className='text-sm font-medium text-gray-500'>Solde net</h3>
-              <p className={`text-2xl font-bold ${data.net_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {data.net_balance.toLocaleString('fr-FR', {
-                  style: 'currency',
-                  currency: 'EUR',
-                })}
-              </p>
-            </div>
-            <div className='bg-white p-4 rounded-lg shadow'>
-              <h3 className='text-sm font-medium text-gray-500'>Solde prévisionnel</h3>
-              <p className={`text-2xl font-bold ${data.forecast_net_balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {data.forecast_net_balance.toLocaleString('fr-FR', {
-                  style: 'currency',
-                  currency: 'EUR',
-                })}
-              </p>
+          {/* Graphique */}
+          <div className='glass p-6 rounded-lg elevation-2 mb-6'>
+            <div className='h-96'>
+              <Line data={chartData} options={chartOptions} />
             </div>
           </div>
-        </div>
 
-        {/* Graphique */}
-        <div className='bg-white p-6 rounded-lg shadow'>
-          <div className='h-96'>
-            <Line data={chartData} options={chartOptions} />
+          {/* Légende */}
+          <div className='glass p-6 rounded-lg elevation-1'>
+            <p className='text-sm text-muted-foreground mb-2'>
+              <strong className='text-white'>Ligne continue :</strong> Données historiques
+            </p>
+            <p className='text-sm text-muted-foreground'>
+              <strong className='text-white'>Ligne pointillée :</strong> Données prévisionnelles basées sur vos habitudes de dépenses et revenus récurrents
+            </p>
           </div>
-        </div>
-
-        {/* Légende */}
-        <div className='mt-6 text-sm text-gray-600'>
-          <p className='mb-2'>
-            <strong>Ligne continue :</strong> Données historiques
-          </p>
-          <p>
-            <strong>Ligne pointillée :</strong> Données prévisionnelles basées sur vos habitudes de dépenses et revenus récurrents
-          </p>
         </div>
       </div>
     </ProtectedRoute>
