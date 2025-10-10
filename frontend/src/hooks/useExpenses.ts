@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { getExpensesService, createExpenseService, getExpenseCategoriesService, getExpenseFrequenciesService, deleteExpenseService, updateExpenseService } from '@/services/expense';
-import { Expense, Category, Frequency, UpdateExpenseRequest } from '@/types/expense';
+import { Expense, Category, Frequency, CreateExpenseRequest, UpdateExpenseRequest } from '@/types/expense';
 
 // Données de fallback au cas où l'API ne répond pas
 const fallbackCategories: Category[] = [
@@ -95,15 +95,15 @@ export const useExpenses = () => {
     }
   }, []);
 
-  const createExpense = useCallback(async (expense: Omit<Expense, 'id' | 'created_at' | 'updated_at'>) => {
+  const createExpense = useCallback(async (expense: CreateExpenseRequest) => {
     setCreateExpenseState({ loading: true, error: null, data: null });
     try {
       const data = await createExpenseService(expense);
       setCreateExpenseState({ loading: false, error: null, data });
-      
+
       // Rafraîchir la liste des dépenses après création
       await fetchExpenses();
-      
+
       return data;
     } catch (error: any) {
       const errorMessage = error.response?.data?.detail || 'Erreur lors de la création de la dépense';
