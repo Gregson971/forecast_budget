@@ -113,7 +113,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { access_token } = await refreshTokenService(refresh_token);
       localStorage.setItem('access_token', access_token);
-      console.log('🔁 Token refreshed');
     } catch (error) {
       console.error('🔒 Refresh token failed');
       toast.error('Session expirée', {

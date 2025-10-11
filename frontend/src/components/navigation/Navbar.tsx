@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import NavMenu from '@/components/navigation/NavMenu';
 import MobileMenu from '@/components/navigation/MobileMenu';
+import UserDropdown from '@/components/navigation/UserDropdown';
 import { useAuth } from '@/context/AuthContext';
 
 export default function Navbar() {
@@ -81,25 +82,7 @@ export default function Navbar() {
           {/* Utilisateur desktop */}
           <div className='hidden md:flex items-center space-x-4'>
             {user ? (
-              <>
-                <div className='flex items-center space-x-2'>
-                  <div className='w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center'>
-                    <span className='text-sm font-medium text-white'>
-                      {user.first_name?.charAt(0)}
-                      {user.last_name?.charAt(0)}
-                    </span>
-                  </div>
-                  <span className='text-gray-300 font-medium'>
-                    {user.first_name} {user.last_name}
-                  </span>
-                </div>
-                <button
-                  onClick={logout}
-                  className='px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white font-medium rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25'
-                >
-                  Déconnexion
-                </button>
-              </>
+              <UserDropdown user={user} logout={logout} />
             ) : (
               <>
                 <Link href='/auth/login' className='text-gray-300 hover:text-white px-4 py-2 rounded-xl hover:bg-white/10 transition-all duration-300 font-medium'>

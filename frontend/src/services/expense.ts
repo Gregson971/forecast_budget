@@ -59,8 +59,6 @@ export const updateExpenseService = async (expense_id: string, expenseData: any)
       updated_at: new Date().toISOString(), // Mettre à jour la date de modification
     };
     
-    console.log('Données envoyées au backend:', updatedExpense);
-    
     const res = await api.put(`/expenses/${expense_id}`, updatedExpense);
     return res.data;
   } catch (error) {

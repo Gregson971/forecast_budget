@@ -16,8 +16,6 @@ const processQueue = (error: any, token: string | null = null) => {
 
 const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"
 
-console.log('🌐 API Base URL:', baseURL)
-
 const instance = axios.create({
   baseURL: baseURL, // backend FastAPI
   timeout: 10000, // 10 secondes de timeout
@@ -28,7 +26,6 @@ instance.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
-  console.log('📤 Request:', config.method?.toUpperCase(), config.url, config.headers)
   return config
 }, error => {
   console.error('❌ Request Error:', error)
@@ -37,7 +34,6 @@ instance.interceptors.request.use(config => {
 
 instance.interceptors.response.use(
   response => {
-    console.log('📥 Response:', response.status, response.config.url)
     return response
   },
   async error => {

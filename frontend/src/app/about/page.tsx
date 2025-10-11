@@ -88,37 +88,6 @@ export default function AboutPage() {
           </div>
         </div>
 
-        {/* Section Technologie */}
-        <div className='glass-card p-8 rounded-lg mb-12 fade-in elevation-2'>
-          <h2 className='text-3xl font-semibold text-white mb-6'>Technologies Utilisées</h2>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-6'>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white font-bold text-sm'>Next.js</span>
-              </div>
-              <p className='text-gray-400 text-sm'>Frontend React</p>
-            </div>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-gradient-to-r from-green-600 to-green-700 rounded-xl flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white font-bold text-sm'>Python</span>
-              </div>
-              <p className='text-gray-400 text-sm'>Backend FastAPI</p>
-            </div>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white font-bold text-sm'>PostgreSQL</span>
-              </div>
-              <p className='text-gray-400 text-sm'>Base de données</p>
-            </div>
-            <div className='text-center'>
-              <div className='w-16 h-16 bg-gradient-to-r from-orange-600 to-orange-700 rounded-xl flex items-center justify-center mx-auto mb-3'>
-                <span className='text-white font-bold text-sm'>Tailwind</span>
-              </div>
-              <p className='text-gray-400 text-sm'>Styling CSS</p>
-            </div>
-          </div>
-        </div>
-
         {/* Section Contact */}
         <div className='glass-card p-8 rounded-lg mb-12 fade-in elevation-2'>
           <h2 className='text-3xl font-semibold text-white mb-6'>Contact</h2>

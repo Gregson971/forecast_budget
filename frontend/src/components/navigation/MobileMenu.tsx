@@ -46,6 +46,22 @@ export default function MobileMenu({ open, onClose, user, logout }: MobileMenuPr
             À propos
           </MenuItem>
         </nav>
+
+        {/* Paramètres utilisateur mobile */}
+        {user && (
+          <div className='mb-6 border-t border-white/10 pt-4'>
+            <h3 className='text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3'>Paramètres</h3>
+            <div className='flex flex-col space-y-2'>
+              <MenuItem href='/settings/account' onClick={onClose}>
+                Paramètres du compte
+              </MenuItem>
+              <MenuItem href='/settings/sessions' onClick={onClose}>
+                Sessions actives
+              </MenuItem>
+            </div>
+          </div>
+        )}
+
         {/* Boutons connexion/déconnexion mobile */}
         {user ? (
           <button

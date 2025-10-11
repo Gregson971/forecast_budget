@@ -1,0 +1,225 @@
+'use client';
+
+import { useAuth } from '@/context/AuthContext';
+import ProtectedRoute from '@/components/ProtectedRoute';
+import Link from 'next/link';
+
+export default function AccountPage() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center px-4'>
+        <div className='glass-card p-8 rounded-lg elevation-2'>
+          <div className='flex items-center space-x-4'>
+            <div className='w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin'></div>
+            <span className='text-white text-lg'>Chargement...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <ProtectedRoute>
+      <div className='page-container'>
+        <div className='container mx-auto max-w-4xl'>
+          {/* Header */}
+          <div className='mb-8'>
+            <h1 className='text-4xl font-bold text-white mb-2'>Paramètres du compte</h1>
+            <p className='text-muted-foreground'>Gérez les informations de votre compte</p>
+          </div>
+
+          {/* Informations du compte */}
+          <div className='glass-card p-6 rounded-lg elevation-2 mb-6'>
+            <h2 className='text-2xl font-semibold text-white mb-6 flex items-center'>
+              <svg className='w-6 h-6 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z'
+                />
+              </svg>
+              Informations personnelles
+            </h2>
+
+            <div className='space-y-4'>
+              {/* Avatar */}
+              <div className='flex items-center space-x-4 pb-6 border-b border-white/10'>
+                <div className='w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center'>
+                  <span className='text-3xl font-medium text-white'>
+                    {user?.first_name?.charAt(0)}
+                    {user?.last_name?.charAt(0)}
+                  </span>
+                </div>
+                <div>
+                  <h3 className='text-xl font-semibold text-white'>
+                    {user?.first_name} {user?.last_name}
+                  </h3>
+                  <p className='text-muted-foreground'>{user?.email}</p>
+                </div>
+              </div>
+
+              {/* Détails */}
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-6 pt-4'>
+                {/* Prénom */}
+                <div>
+                  <label className='block text-sm font-medium text-muted-foreground mb-2'>Prénom</label>
+                  <div className='glass p-3 rounded-lg elevation-1'>
+                    <p className='text-white'>{user?.first_name}</p>
+                  </div>
+                </div>
+
+                {/* Nom */}
+                <div>
+                  <label className='block text-sm font-medium text-muted-foreground mb-2'>Nom</label>
+                  <div className='glass p-3 rounded-lg elevation-1'>
+                    <p className='text-white'>{user?.last_name}</p>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className='md:col-span-2'>
+                  <label className='block text-sm font-medium text-muted-foreground mb-2'>Email</label>
+                  <div className='glass p-3 rounded-lg elevation-1'>
+                    <p className='text-white'>{user?.email}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions futures */}
+          <div className='glass-card p-6 rounded-lg elevation-2 mb-6'>
+            <h2 className='text-2xl font-semibold text-white mb-6 flex items-center'>
+              <svg className='w-6 h-6 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z'
+                />
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M15 12a3 3 0 11-6 0 3 3 0 016 0z' />
+              </svg>
+              Actions
+            </h2>
+
+            <div className='space-y-3'>
+              {/* Modifier le profil - Désactivé pour le moment */}
+              <button
+                disabled
+                className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 opacity-50 cursor-not-allowed'
+              >
+                <div className='flex items-center space-x-3'>
+                  <svg className='w-5 h-5 text-primary' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z'
+                    />
+                  </svg>
+                  <div className='text-left'>
+                    <p className='font-medium text-white'>Modifier le profil</p>
+                    <p className='text-sm text-muted-foreground'>Bientôt disponible</p>
+                  </div>
+                </div>
+                <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                </svg>
+              </button>
+
+              {/* Changer le mot de passe - Désactivé pour le moment */}
+              <button
+                disabled
+                className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 opacity-50 cursor-not-allowed'
+              >
+                <div className='flex items-center space-x-3'>
+                  <svg className='w-5 h-5 text-primary' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z'
+                    />
+                  </svg>
+                  <div className='text-left'>
+                    <p className='font-medium text-white'>Changer le mot de passe</p>
+                    <p className='text-sm text-muted-foreground'>Bientôt disponible</p>
+                  </div>
+                </div>
+                <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                </svg>
+              </button>
+
+              {/* Supprimer le compte - Désactivé pour le moment */}
+              <button
+                disabled
+                className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 opacity-50 cursor-not-allowed'
+              >
+                <div className='flex items-center space-x-3'>
+                  <svg className='w-5 h-5 text-destructive' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16'
+                    />
+                  </svg>
+                  <div className='text-left'>
+                    <p className='font-medium text-destructive'>Supprimer le compte</p>
+                    <p className='text-sm text-muted-foreground'>Bientôt disponible</p>
+                  </div>
+                </div>
+                <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                  <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Lien vers Sessions */}
+          <div className='glass-card p-6 rounded-lg elevation-2'>
+            <h2 className='text-2xl font-semibold text-white mb-4 flex items-center'>
+              <svg className='w-6 h-6 mr-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth={2}
+                  d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                />
+              </svg>
+              Sécurité
+            </h2>
+            <Link
+              href='/settings/sessions'
+              className='flex items-center justify-between p-4 glass rounded-lg elevation-1 hover:elevation-2 transition-all hover:bg-white/5'
+            >
+              <div className='flex items-center space-x-3'>
+                <div className='w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center'>
+                  <svg className='w-5 h-5 text-primary' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                    <path
+                      strokeLinecap='round'
+                      strokeLinejoin='round'
+                      strokeWidth={2}
+                      d='M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'
+                    />
+                  </svg>
+                </div>
+                <div className='text-left'>
+                  <p className='font-medium text-white'>Sessions actives</p>
+                  <p className='text-sm text-muted-foreground'>Gérez vos sessions de connexion</p>
+                </div>
+              </div>
+              <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </div>
+    </ProtectedRoute>
+  );
+}

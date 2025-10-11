@@ -5,15 +5,12 @@ export const loginService = async (email: string, password: string) => {
   formData.append('username', email);
   formData.append('password', password);
 
-  console.log('🔐 Tentative de connexion pour:', email);
-
   try {
     const res = await api.post('/auth/login', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    console.log('✅ Connexion réussie');
     return res.data;
   } catch (error: any) {
     console.error('❌ Erreur de connexion:', error.response?.data);

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -12,6 +12,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +32,21 @@ export default function LoginPage() {
       setLoading(false);
     }
   };
+
+  // Éviter les erreurs d'hydratation causées par les extensions de navigateur
+  if (!mounted) {
+    return (
+      <div className='min-h-screen flex items-center justify-center px-4'>
+        <div className='w-full max-w-md'>
+          <div className='glass-card p-8 rounded-lg elevation-3'>
+            <div className='flex items-center justify-center'>
+              <div className='w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen flex items-center justify-center px-4'>
