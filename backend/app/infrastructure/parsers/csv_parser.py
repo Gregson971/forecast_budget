@@ -65,10 +65,24 @@ class BankCSVParser:
         # Parser le CSV avec point-virgule comme délimiteur
         csv_reader = csv.DictReader(StringIO(file_content), delimiter=';')
 
+        # Valider que les colonnes requises sont présentes
+        if csv_reader.fieldnames:
+            required_columns = ['dateOp']
+            has_amount = 'amount' in csv_reader.fieldnames or 'montant' in csv_reader.fieldnames
+            has_date = 'dateOp' in csv_reader.fieldnames
+
+            if not has_date or not has_amount:
+                raise ValueError(
+                    f"Format CSV invalide. Colonnes requises: dateOp et (amount ou montant). "
+                    f"Colonnes trouvées: {csv_reader.fieldnames}"
+                )
+
         for row in csv_reader:
             try:
                 # Ignorer les lignes vides
-                if not row.get('dateOp') or not row.get('amount'):
+                # Supporter à la fois 'amount' et 'montant'
+                amount_value = row.get('amount') or row.get('montant')
+                if not row.get('dateOp') or not amount_value:
                     continue
 
                 transaction = self._parse_row(row)
@@ -90,7 +104,8 @@ class BankCSVParser:
         date = datetime.strptime(date_str, '%Y-%m-%d')
 
         # Parser le montant (format français: virgule comme séparateur décimal)
-        amount_str = row.get('amount', '0').replace(' ', '').replace('"', '')
+        # Supporter à la fois 'amount' et 'montant'
+        amount_str = (row.get('amount') or row.get('montant', '0')).replace(' ', '').replace('"', '')
         # Remplacer la virgule par un point pour la conversion
         amount_str = amount_str.replace(',', '.')
         amount = float(amount_str)

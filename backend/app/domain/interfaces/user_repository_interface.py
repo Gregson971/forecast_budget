@@ -26,3 +26,13 @@ class UserRepositoryInterface(ABC):
     def get_by_id(self, user_id: str) -> User:
         """Récupère un utilisateur par son id."""
         pass
+
+    @abstractmethod
+    def update(self, user_id: str, user: User) -> User:
+        """Met à jour un utilisateur."""
+        pass
+
+    @abstractmethod
+    def delete(self, user_id: str) -> None:
+        """Supprime un utilisateur."""
+        pass

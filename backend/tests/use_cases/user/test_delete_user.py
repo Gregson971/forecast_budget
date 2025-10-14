@@ -1,10 +1,11 @@
-"""Tests pour le cas d'utilisation de récupération d'un utilisateur."""
+"""Tests pour le cas d'utilisation de suppression d'un utilisateur."""
 
 import uuid
+from uuid import uuid4
 from datetime import datetime
-from app.use_cases.user.get_user import GetUser
-from app.domain.entities.user import User
+from app.use_cases.user.delete_user import DeleteUser
 from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
+from app.domain.entities.user import User
 
 
 class InMemoryUserRepository(UserRepositoryInterface):
@@ -17,16 +18,18 @@ class InMemoryUserRepository(UserRepositoryInterface):
         self.users[user.id] = user
         return user
 
+    def get_by_id(self, user_id: str) -> User:
+        return self.users.get(user_id)
+
     def get_by_email(self, email: str) -> User:
+        """Récupère un utilisateur par son email."""
         for user in self.users.values():
             if user.email == email:
                 return user
         return None
 
-    def get_by_id(self, user_id: str) -> User:
-        return self.users.get(user_id)
-
     def get_all(self) -> list[User]:
+        """Récupère tous les utilisateurs."""
         return list(self.users.values())
 
     def update(self, user_id: str, user: User) -> User:
@@ -37,13 +40,12 @@ class InMemoryUserRepository(UserRepositoryInterface):
         return None
 
     def delete(self, user_id: str) -> None:
-        """Supprime un utilisateur par son id."""
         if user_id in self.users:
             del self.users[user_id]
 
 
-def test_get_user_with_valid_id():
-    """Test pour le cas d'utilisation de récupération d'un utilisateur avec un id valide."""
+def test_delete_user_success():
+    """Test pour le cas d'utilisation de suppression d'un utilisateur avec succès."""
 
     repo = InMemoryUserRepository()
     user_id = str(uuid.uuid4())
@@ -59,34 +61,30 @@ def test_get_user_with_valid_id():
     )
     repo.add(user)
 
-    use_case = GetUser(repo)
-    result = use_case.execute(user_id)
+    use_case = DeleteUser(repo)
+    use_case.execute(user_id)
 
-    assert result is not None
-    assert result.id == user_id
-    assert result.first_name == "John"
-    assert result.last_name == "Doe"
-    assert result.email == "john.doe@example.com"
+    assert user_id not in repo.users
 
 
-def test_get_user_with_invalid_id():
-    """Test pour le cas d'utilisation de récupération d'un utilisateur avec un id invalide."""
+def test_delete_user_failure_with_invalid_user_id():
+    """Test pour le cas d'utilisation de suppression d'un utilisateur avec un id invalide."""
 
     repo = InMemoryUserRepository()
-    use_case = GetUser(repo)
+    use_case = DeleteUser(repo)
 
     try:
-        use_case.execute("invalid_id")
+        use_case.execute(str(uuid4()))
         assert False, "Should raise ValueError"
     except ValueError as e:
-        assert str(e) == "Utilisateur non trouvé"
+        assert str(e) == "L'utilisateur n'existe pas"
 
 
-def test_get_user_with_empty_id():
-    """Test pour le cas d'utilisation de récupération d'un utilisateur avec un id vide."""
+def test_delete_user_failure_with_empty_user_id():
+    """Test pour le cas d'utilisation de suppression d'un utilisateur avec un id vide."""
 
     repo = InMemoryUserRepository()
-    use_case = GetUser(repo)
+    use_case = DeleteUser(repo)
 
     try:
         use_case.execute("")

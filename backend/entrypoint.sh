@@ -1,16 +1,21 @@
 #!/bin/sh
 
-# Vérifier si nous sommes sur Railway (avec DATABASE_URL)
-if [ -n "$DATABASE_URL" ]; then
+# Vérifier si nous sommes sur Railway (variable RAILWAY_ENVIRONMENT spécifique à Railway)
+# ou si le service postgres est accessible (Docker local)
+if [ -n "$RAILWAY_ENVIRONMENT" ]; then
     echo "Railway environment detected, skipping PostgreSQL wait..."
     # Sur Railway, la base de données est déjà prête
-else
-    # Attendre que PostgreSQL soit prêt (pour Docker local)
-    echo "Waiting for PostgreSQL..."
+elif nc -z postgres 5432 2>/dev/null; then
+    # Le service postgres est accessible, attendre qu'il soit prêt
+    echo "Docker environment detected. Waiting for PostgreSQL..."
     while ! nc -z postgres 5432; do
         sleep 0.1
     done
     echo "PostgreSQL started"
+else
+    # DATABASE_URL est défini mais postgres n'est pas accessible comme service Docker
+    # On suppose que c'est une base externe accessible directement
+    echo "External database detected, checking connectivity..."
 fi
 
 # Initialiser la base de données (créer les tables si nécessaire)

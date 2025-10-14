@@ -24,6 +24,17 @@ class SQLUserRepository(UserRepositoryInterface):
         )
         self.db.add(user_db)
         self.db.commit()
+        self.db.refresh(user_db)
+
+        return User(
+            id=user_db.id,
+            first_name=user_db.first_name,
+            last_name=user_db.last_name,
+            email=user_db.email,
+            password=user_db.password,
+            created_at=user_db.created_at,
+            updated_at=user_db.updated_at,
+        )
 
     def get_all(self) -> list[User]:
         """Récupère tous les utilisateurs."""
@@ -68,5 +79,41 @@ class SQLUserRepository(UserRepositoryInterface):
                 created_at=user_db.created_at,
                 updated_at=user_db.updated_at,
             )
+
+        return None
+
+    def update(self, user_id: str, user: User) -> User:
+        """Met à jour un utilisateur."""
+
+        user_db = self.db.query(UserDB).filter(UserDB.id == user_id).first()
+
+        if not user_db:
+            return None
+
+        # Mettre à jour les champs
+        user_db.first_name = user.first_name
+        user_db.last_name = user.last_name
+        user_db.email = user.email
+        user_db.password = user.password
+        user_db.updated_at = user.updated_at
+
+        self.db.commit()
+        self.db.refresh(user_db)
+
+        return User(
+            id=user_db.id,
+            first_name=user_db.first_name,
+            last_name=user_db.last_name,
+            email=user_db.email,
+            password=user_db.password,
+            created_at=user_db.created_at,
+            updated_at=user_db.updated_at,
+        )
+
+    def delete(self, user_id: str) -> None:
+        """Supprime un utilisateur."""
+
+        self.db.query(UserDB).filter(UserDB.id == user_id).delete()
+        self.db.commit()
 
         return None

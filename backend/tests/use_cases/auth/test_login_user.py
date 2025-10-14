@@ -24,10 +24,30 @@ class InMemoryUserRepository(UserRepositoryInterface):
         return self.users.get(email)
 
     def get_by_id(self, user_id: str) -> User:
-        return self.users.get(user_id)
+        for user in self.users.values():
+            if user.id == user_id:
+                return user
+        return None
 
     def get_all(self) -> list[User]:
         return list(self.users.values())
+
+    def update(self, user_id: str, user: User) -> User:
+        """Met à jour un utilisateur."""
+        if user_id in self.users:
+            self.users[user_id] = user
+            return user
+        return None
+
+    def delete(self, user_id: str) -> None:
+        """Supprime un utilisateur par son id."""
+        email_to_delete = None
+        for email, user in self.users.items():
+            if user.id == user_id:
+                email_to_delete = email
+                break
+        if email_to_delete:
+            del self.users[email_to_delete]
 
 
 class InMemoryRefreshTokenRepository(RefreshTokenRepositoryInterface):
