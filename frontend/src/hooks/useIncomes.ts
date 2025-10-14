@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { incomeService } from '@/services/income';
 import type { Income, CreateIncomeRequest, UpdateIncomeRequest, Category, Frequency } from '@/types/income';
+import { handleSilentError } from '@/lib/errorHandler';
 
 export const useIncomes = () => {
   const [incomes, setIncomes] = useState<Income[]>([]);
@@ -39,7 +40,7 @@ export const useIncomes = () => {
       const data = await incomeService.getCategories();
       setCategories(data);
     } catch (err: any) {
-      console.error('Erreur lors du chargement des catégories:', err);
+      handleSilentError(err);
       // Ne pas afficher d'erreur pour les catégories car ce n'est pas critique
     }
   }, []);
@@ -50,7 +51,7 @@ export const useIncomes = () => {
       const data = await incomeService.getFrequencies();
       setFrequencies(data);
     } catch (err: any) {
-      console.error('Erreur lors du chargement des fréquences:', err);
+      handleSilentError(err);
       // Ne pas afficher d'erreur pour les fréquences car ce n'est pas critique
     }
   }, []);

@@ -5,17 +5,12 @@ export const loginService = async (email: string, password: string) => {
   formData.append('username', email);
   formData.append('password', password);
 
-  try {
-    const res = await api.post('/auth/login', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
-    return res.data;
-  } catch (error: any) {
-    console.error('❌ Erreur de connexion:', error.response?.data);
-    throw error;
-  }
+  const res = await api.post('/auth/login', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return res.data;
 };
 
 export const registerService = async (email: string, password: string, first_name: string, last_name: string) => {

@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect } from 'react';
 import { getExpensesService, createExpenseService, getExpenseCategoriesService, getExpenseFrequenciesService, deleteExpenseService, updateExpenseService } from '@/services/expense';
 import { Expense, Category, Frequency, CreateExpenseRequest, UpdateExpenseRequest } from '@/types/expense';
+import { handleSilentError } from '@/lib/errorHandler';
 
 // Données de fallback au cas où l'API ne répond pas
 const fallbackCategories: Category[] = [
@@ -161,7 +162,7 @@ export const useExpenses = () => {
         error: null,
       });
     } catch (error) {
-      console.error('Erreur lors du chargement des données:', error);
+      handleSilentError(error);
       setExpenseDataState({
         categories: fallbackCategories,
         frequencies: fallbackFrequencies,

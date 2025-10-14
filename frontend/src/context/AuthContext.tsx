@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
 import { loginService, registerService, refreshTokenService, getUserService } from '@/services/auth';
+import { handleError, handleSilentError } from '@/lib/errorHandler';
 
 type User = { email: string; first_name: string; last_name: string };
 type AuthContextType = {
@@ -43,8 +44,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         duration: 5000,
       });
     } catch (error: any) {
-      console.error('Erreur de connexion:', error);
-
       let errorMessage = 'Erreur lors de la connexion';
 
       if (error.response?.status === 422) {
@@ -57,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         errorMessage = 'Impossible de se connecter au serveur';
       }
 
-      toast.error(errorMessage);
+      handleError(error, { customMessage: errorMessage });
       throw error;
     }
   };
@@ -114,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const { access_token } = await refreshTokenService(refresh_token);
       localStorage.setItem('access_token', access_token);
     } catch (error) {
-      console.error('🔒 Refresh token failed');
+      handleSilentError(error);
       toast.error('Session expirée', {
         description: 'Vous allez être redirigé vers la page de connexion.',
         duration: 5000,
@@ -166,7 +165,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const userData = await getUserService(access_token);
           setUser(userData);
         } catch (error) {
-          console.error('Erreur lors de la récupération des informations utilisateur:', error);
+          handleSilentError(error);
           // Si le token est invalide, on déconnecte l'utilisateur
           forceLogout();
         }

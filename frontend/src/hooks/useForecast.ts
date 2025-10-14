@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { forecastService, ForecastData, ForecastPeriod } from '@/services/forecast';
+import { handleSilentError } from '@/lib/errorHandler';
 
 export const useForecast = (period: ForecastPeriod) => {
   const [data, setData] = useState<ForecastData | null>(null);
@@ -11,7 +12,7 @@ export const useForecast = (period: ForecastPeriod) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Vérifier si l'utilisateur est authentifié
         const accessToken = localStorage.getItem('access_token');
         if (!accessToken) {
@@ -19,11 +20,11 @@ export const useForecast = (period: ForecastPeriod) => {
           setLoading(false);
           return;
         }
-        
+
         const forecastData = await forecastService.getForecast(period);
         setData(forecastData);
       } catch (err) {
-        console.error('Erreur lors de la récupération des prévisions:', err);
+        handleSilentError(err);
         setError(err instanceof Error ? err.message : 'Erreur inconnue');
       } finally {
         setLoading(false);

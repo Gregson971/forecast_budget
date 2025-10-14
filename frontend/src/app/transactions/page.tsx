@@ -10,6 +10,7 @@ import { useTransactions } from '@/hooks/useTransactions';
 import { Transaction } from '@/types/transaction';
 import type { CreateExpenseRequest, UpdateExpenseRequest } from '@/types/expense';
 import type { CreateIncomeRequest, UpdateIncomeRequest } from '@/types/income';
+import { handleCrudError } from '@/lib/errorHandler';
 
 export default function TransactionsPage() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function TransactionsPage() {
     try {
       await deleteTransaction(id, type);
     } catch (error) {
-      console.error('Erreur lors de la suppression:', error);
+      handleCrudError('delete', type === 'expense' ? 'la dépense' : 'le revenu', error);
     }
   };
 
@@ -58,7 +59,7 @@ export default function TransactionsPage() {
       await createTransaction(type, data);
       setIsModalOpen(false);
     } catch (error) {
-      console.error('Erreur lors de la création:', error);
+      handleCrudError('create', type === 'expense' ? 'la dépense' : 'le revenu', error);
       throw error;
     }
   };
@@ -72,7 +73,7 @@ export default function TransactionsPage() {
       await updateTransaction(id, type, data);
       setIsModalOpen(false);
     } catch (error) {
-      console.error('Erreur lors de la modification:', error);
+      handleCrudError('update', type === 'expense' ? 'la dépense' : 'le revenu', error);
       throw error;
     }
   };

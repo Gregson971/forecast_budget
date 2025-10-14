@@ -1,4 +1,5 @@
 import axios from "axios"
+import { handleSilentError } from "./errorHandler"
 
 let isRefreshing = false
 let failedQueue: any[] = []
@@ -28,7 +29,7 @@ instance.interceptors.request.use(config => {
   }
   return config
 }, error => {
-  console.error('❌ Request Error:', error)
+  handleSilentError(error)
   return Promise.reject(error)
 })
 
@@ -37,11 +38,11 @@ instance.interceptors.response.use(
     return response
   },
   async error => {
-    console.error('❌ Response Error:', error.message, error.config?.url, error.response?.status)
-    
+    // Log silencieux de l'erreur (pas de toast ici, les composants s'en chargent)
+    handleSilentError(error)
+
     // Gestion des erreurs de réseau
     if (!error.response) {
-      console.error('🌐 Network Error - Impossible de se connecter au serveur')
       // Si c'est une erreur de réseau, on peut essayer de rafraîchir le token
       // mais seulement si on a un refresh token
       const refreshToken = localStorage.getItem("refresh_token")

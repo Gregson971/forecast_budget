@@ -3,6 +3,7 @@
 import { useSessions } from '@/hooks/useSessions';
 import SessionList from '@/components/SessionList';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import { handleSilentError } from '@/lib/errorHandler';
 
 export default function SessionsPage() {
   const { sessions, sessionsLoading, sessionsError, revokeSession, fetchSessions } = useSessions();
@@ -12,7 +13,7 @@ export default function SessionsPage() {
       await revokeSession(sessionId);
       // La liste sera automatiquement rafraîchie grâce au hook
     } catch (error) {
-      console.error('Erreur lors de la révocation de la session:', error);
+      handleSilentError(error);
     }
   };
 

@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
+import { handleSilentError } from '@/lib/errorHandler';
 
 export default function RegisterPage() {
   const { register } = useAuth();
@@ -35,7 +36,7 @@ export default function RegisterPage() {
     try {
       await register(email, password, first_name, last_name);
     } catch (error) {
-      console.error("Erreur d'inscription:", error);
+      handleSilentError(error);
     } finally {
       setIsLoading(false);
     }

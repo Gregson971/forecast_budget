@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { importCSV } from '@/services/import'
 import { ImportResult } from '@/types/import'
 import Button from '@/components/ui/Button'
+import { handleSilentError } from '@/lib/errorHandler'
 
 interface CSVUploaderProps {
   onSuccess?: () => void
@@ -70,7 +71,7 @@ export default function CSVUploader({ onSuccess }: CSVUploaderProps) {
         })
       }
     } catch (error: any) {
-      console.error('Erreur lors de l\'import:', error)
+      handleSilentError(error)
       toast.error('Erreur lors de l\'import', {
         description: error.response?.data?.detail || 'Une erreur est survenue',
       })

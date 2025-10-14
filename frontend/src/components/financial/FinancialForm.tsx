@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 import { BaseFinancialItem, BaseFinancialRequest, Category, Frequency } from '@/types/financial';
+import { handleSilentError } from '@/lib/errorHandler';
 
 interface FinancialFormProps {
   item?: BaseFinancialItem | null; // Pour l'édition
@@ -23,7 +24,7 @@ const formatDateForInput = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toISOString().split('T')[0];
   } catch (error) {
-    console.error('Erreur lors de la conversion de la date:', error);
+    handleSilentError(error);
     return new Date().toISOString().split('T')[0];
   }
 };

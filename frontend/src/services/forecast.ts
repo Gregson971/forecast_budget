@@ -29,29 +29,7 @@ export type ForecastPeriod = '1m' | '3m' | '6m' | '1y';
 
 export const forecastService = {
   async getForecast(period: ForecastPeriod): Promise<ForecastData> {
-    try {
-      const response = await api.get(`/forecasts?period=${period}`);
-      return response.data;
-    } catch (error: any) {
-      console.error('❌ Erreur lors de la récupération des prévisions:', error);
-      
-      // Gestion spécifique des erreurs d'authentification
-      if (error.response?.status === 401) {
-        console.error('🔐 Erreur d\'authentification - Token invalide ou expiré');
-        // L'intercepteur axios devrait déjà gérer le refresh du token
-        throw new Error('Session expirée. Veuillez vous reconnecter.');
-      }
-      
-      // Gestion des autres erreurs
-      if (error.response?.status === 500) {
-        throw new Error('Erreur serveur. Veuillez réessayer plus tard.');
-      }
-      
-      if (error.response?.data?.detail) {
-        throw new Error(error.response.data.detail);
-      }
-      
-      throw new Error('Erreur lors de la récupération des prévisions');
-    }
+    const response = await api.get(`/forecasts?period=${period}`);
+    return response.data;
   }
 }; 

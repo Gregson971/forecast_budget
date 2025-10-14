@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Modal from '@/components/ui/Modal';
 import FinancialForm from './FinancialForm';
 import { BaseFinancialItem, BaseFinancialRequest, Category, Frequency } from '@/types/financial';
+import { handleSilentError } from '@/lib/errorHandler';
 
 interface FinancialModalProps {
   isOpen: boolean;
@@ -29,8 +30,7 @@ export default function FinancialModal({ isOpen, onClose, item, onAdd, onUpdate,
         onClose();
       }
     } catch (error) {
-      // L'erreur sera gérée par le formulaire
-      console.error('Erreur lors de la création:', error);
+      handleSilentError(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -44,8 +44,7 @@ export default function FinancialModal({ isOpen, onClose, item, onAdd, onUpdate,
         onClose();
       }
     } catch (error) {
-      // L'erreur sera gérée par le formulaire
-      console.error('Erreur lors de la modification:', error);
+      handleSilentError(error);
     } finally {
       setIsSubmitting(false);
     }

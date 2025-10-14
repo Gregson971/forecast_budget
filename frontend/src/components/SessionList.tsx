@@ -1,6 +1,7 @@
 'use client';
 import { useSessions } from '@/hooks/useSessions';
 import SessionItem from './SessionItem';
+import { handleSilentError } from '@/lib/errorHandler';
 
 export default function SessionList() {
   const { sessions, sessionsLoading, sessionsError, revokeSession, revokeLoading, revokeError } = useSessions();
@@ -10,7 +11,7 @@ export default function SessionList() {
       await revokeSession(id);
       // La liste sera automatiquement rafraîchie grâce au hook
     } catch (error) {
-      console.error('Erreur lors de la révocation:', error);
+      handleSilentError(error);
     }
   };
 
