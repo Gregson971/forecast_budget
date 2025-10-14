@@ -25,10 +25,11 @@
 
 ### 💰 Gestion financière
 
+- **Gestion unifiée des transactions** - Page unique pour dépenses et revenus avec filtres (type, mois, année) et pagination (20 transactions/page)
 - **Suivi des dépenses** avec catégories et filtres
 - **Gestion des revenus** avec sources multiples
 - **Historique détaillé** avec recherche et tri
-- **Import CSV** depuis exports bancaires (Boursorama, etc.)
+- **Import CSV** depuis exports bancaires (Boursorama, etc.) avec détection automatique des doublons
 - **Export des données** (à venir)
 
 ### 📊 Analyses et prévisions
@@ -51,6 +52,9 @@
 - **Mode sombre** par défaut
 - **Responsive design** pour tous les appareils
 - **Animations fluides** et transitions
+- **Gestion d'erreurs centralisée** avec notifications toast (Sonner)
+- **Error boundary Next.js** pour une meilleure expérience utilisateur
+- **Gestion silencieuse** des erreurs avec logs en développement uniquement
 
 ## 🏗️ Architecture
 

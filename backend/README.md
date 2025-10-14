@@ -200,11 +200,13 @@ Une fois l'application démarrée, la documentation interactive est disponible :
 - `GET /expenses/frequencies` - Liste des fréquences disponibles
 
 #### Revenus
-- `GET /income/` - Liste des revenus
-- `POST /income/` - Créer un revenu
-- `GET /income/{income_id}` - Récupérer un revenu
-- `PUT /income/{income_id}` - Modifier un revenu
-- `DELETE /income/{income_id}` - Supprimer un revenu
+- `GET /incomes/` - Liste des revenus
+- `POST /incomes/` - Créer un revenu
+- `GET /incomes/{income_id}` - Récupérer un revenu
+- `PUT /incomes/{income_id}` - Modifier un revenu
+- `DELETE /incomes/{income_id}` - Supprimer un revenu
+- `GET /incomes/categories` - Liste des catégories de revenus disponibles
+- `GET /incomes/frequencies` - Liste des fréquences disponibles
 
 #### Prévisions
 - `GET /forecast/` - Prévisions budgétaires
@@ -237,6 +239,27 @@ alembic downgrade -1
 
 # Voir l'historique des migrations
 alembic history
+
+# Voir la version actuelle
+alembic current
+```
+
+### Migrations disponibles
+
+Les migrations actuelles créent les tables suivantes :
+- **users** - Utilisateurs de l'application
+- **sessions** - Sessions actives des utilisateurs
+- **refresh_tokens** - Tokens de rafraîchissement JWT
+- **expenses** - Dépenses des utilisateurs
+- **incomes** - Revenus des utilisateurs (ajouté récemment)
+
+**Note importante** : Si vous rencontrez l'erreur `relation "incomes" does not exist`, exécutez :
+```bash
+# Avec Docker
+docker compose exec api alembic upgrade head
+
+# En local
+alembic upgrade head
 ```
 
 ## 🧪 Tests
@@ -394,10 +417,26 @@ ORIGINS_ALLOWED=["https://yourdomain.com"]
 
 ```bash
 # Vérifier que PostgreSQL est démarré
-docker-compose ps postgres
+docker compose ps postgres
 
 # Vérifier les logs
-docker-compose logs postgres
+docker compose logs postgres
+
+# Vérifier la connexion depuis l'API
+docker compose exec api python -c "from app.infrastructure.db.database import engine; print(engine.url)"
+```
+
+#### Erreur "relation does not exist"
+
+```bash
+# Vérifier la version actuelle de la migration
+docker compose exec api alembic current
+
+# Appliquer toutes les migrations
+docker compose exec api alembic upgrade head
+
+# Vérifier les tables créées
+docker compose exec postgres psql -U postgres -d forecast_budget -c "\dt"
 ```
 
 #### Erreur de migration

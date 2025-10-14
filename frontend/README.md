@@ -17,6 +17,9 @@ Ceci est le frontend pour l'application **Forecast Budget**, une interface moder
 - 🔄 **Synchronisation temps réel** avec l'API backend
 - 🌙 **Mode sombre Material UI** par défaut
 - ⚡ **Performance optimisée** avec Next.js 15 et Turbopack
+- 🛡️ **Gestion d'erreurs centralisée** avec error handler et notifications toast (Sonner)
+- 🚨 **Error boundary Next.js** pour capturer les erreurs de rendu React
+- 📝 **Logs en développement** uniquement pour une meilleure expérience de débogage
 
 ## 🛠️ Technologies utilisées
 
@@ -113,6 +116,7 @@ frontend/
 │   │   ├── about/               # Page à propos
 │   │   ├── layout.tsx           # Layout principal
 │   │   ├── page.tsx             # Page d'accueil
+│   │   ├── error.tsx            # Error boundary global
 │   │   └── globals.css          # Styles globaux
 │   ├── components/              # Composants réutilisables
 │   │   ├── ui/                  # Composants UI de base
@@ -140,6 +144,7 @@ frontend/
 │   │   └── import.ts            # Service d'import CSV
 │   ├── lib/                     # Utilitaires et configurations
 │   │   ├── api.ts               # Configuration Axios
+│   │   ├── errorHandler.ts      # Gestionnaire d'erreurs centralisé
 │   │   └── utils.ts             # Fonctions utilitaires
 │   └── types/                   # Types TypeScript
 │       ├── expense.ts           # Types pour les dépenses
@@ -202,19 +207,17 @@ npm run test:coverage # Tests avec couverture
 - **Inscription** : Création de compte utilisateur
 - **Gestion des sessions** : Visualisation et révocation
 
-### 💰 Gestion des dépenses
+### 💰 Gestion des transactions (Page unifiée)
 
-- **Liste des dépenses** avec filtres et tri
-- **Ajout de dépense** avec catégories
-- **Modification et suppression** des dépenses
-- **Visualisation** par période
-
-### 💵 Gestion des revenus
-
-- **Liste des revenus** avec filtres
-- **Ajout de revenu** avec sources
-- **Modification et suppression** des revenus
-- **Suivi des revenus** par période
+- **Liste unifiée** de toutes les transactions (dépenses et revenus)
+- **Filtres intelligents** :
+  - Par type (toutes, dépenses, revenus)
+  - Par mois (1-12)
+  - Par année
+- **Pagination** : 20 transactions par page
+- **Actions rapides** : Modifier ou supprimer directement depuis la liste
+- **Ajout simplifié** : Modales dédiées pour dépenses et revenus
+- **Design épuré** : Tableau Material UI avec système d'élévation
 
 ### 📊 Prévisions et tableaux de bord
 
@@ -236,6 +239,44 @@ npm run test:coverage # Tests avec couverture
 - **Profil utilisateur** : Modification des informations
 - **Gestion des sessions** : Sessions actives et révocation
 - **Préférences** : Configuration de l'application
+
+## 🛡️ Gestion des erreurs
+
+L'application utilise un système de gestion d'erreurs centralisé pour une meilleure expérience utilisateur.
+
+### Error Handler (`src/lib/errorHandler.ts`)
+
+Le gestionnaire d'erreurs centralisé offre trois types de handlers :
+
+```typescript
+// Handler standard - Affiche une notification toast
+handleError(error, {
+  showToast: true,  // Afficher une notification (défaut: true)
+  context: 'Login'  // Contexte de l'erreur
+})
+
+// Handler CRUD - Pour les opérations Create, Read, Update, Delete
+handleCrudError('create', 'expense', error)
+handleCrudError('delete', 'income', error)
+
+// Handler silencieux - Logs uniquement (pas de toast)
+handleSilentError(error)
+```
+
+**Fonctionnalités** :
+- Catégorisation automatique des erreurs (Network, Authentication, Validation, Server, Unknown)
+- Logs en développement uniquement (`NODE_ENV === 'development'`)
+- Messages d'erreur traduits en français
+- Notifications toast avec Sonner
+
+### Error Boundary (`src/app/error.tsx`)
+
+Page d'erreur globale Next.js qui capture toutes les erreurs de rendu React :
+
+- **Mode développement** : Affiche les détails de l'erreur avec stack trace
+- **Mode production** : Interface utilisateur propre et user-friendly
+- Boutons "Réessayer" et "Retour à l'accueil"
+- Design cohérent avec le reste de l'application
 
 ## 🔌 Intégration API
 
@@ -266,10 +307,18 @@ api.interceptors.request.use((config) => {
 
 - `POST /auth/login` - Connexion utilisateur
 - `POST /auth/register` - Inscription utilisateur
+- `POST /auth/refresh` - Rafraîchir le token JWT
+- `GET /auth/me` - Profil utilisateur
+- `GET /auth/me/sessions` - Liste des sessions
+- `DELETE /auth/me/sessions/{session_id}` - Révoquer une session
 - `GET /expenses/` - Liste des dépenses
 - `POST /expenses/` - Créer une dépense
-- `GET /income/` - Liste des revenus
-- `POST /income/` - Créer un revenu
+- `PUT /expenses/{expense_id}` - Modifier une dépense
+- `DELETE /expenses/{expense_id}` - Supprimer une dépense
+- `GET /incomes/` - Liste des revenus
+- `POST /incomes/` - Créer un revenu
+- `PUT /incomes/{income_id}` - Modifier un revenu
+- `DELETE /incomes/{income_id}` - Supprimer un revenu
 - `GET /forecast/` - Prévisions budgétaires
 - `POST /imports/csv` - Importer des transactions depuis CSV
 
@@ -402,6 +451,32 @@ npm run build
 # Supprimer node_modules et réinstaller
 rm -rf node_modules package-lock.json
 npm install
+```
+
+#### Erreurs non gérées affichées dans la console
+
+Les erreurs sont maintenant gérées de manière centralisée :
+- Les logs apparaissent uniquement en mode développement
+- Les notifications toast s'affichent pour informer l'utilisateur
+- Les erreurs critiques sont capturées par l'error boundary
+
+Pour déboguer :
+```bash
+# Vérifier les logs de développement
+npm run dev
+# Ouvrir la console du navigateur (F12)
+```
+
+#### Erreur 500 sur `/incomes`
+
+Si vous obtenez une erreur 500 sur l'endpoint `/incomes`, vérifiez que :
+```bash
+# La table incomes existe dans la base de données backend
+cd ../backend
+docker compose exec postgres psql -U postgres -d forecast_budget -c "\dt"
+
+# Si la table n'existe pas, appliquez les migrations
+docker compose exec api alembic upgrade head
 ```
 
 ## 📄 Licence
