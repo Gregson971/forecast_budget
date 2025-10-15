@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from 'date-fns';
-import Button from './ui/Button';
-import Badge from './ui/Badge';
+import Button from '@/components/ui/Button';
+import Badge from '@/components/ui/Badge';
 
 type Props = {
   session: any;
