@@ -103,60 +103,119 @@ L'application sera disponible sur [http://localhost:3000](http://localhost:3000)
 ```
 frontend/
 ├── src/
-│   ├── app/                     # Pages et layouts (App Router)
-│   │   ├── auth/                # Pages d'authentification
-│   │   │   ├── login/           # Page de connexion
-│   │   │   └── register/        # Page d'inscription
-│   │   ├── expenses/            # Gestion des dépenses
-│   │   ├── incomes/             # Gestion des revenus
-│   │   ├── forecasts/           # Prévisions et tableaux de bord
-│   │   ├── import/              # Import de transactions CSV
-│   │   ├── settings/            # Paramètres utilisateur
-│   │   │   └── sessions/        # Gestion des sessions
-│   │   ├── about/               # Page à propos
-│   │   ├── layout.tsx           # Layout principal
-│   │   ├── page.tsx             # Page d'accueil
-│   │   ├── error.tsx            # Error boundary global
-│   │   └── globals.css          # Styles globaux
-│   ├── components/              # Composants réutilisables
-│   │   ├── ui/                  # Composants UI de base
-│   │   ├── navigation/          # Navigation et menu
-│   │   ├── expense/             # Composants pour les dépenses
-│   │   ├── income/              # Composants pour les revenus
-│   │   ├── financial/           # Composants financiers
-│   │   ├── import/              # Composants pour l'import CSV
-│   │   │   └── CSVUploader.tsx  # Composant d'upload CSV
-│   │   ├── AuthForm.tsx         # Formulaire d'authentification
-│   │   ├── ProtectedRoute.tsx   # Protection des routes
-│   │   └── ErrorNotification.tsx # Notifications d'erreur
-│   ├── context/                 # Contextes React
-│   │   └── AuthContext.tsx      # Contexte d'authentification
-│   ├── hooks/                   # Hooks personnalisés
-│   │   ├── useExpenses.ts       # Hook pour les dépenses
-│   │   ├── useIncomes.ts        # Hook pour les revenus
-│   │   ├── useForecast.ts       # Hook pour les prévisions
-│   │   └── useSessions.ts       # Hook pour les sessions
-│   ├── services/                # Services API
-│   │   ├── auth.ts              # Service d'authentification
-│   │   ├── expense.ts           # Service des dépenses
-│   │   ├── income.ts            # Service des revenus
-│   │   ├── forecast.ts          # Service des prévisions
-│   │   └── import.ts            # Service d'import CSV
-│   ├── lib/                     # Utilitaires et configurations
-│   │   ├── api.ts               # Configuration Axios
-│   │   ├── errorHandler.ts      # Gestionnaire d'erreurs centralisé
-│   │   └── utils.ts             # Fonctions utilitaires
-│   └── types/                   # Types TypeScript
-│       ├── expense.ts           # Types pour les dépenses
-│       ├── income.ts            # Types pour les revenus
-│       ├── import.ts            # Types pour l'import
-│       └── financial.ts         # Types financiers généraux
-├── public/                      # Assets statiques
-├── package.json                 # Dépendances et scripts
-├── next.config.ts               # Configuration Next.js
-├── tailwind.config.ts           # Configuration Tailwind
-├── tsconfig.json                # Configuration TypeScript
-└── postcss.config.mjs           # Configuration PostCSS
+│   ├── app/                           # Pages et layouts (App Router - Next.js 15)
+│   │   ├── auth/                      # Pages d'authentification
+│   │   │   ├── login/                 # Page de connexion
+│   │   │   └── register/              # Page d'inscription
+│   │   ├── transactions/              # Gestion unifiée des transactions
+│   │   │   └── page.tsx               # Page des transactions (Server Component)
+│   │   ├── forecasts/                 # Prévisions et tableaux de bord
+│   │   │   └── page.tsx               # Page des prévisions (Server Component)
+│   │   ├── settings/                  # Paramètres utilisateur
+│   │   │   ├── account/               # Gestion du profil
+│   │   │   │   └── page.tsx           # Page du compte (Server Component)
+│   │   │   └── sessions/              # Gestion des sessions
+│   │   │       └── page.tsx           # Page des sessions (Server Component)
+│   │   ├── about/                     # Page à propos
+│   │   ├── layout.tsx                 # Layout principal avec AuthProvider
+│   │   ├── page.tsx                   # Page d'accueil
+│   │   ├── error.tsx                  # Error boundary global
+│   │   └── globals.css                # Styles globaux + Tailwind
+│   │
+│   ├── components/                    # Composants réutilisables (organisés par fonctionnalité)
+│   │   ├── auth/                      # Authentification et protection
+│   │   │   ├── AuthForm.tsx           # Formulaire d'authentification
+│   │   │   └── ProtectedRoute.tsx     # HOC de protection de routes
+│   │   ├── profile/                   # Gestion du profil utilisateur
+│   │   │   └── EditProfileForm.tsx    # Formulaire d'édition de profil
+│   │   ├── sessions/                  # Gestion des sessions
+│   │   │   ├── SessionItem.tsx        # Item de session
+│   │   │   └── SessionList.tsx        # Liste des sessions actives
+│   │   ├── financial/                 # Composants financiers
+│   │   │   ├── FinancialForm.tsx      # Formulaire de transaction
+│   │   │   └── FinancialModal.tsx     # Modale de transaction
+│   │   ├── transaction/               # Gestion des transactions
+│   │   │   ├── TransactionItem.tsx    # Item de transaction
+│   │   │   ├── TransactionList.tsx    # Liste des transactions
+│   │   │   └── TransactionModal.tsx   # Modale d'ajout/édition
+│   │   ├── import/                    # Import de données
+│   │   │   └── CSVUploader.tsx        # Upload CSV drag & drop
+│   │   ├── navigation/                # Navigation et menu
+│   │   │   ├── Navbar.tsx             # Barre de navigation
+│   │   │   ├── NavMenu.tsx            # Menu de navigation
+│   │   │   ├── MenuItem.tsx           # Item de menu
+│   │   │   ├── MobileMenu.tsx         # Menu mobile
+│   │   │   └── UserDropdown.tsx       # Dropdown utilisateur
+│   │   ├── wrappers/                  # Client Component Wrappers (Server/Client Split)
+│   │   │   ├── AccountClientWrapper.tsx      # Wrapper pour la page compte
+│   │   │   ├── SessionsClientWrapper.tsx     # Wrapper pour la page sessions
+│   │   │   ├── TransactionsClientWrapper.tsx # Wrapper pour la page transactions
+│   │   │   └── ForecastsClientWrapper.tsx    # Wrapper pour la page prévisions
+│   │   ├── ui/                        # Composants UI de base
+│   │   │   ├── Button.tsx             # Bouton réutilisable
+│   │   │   ├── Input.tsx              # Input réutilisable
+│   │   │   ├── Modal.tsx              # Modale réutilisable
+│   │   │   ├── Badge.tsx              # Badge réutilisable
+│   │   │   └── ConfirmModal.tsx       # Modale de confirmation
+│   │   └── ErrorNotification.tsx      # Notification d'erreur
+│   │
+│   ├── context/                       # Contextes React
+│   │   └── AuthContext.tsx            # Contexte d'authentification global
+│   │
+│   ├── hooks/                         # Hooks personnalisés
+│   │   ├── useTransactions.ts         # Hook pour les transactions unifiées
+│   │   ├── useForecast.ts             # Hook pour les prévisions
+│   │   └── useSessions.ts             # Hook pour les sessions
+│   │
+│   ├── services/                      # Services API
+│   │   ├── auth.ts                    # Service d'authentification
+│   │   ├── expense.ts                 # Service des dépenses
+│   │   ├── income.ts                  # Service des revenus
+│   │   ├── forecast.ts                # Service des prévisions
+│   │   └── import.ts                  # Service d'import CSV
+│   │
+│   ├── lib/                           # Utilitaires et configurations
+│   │   ├── api.ts                     # Configuration Axios + Intercepteurs
+│   │   ├── errorHandler.ts            # Gestionnaire d'erreurs centralisé
+│   │   └── utils.ts                   # Fonctions utilitaires
+│   │
+│   └── types/                         # Types TypeScript
+│       ├── expense.ts                 # Types pour les dépenses
+│       ├── income.ts                  # Types pour les revenus
+│       ├── transaction.ts             # Types pour les transactions
+│       ├── import.ts                  # Types pour l'import
+│       └── financial.ts               # Types financiers généraux
+│
+├── public/                            # Assets statiques
+├── package.json                       # Dépendances et scripts
+├── next.config.ts                     # Configuration Next.js
+├── tailwind.config.ts                 # Configuration Tailwind CSS 4.1
+├── tsconfig.json                      # Configuration TypeScript
+└── postcss.config.mjs                 # Configuration PostCSS
+```
+
+### Architecture Server/Client Components
+
+L'application utilise l'architecture **Server Components + Client Components** de Next.js 15 pour une performance optimale :
+
+#### Server Components (pages principales)
+- Rendu côté serveur pour le SEO et les performances
+- Contenu statique (headers, titres, descriptions)
+- Zéro JavaScript envoyé au client pour le contenu statique
+- Pages : `account`, `sessions`, `transactions`, `forecasts`
+
+#### Client Components (wrappers)
+- Logique interactive et gestion d'état
+- Hooks React (`useState`, `useEffect`, custom hooks)
+- Event handlers et interactions utilisateur
+- Localisation : `src/components/wrappers/`
+
+**Pattern utilisé :**
+```
+Server Component (page.tsx)
+├── Header statique (Server)
+└── ClientWrapper (Client)
+    └── Logique interactive
 ```
 
 ## 🎨 Design System
@@ -236,9 +295,20 @@ npm run test:coverage # Tests avec couverture
 
 ### ⚙️ Paramètres
 
-- **Profil utilisateur** : Modification des informations
-- **Gestion des sessions** : Sessions actives et révocation
-- **Préférences** : Configuration de l'application
+#### 👤 Profil utilisateur (`/settings/account`)
+- **Édition du profil** : Modification du prénom, nom et email
+- **Interface intuitive** : Mode vue/édition avec bouton "Modifier"
+- **Validation en temps réel** : Mise à jour uniquement des champs modifiés
+- **Avatar dynamique** : Initiales colorées générées automatiquement
+- **Actions futures** : Changement de mot de passe et suppression de compte (à venir)
+- **Lien rapide** : Accès aux sessions actives depuis la page profil
+
+#### 🔐 Gestion des sessions (`/settings/sessions`)
+- **Visualisation** : Liste de toutes les sessions actives
+- **Informations détaillées** : User agent, IP, date de création
+- **Session courante** : Badge "Appareil actuel" pour identifier la session en cours
+- **Révocation** : Déconnexion à distance des autres sessions
+- **Sécurité** : Gestion complète des accès à votre compte
 
 ## 🛡️ Gestion des erreurs
 
@@ -305,21 +375,31 @@ api.interceptors.request.use((config) => {
 
 ### Endpoints utilisés
 
+#### Authentification & Utilisateur
 - `POST /auth/login` - Connexion utilisateur
 - `POST /auth/register` - Inscription utilisateur
 - `POST /auth/refresh` - Rafraîchir le token JWT
-- `GET /auth/me` - Profil utilisateur
-- `GET /auth/me/sessions` - Liste des sessions
+- `GET /auth/me` - Récupérer le profil utilisateur
+- `PUT /users/me` - Mettre à jour le profil utilisateur (prénom, nom, email)
+
+#### Sessions
+- `GET /auth/me/sessions` - Liste des sessions actives
 - `DELETE /auth/me/sessions/{session_id}` - Révoquer une session
-- `GET /expenses/` - Liste des dépenses
+
+#### Dépenses
+- `GET /expenses/` - Liste des dépenses (avec filtres)
 - `POST /expenses/` - Créer une dépense
 - `PUT /expenses/{expense_id}` - Modifier une dépense
 - `DELETE /expenses/{expense_id}` - Supprimer une dépense
-- `GET /incomes/` - Liste des revenus
+
+#### Revenus
+- `GET /incomes/` - Liste des revenus (avec filtres)
 - `POST /incomes/` - Créer un revenu
 - `PUT /incomes/{income_id}` - Modifier un revenu
 - `DELETE /incomes/{income_id}` - Supprimer un revenu
-- `GET /forecast/` - Prévisions budgétaires
+
+#### Prévisions & Import
+- `GET /forecast/` - Prévisions budgétaires (par période)
 - `POST /imports/csv` - Importer des transactions depuis CSV
 
 ## 🧪 Tests
