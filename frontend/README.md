@@ -404,32 +404,184 @@ api.interceptors.request.use((config) => {
 
 ## 🧪 Tests
 
+L'application utilise **Jest 30.2.0** et **React Testing Library 16.3.0** pour une couverture de tests complète.
+
+### Infrastructure de tests
+
+- **Framework** : Jest avec environnement jsdom
+- **Bibliothèque de tests** : React Testing Library (RTL)
+- **Utilitaires** : @testing-library/user-event, @testing-library/jest-dom
+- **Configuration** : jest.config.ts, jest.setup.ts
+- **Couverture actuelle** : 46 tests (100% passants)
+
 ### Structure des tests
 
 ```
 tests/
-├── components/           # Tests des composants
-├── pages/               # Tests des pages
-├── hooks/               # Tests des hooks
-├── services/            # Tests des services
-└── utils/               # Tests des utilitaires
+├── components/              # Tests des composants React
+│   ├── ui/                  # Tests des composants UI (Button, Input)
+│   └── sessions/            # Tests des composants sessions
+├── hooks/                   # Tests des custom hooks (useSessions)
+├── services/                # Tests des services API (auth)
+└── utils/                   # Tests des utilitaires (errorHandler)
 ```
 
-### Exécution des tests
+### Tests existants
+
+**Composants UI** (13 tests)
+- `Button.test.tsx` : Tests du composant Button (6 tests)
+- `Input.test.tsx` : Tests du composant Input avec validation (7 tests)
+
+**Composants métier** (7 tests)
+- `SessionItem.test.tsx` : Tests d'affichage et interactions (7 tests)
+
+**Hooks personnalisés** (4 tests)
+- `useSessions.test.ts` : Tests du hook de gestion des sessions (4 tests)
+
+**Services API** (7 tests)
+- `auth.test.ts` : Tests des services d'authentification (7 tests)
+
+**Utilitaires** (17 tests)
+- `errorHandler.test.ts` : Tests du gestionnaire d'erreurs centralisé (17 tests)
+
+### Scripts de tests disponibles
 
 ```bash
-# Tous les tests
+# Exécuter tous les tests
 npm run test
 
-# Tests en mode watch
+# Tests en mode watch (re-exécution automatique)
 npm run test:watch
 
-# Tests avec couverture
+# Tests avec rapport de couverture de code
 npm run test:coverage
 
-# Tests spécifiques
-npm run test -- --testPathPattern=components
+# Tests avec sortie détaillée
+npm run test:ui
+
+# Exécuter des tests spécifiques
+npm run test -- tests/components/ui/Button.test.tsx
+npm run test -- --testPathPattern=hooks
+npm run test -- --testNamePattern="handles fetch error"
 ```
+
+### Configuration Jest
+
+**jest.config.ts**
+- Environnement jsdom pour simuler le DOM
+- Module mapper pour les alias TypeScript (`@/`)
+- Seuil de couverture : 50% (branches, fonctions, lignes, statements)
+- Exclusions : fichiers .d.ts, stories, app/ directory
+
+**jest.setup.ts**
+- Mocks globaux : Next.js router, localStorage, matchMedia, IntersectionObserver
+- Configuration de @testing-library/jest-dom
+- Gestion des rejets de promesses non gérées
+
+### Bonnes pratiques de test
+
+```typescript
+// Test d'un composant UI
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+it('handles user interaction', async () => {
+  const user = userEvent.setup();
+  const handleClick = jest.fn();
+
+  render(<Button onClick={handleClick}>Click me</Button>);
+
+  await user.click(screen.getByRole('button'));
+
+  expect(handleClick).toHaveBeenCalled();
+});
+
+// Test d'un hook personnalisé
+import { renderHook, waitFor, act } from '@testing-library/react';
+
+it('fetches data on mount', async () => {
+  const { result } = renderHook(() => useCustomHook());
+
+  await waitFor(() => {
+    expect(result.current.loading).toBe(false);
+  });
+
+  expect(result.current.data).toBeDefined();
+});
+
+// Test d'un service API
+jest.mock('@/lib/api');
+const mockedApi = api as jest.Mocked<typeof api>;
+
+it('calls API with correct parameters', async () => {
+  mockedApi.get.mockResolvedValue({ data: mockData });
+
+  const result = await getDataService();
+
+  expect(result).toEqual(mockData);
+  expect(mockedApi.get).toHaveBeenCalledWith('/endpoint');
+});
+```
+
+### Couverture de code
+
+Exécutez les tests avec couverture pour voir les métriques détaillées :
+
+```bash
+npm run test:coverage
+```
+
+Le rapport de couverture sera généré dans `coverage/` avec :
+- Rapport HTML interactif dans `coverage/lcov-report/index.html`
+- Résumé dans la console
+- Seuils de couverture configurés à 50% minimum
+
+### Mocking et utilitaires
+
+**Mocks globaux disponibles** :
+- `localStorage` : Mock complet avec getItem, setItem, removeItem
+- `next/navigation` : useRouter, usePathname, useSearchParams
+- `window.matchMedia` : Pour les tests de media queries
+- `IntersectionObserver` : Pour les tests de lazy loading
+
+**Helpers de test** :
+- `@testing-library/jest-dom` : Matchers personnalisés (toBeInTheDocument, toHaveValue, etc.)
+- `@testing-library/user-event` : Simulation d'interactions utilisateur réalistes
+- `waitFor` : Attendre des changements asynchrones
+- `act` : Wrapper pour les mises à jour d'état React
+
+### Ajouter de nouveaux tests
+
+Pour tester un nouveau composant ou hook :
+
+1. Créer un fichier de test dans le répertoire approprié
+2. Importer les utilitaires de test nécessaires
+3. Mocker les dépendances externes (API, contextes, etc.)
+4. Écrire des tests descriptifs avec `describe` et `it`
+5. Utiliser `render`, `renderHook`, `screen`, `waitFor` selon le besoin
+6. Vérifier avec `npm run test`
+
+**Exemple de nouveau test** :
+
+```typescript
+// tests/components/ui/NewComponent.test.tsx
+import { render, screen } from '@testing-library/react';
+import NewComponent from '@/components/ui/NewComponent';
+
+describe('NewComponent', () => {
+  it('renders correctly', () => {
+    render(<NewComponent title="Test" />);
+    expect(screen.getByText('Test')).toBeInTheDocument();
+  });
+});
+```
+
+### Documentation complète
+
+Pour plus d'informations sur les tests, consultez :
+- `tests/README.md` - Guide détaillé des tests avec exemples
+- Documentation Jest : https://jestjs.io/
+- Documentation RTL : https://testing-library.com/react
 
 ## 🚀 Déploiement
 
