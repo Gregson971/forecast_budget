@@ -77,8 +77,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Vous allez être redirigé vers la page d'accueil.",
         duration: 5000,
       });
-    } catch (error) {
-      toast.error("Erreur lors de l'inscription");
+    } catch (error: any) {
+      let errorMessage = "Erreur lors de l'inscription";
+
+      // Extraire le message d'erreur détaillé du backend
+      if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || "Données d'inscription invalides";
+      } else if (error.response?.status === 404) {
+        errorMessage = 'Service non disponible';
+      } else if (!error.response) {
+        errorMessage = 'Impossible de se connecter au serveur';
+      }
+
+      handleError(error, { customMessage: errorMessage });
       throw error;
     }
   };

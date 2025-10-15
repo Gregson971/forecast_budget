@@ -22,7 +22,7 @@ class RegisterUser:
 
         # Vérifier si l'utilisateur existe déjà
         if self.user_repo.get_by_email(data["email"]):
-            raise ValueError("L'utilisateur existe déjà")
+            raise ValueError("Cet email est déjà utilisé")
 
         # Créer un nouvel utilisateur
         hashed_password = bcrypt.hash(data["password"])
@@ -44,13 +44,21 @@ class RegisterUser:
     def validate_data(self, data: dict) -> None:
         """Valide les données d'entrée pour la création d'un utilisateur."""
 
+        field_names = {
+            "first_name": "Prénom",
+            "last_name": "Nom",
+            "email": "Email",
+            "password": "Mot de passe"
+        }
+
         required_fields = ["first_name", "last_name", "email", "password"]
         for field in required_fields:
             if field not in data or not data[field]:
-                raise ValueError(f"Le champ {field} est requis")
+                field_label = field_names.get(field, field)
+                raise ValueError(f"Le champ '{field_label}' est requis")
 
     def validate_email(self, email: str) -> None:
         """Valide l'email d'entrée."""
 
         if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-            raise ValueError("L'email est invalide")
+            raise ValueError("L'adresse email n'est pas valide")
