@@ -3,7 +3,7 @@ import { createContext, useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { toast } from 'sonner';
-import { loginService, registerService, refreshTokenService, getUserService } from '@/services/auth';
+import { loginService, registerService, refreshTokenService, getUserService, updateUserService } from '@/services/auth';
 import { handleError, handleSilentError } from '@/lib/errorHandler';
 
 type User = { email: string; first_name: string; last_name: string };
@@ -13,6 +13,7 @@ type AuthContextType = {
   register: (email: string, password: string, first_name: string, last_name: string) => Promise<void>;
   logout: () => void;
   getUser: () => Promise<User | null>;
+  updateUser: (data: { first_name?: string; last_name?: string; email?: string }) => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
 };
@@ -149,6 +150,34 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateUser = async (data: { first_name?: string; last_name?: string; email?: string }) => {
+    const access_token = localStorage.getItem('access_token');
+    if (!access_token) {
+      toast.error('Vous devez être connecté pour modifier votre profil');
+      return;
+    }
+
+    try {
+      const updatedUser = await updateUserService(data, access_token);
+      setUser(updatedUser);
+      toast.success('Profil mis à jour avec succès', {
+        description: 'Vos informations ont été modifiées.',
+        duration: 3000,
+      });
+    } catch (error: any) {
+      let errorMessage = 'Erreur lors de la mise à jour du profil';
+
+      if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      } else if (error.response?.status === 400) {
+        errorMessage = error.response?.data?.detail || 'Données invalides';
+      }
+
+      handleError(error, { customMessage: errorMessage });
+      throw error;
+    }
+  };
+
   // Gestion automatique du rafraîchissement des tokens
   useEffect(() => {
     const interval = setInterval(() => {
@@ -197,6 +226,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         register,
         logout,
         getUser,
+        updateUser,
         isAuthenticated: !!user,
         isLoading,
       }}

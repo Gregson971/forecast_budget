@@ -49,3 +49,15 @@ export const getUserService = async (access_token: string) => {
   });
   return res.data;
 };
+
+export const updateUserService = async (
+  data: { first_name?: string; last_name?: string; email?: string },
+  access_token: string
+) => {
+  const res = await api.put('/users/me', data, {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return res.data;
+};
