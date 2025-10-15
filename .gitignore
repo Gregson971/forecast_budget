@@ -1,3 +1,5 @@
 # VSCode config is in .vscode/settings.json
 .vscode/
 .DS_Store
+
+CLAUDE.md
