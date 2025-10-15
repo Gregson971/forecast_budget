@@ -32,8 +32,14 @@ app = FastAPI(
 origins_allowed_str = os.getenv("ORIGINS_ALLOWED", '["http://localhost:3000"]')
 try:
     origins_allowed = json.loads(origins_allowed_str)
-except json.JSONDecodeError:
+    logger.info(f"CORS origins configured: {origins_allowed}")
+except json.JSONDecodeError as e:
+    logger.error(f"Failed to parse ORIGINS_ALLOWED: {e}. Using default.")
     origins_allowed = ["http://localhost:3000"]
+
+# Log CORS configuration at startup
+logger.info(f"Starting FastAPI with CORS origins: {origins_allowed}")
+logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
 
 app.add_middleware(
     CORSMiddleware,
@@ -61,6 +67,23 @@ def read_root():
     """Route pour la racine de l'API."""
 
     return {"message": "Bienvenue sur l'API de gestion de budget"}
+
+
+@app.get("/cors-config")
+def get_cors_config():
+    """Endpoint de debug pour vérifier la configuration CORS."""
+    origins_allowed_str = os.getenv("ORIGINS_ALLOWED", '["http://localhost:3000"]')
+    try:
+        origins_allowed = json.loads(origins_allowed_str)
+    except json.JSONDecodeError:
+        origins_allowed = ["http://localhost:3000"]
+
+    return {
+        "origins_allowed": origins_allowed,
+        "origins_allowed_raw": origins_allowed_str,
+        "environment": os.getenv("ENVIRONMENT", "development"),
+        "debug": os.getenv("DEBUG", "false")
+    }
 
 
 app.include_router(auth_router)
