@@ -61,3 +61,12 @@ export const updateUserService = async (
   });
   return res.data;
 };
+
+export const deleteUserService = async (access_token: string) => {
+  const res = await api.delete('/users/me', {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  });
+  return res.data;
+};

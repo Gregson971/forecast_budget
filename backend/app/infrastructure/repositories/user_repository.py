@@ -4,6 +4,10 @@ from sqlalchemy.orm import Session
 from app.domain.entities.user import User
 from app.domain.interfaces.user_repository_interface import UserRepositoryInterface
 from app.infrastructure.db.models.user_db import UserDB
+from app.infrastructure.db.models.expense_db import ExpenseDB
+from app.infrastructure.db.models.income_db import IncomeDB
+from app.infrastructure.db.models.session_db import SessionDB
+from app.infrastructure.db.models.refresh_token_db import RefreshTokenDB
 
 
 class SQLUserRepository(UserRepositoryInterface):
@@ -111,9 +115,23 @@ class SQLUserRepository(UserRepositoryInterface):
         )
 
     def delete(self, user_id: str) -> None:
-        """Supprime un utilisateur."""
+        """Supprime un utilisateur et toutes ses données associées (cascade)."""
 
+        # Supprimer toutes les dépenses de l'utilisateur
+        self.db.query(ExpenseDB).filter(ExpenseDB.user_id == user_id).delete()
+
+        # Supprimer tous les revenus de l'utilisateur
+        self.db.query(IncomeDB).filter(IncomeDB.user_id == user_id).delete()
+
+        # Supprimer toutes les sessions de l'utilisateur
+        self.db.query(SessionDB).filter(SessionDB.user_id == user_id).delete()
+
+        # Supprimer tous les refresh tokens de l'utilisateur
+        self.db.query(RefreshTokenDB).filter(RefreshTokenDB.user_id == user_id).delete()
+
+        # Finalement, supprimer l'utilisateur lui-même
         self.db.query(UserDB).filter(UserDB.id == user_id).delete()
+
         self.db.commit()
 
         return None

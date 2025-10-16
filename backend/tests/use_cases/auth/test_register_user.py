@@ -85,7 +85,7 @@ def test_register_existing_user_raises_exception():
         use_case.execute(user_data)
         assert False, "Should raise ValueError"
     except ValueError as ve:
-        assert str(ve) == "L'utilisateur existe déjà"
+        assert str(ve) == "Cet email est déjà utilisé"
 
 
 def test_register_user_with_empty_fields_raises_exception():
@@ -108,7 +108,7 @@ def test_register_user_with_empty_fields_raises_exception():
         use_case.execute(user_data)
         assert False, "Should raise ValueError"
     except ValueError as ve:
-        assert str(ve) == "Le champ email est requis"
+        assert str(ve) == "Le champ 'Email' est requis"
 
 
 def test_register_user_with_missing_fields_raises_exception():
@@ -130,7 +130,7 @@ def test_register_user_with_missing_fields_raises_exception():
         use_case.execute(user_data)
         assert False, "Should raise ValueError"
     except ValueError as ve:
-        assert str(ve) == "Le champ email est requis"
+        assert str(ve) == "Le champ 'Email' est requis"
 
 
 def test_register_user_with_invalid_email_raises_exception():
@@ -153,4 +153,4 @@ def test_register_user_with_invalid_email_raises_exception():
         use_case.execute(user_data)
         assert False, "Should raise ValueError"
     except ValueError as ve:
-        assert str(ve) == "L'email est invalide"
+        assert str(ve) == "L'adresse email n'est pas valide"

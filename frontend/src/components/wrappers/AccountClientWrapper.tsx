@@ -1,12 +1,48 @@
 'use client';
 
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 import EditProfileForm from '@/components/profile/EditProfileForm';
+import ConfirmModal from '@/components/ui/ConfirmModal';
 import Link from 'next/link';
+import { deleteUserService } from '@/services/auth';
+import { handleError } from '@/lib/errorHandler';
+import { toast } from 'sonner';
 
 export default function AccountClientWrapper() {
-  const { isLoading } = useAuth();
+  const router = useRouter();
+  const { isLoading, logout } = useAuth();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      if (!accessToken) {
+        toast.error('Session expirée. Veuillez vous reconnecter.');
+        return;
+      }
+
+      await deleteUserService(accessToken);
+
+      toast.success('Votre compte a été supprimé avec succès');
+
+      // Déconnecter l'utilisateur et rediriger vers la page d'accueil
+      logout();
+      router.push('/');
+    } catch (error) {
+      handleError(error, {
+        customMessage: 'Impossible de supprimer votre compte. Veuillez réessayer.',
+      });
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteModal(false);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -66,13 +102,14 @@ export default function AccountClientWrapper() {
             </svg>
           </button>
 
-          {/* Supprimer le compte - Désactivé pour le moment */}
+          {/* Supprimer le compte */}
           <button
-            disabled
-            className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 opacity-50 cursor-not-allowed'
+            onClick={() => setShowDeleteModal(true)}
+            disabled={isDeleting}
+            className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 hover:elevation-2 transition-all hover:bg-red-500/5 border-2 border-transparent hover:border-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             <div className='flex items-center space-x-3'>
-              <svg className='w-5 h-5 text-destructive' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+              <svg className='w-5 h-5 text-red-400' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path
                   strokeLinecap='round'
                   strokeLinejoin='round'
@@ -81,13 +118,19 @@ export default function AccountClientWrapper() {
                 />
               </svg>
               <div className='text-left'>
-                <p className='font-medium text-destructive'>Supprimer le compte</p>
-                <p className='text-sm text-muted-foreground'>Bientôt disponible</p>
+                <p className='font-medium text-red-400'>Supprimer le compte</p>
+                <p className='text-sm text-muted-foreground'>
+                  {isDeleting ? 'Suppression en cours...' : 'Suppression définitive de toutes vos données'}
+                </p>
               </div>
             </div>
-            <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-              <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
-            </svg>
+            {isDeleting ? (
+              <div className='w-5 h-5 border-2 border-red-400 border-t-transparent rounded-full animate-spin'></div>
+            ) : (
+              <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
+                <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
+              </svg>
+            )}
           </button>
         </div>
       </div>
@@ -130,6 +173,18 @@ export default function AccountClientWrapper() {
           </svg>
         </Link>
       </div>
+
+      {/* Modale de confirmation de suppression */}
+      <ConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteAccount}
+        title='Supprimer votre compte ?'
+        message='Cette action est irréversible. Toutes vos données seront définitivement supprimées (dépenses, revenus, prévisions, sessions). Êtes-vous absolument sûr de vouloir continuer ?'
+        confirmText='Oui, supprimer mon compte'
+        cancelText='Annuler'
+        variant='danger'
+      />
     </ProtectedRoute>
   );
 }
