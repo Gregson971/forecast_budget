@@ -26,6 +26,12 @@ class InMemoryUserRepository(UserRepositoryInterface):
     def get_by_id(self, user_id: str) -> User:
         return self.users.get(user_id)
 
+    def get_by_phone_number(self, phone_number: str) -> User:
+        for user in self.users.values():
+            if user.phone_number == phone_number:
+                return user
+        return None
+
     def get_all(self) -> list[User]:
         return list(self.users.values())
 

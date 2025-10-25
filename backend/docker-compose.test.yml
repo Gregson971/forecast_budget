@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres-test:
+    image: postgres:latest
+    container_name: forecast_budget_postgres_test
+    environment:
+      POSTGRES_DB: forecast_budget_test
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: forecast_budget_api_test
+    depends_on:
+      postgres-test:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres-test:5432/forecast_budget_test
+      SECRET_KEY: test_secret_key_for_docker_tests
+      ENVIRONMENT: development
+      ORIGINS_ALLOWED: '["http://localhost:3000"]'
+    command: >
+      sh -c "
+        echo 'Waiting for PostgreSQL to be ready...' &&
+        sleep 2 &&
+        echo 'Running migrations...' &&
+        alembic upgrade head &&
+        echo 'Running tests...' &&
+        pytest tests/ -v --cov=app --cov-report=term-missing --cov-report=html &&
+        echo 'Tests completed!'
+      "
+    volumes:
+      - ./htmlcov:/app/htmlcov

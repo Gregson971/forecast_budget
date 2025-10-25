@@ -21,6 +21,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copier le code source
 COPY app/ app/
 COPY migrations/ migrations/
+COPY tests/ tests/
 COPY entrypoint.sh .
 COPY init_db.py .
 COPY run_migrations.py .

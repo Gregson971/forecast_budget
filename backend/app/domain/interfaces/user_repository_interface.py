@@ -28,6 +28,11 @@ class UserRepositoryInterface(ABC):
         pass
 
     @abstractmethod
+    def get_by_phone_number(self, phone_number: str) -> User:
+        """Récupère un utilisateur par son numéro de téléphone."""
+        pass
+
+    @abstractmethod
     def update(self, user_id: str, user: User) -> User:
         """Met à jour un utilisateur."""
         pass

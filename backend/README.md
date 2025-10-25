@@ -8,14 +8,17 @@ Ceci est le backend pour l'application **Forecast Budget**, une solution complè
 
 - 🔐 **Authentification JWT** avec refresh tokens
 - 👤 **Gestion des utilisateurs** et sessions
+- 🔑 **Réinitialisation de mot de passe** par SMS (Twilio/Mock)
 - 💰 **Gestion des dépenses** avec catégories et fréquences
 - 💵 **Gestion des revenus**
 - 📊 **Prévisions budgétaires** intelligentes
 - 📥 **Import CSV** depuis exports bancaires (détection automatique doublons, catégorisation)
+- 📱 **Envoi de SMS** (Twilio en production, logs en développement)
 - 🗄️ **Base de données PostgreSQL** avec migrations Alembic
 - 🐳 **Déploiement Docker** prêt à l'emploi
 - 📚 **Documentation API** automatique (Swagger/ReDoc)
-- 🧪 **Tests unitaires** et d'intégration complets
+- 🧪 **Tests unitaires** et d'intégration complets (121 tests)
+- 🔄 **CI/CD** avec GitHub Actions
 
 ## 🛠️ Prérequis
 

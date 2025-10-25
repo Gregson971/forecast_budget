@@ -17,7 +17,12 @@ from app.use_cases.auth.login_user import LoginUser
 from app.use_cases.auth.refresh_token import RefreshToken
 from app.use_cases.auth.get_user_sessions import GetUserSessions
 from app.use_cases.auth.revoke_user_session import RevokeUserSession
+from app.use_cases.auth.request_password_reset import RequestPasswordReset
+from app.use_cases.auth.verify_and_reset_password import VerifyAndResetPassword
 from app.domain.entities.user import User
+from app.infrastructure.repositories.password_reset_code_repository import PasswordResetCodeRepository
+from app.infrastructure.sms.sms_service_factory import create_sms_service
+from app.infrastructure.security.password_hasher import PasswordHasher
 
 auth_router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -90,6 +95,34 @@ class LogoutRequest(BaseModel):
     """Modèle de requête pour le logout d'un utilisateur."""
 
     refresh_token: str
+
+
+class RequestPasswordResetRequest(BaseModel):
+    """Modèle de requête pour demander la réinitialisation du mot de passe."""
+
+    email: EmailStr | None = None
+    phone_number: str | None = None
+
+
+class RequestPasswordResetResponse(BaseModel):
+    """Modèle de réponse pour la demande de réinitialisation."""
+
+    success: bool
+    message: str
+
+
+class VerifyResetCodeRequest(BaseModel):
+    """Modèle de requête pour vérifier le code et réinitialiser le mot de passe."""
+
+    code: str
+    new_password: str
+
+
+class VerifyResetCodeResponse(BaseModel):
+    """Modèle de réponse pour la vérification du code."""
+
+    success: bool
+    message: str
 
 
 @auth_router.get("/me")
@@ -204,3 +237,75 @@ def logout_user(data: LogoutRequest, db: Session = Depends(get_db)):
     token_repo = SQLRefreshTokenRepository(db)
     token_repo.revoke(data.refresh_token)
     return {"message": "Déconnexion réussie"}
+
+
+@auth_router.post("/request-password-reset", response_model=RequestPasswordResetResponse)
+async def request_password_reset(
+    data: RequestPasswordResetRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Demande un code de réinitialisation de mot de passe.
+
+    Le code sera envoyé par SMS au numéro de téléphone associé au compte.
+    Le code expire après 10 minutes.
+    """
+    try:
+        user_repo = SQLUserRepository(db)
+        code_repo = PasswordResetCodeRepository(db)
+        sms_service = create_sms_service()
+
+        use_case = RequestPasswordReset(user_repo, code_repo, sms_service)
+        result = await use_case.execute(
+            email=data.email,
+            phone_number=data.phone_number
+        )
+
+        return result
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Une erreur est survenue lors de l'envoi du code"
+        ) from e
+
+
+@auth_router.post("/verify-reset-code", response_model=VerifyResetCodeResponse)
+def verify_reset_code(
+    data: VerifyResetCodeRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Vérifie le code de réinitialisation et change le mot de passe.
+
+    Le code doit être valide, non expiré et non utilisé.
+    Le nouveau mot de passe doit contenir au moins 8 caractères.
+    """
+    try:
+        user_repo = SQLUserRepository(db)
+        code_repo = PasswordResetCodeRepository(db)
+        password_hasher = PasswordHasher()
+
+        use_case = VerifyAndResetPassword(user_repo, code_repo, password_hasher)
+        result = use_case.execute(
+            code=data.code,
+            new_password=data.new_password
+        )
+
+        return result
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        ) from e
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Une erreur est survenue lors de la réinitialisation"
+        ) from e
