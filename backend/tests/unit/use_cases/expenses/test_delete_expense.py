@@ -1,5 +1,6 @@
 """Module contenant les tests pour le cas d'utilisation de suppression d'une dépense."""
 
+import pytest
 from uuid import uuid4
 from datetime import datetime, UTC
 from app.domain.entities.expense import Expense
@@ -63,9 +64,8 @@ def test_delete_expense_failure_with_invalid_expense_id():
     repo = InMemoryExpenseRepository()
     use_case = DeleteExpense(repo)
 
-    use_case.execute(uuid4(), uuid4())
-
-    assert not repo.expenses
+    with pytest.raises(ValueError, match="La dépense n'existe pas"):
+        use_case.execute(uuid4(), uuid4())
 
 
 def test_delete_expense_failure_with_invalid_user_id():
@@ -75,4 +75,5 @@ def test_delete_expense_failure_with_invalid_user_id():
     repo = InMemoryExpenseRepository()
     use_case = DeleteExpense(repo)
 
-    use_case.execute(uuid4(), uuid4())
+    with pytest.raises(ValueError, match="La dépense n'existe pas"):
+        use_case.execute(uuid4(), uuid4())

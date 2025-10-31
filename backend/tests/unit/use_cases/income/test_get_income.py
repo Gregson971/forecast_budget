@@ -1,5 +1,6 @@
 """Tests pour le cas d'usage de récupération de revenu."""
 
+import pytest
 from datetime import datetime, UTC
 from unittest.mock import Mock
 
@@ -46,12 +47,9 @@ class TestGetIncome:
 
         mock_repository.get_by_id.return_value = None
 
-        # Act
-        response = use_case.execute("income-999", "user-123")
-
-        # Assert
-        assert response is None
-        mock_repository.get_by_id.assert_called_once_with("income-999", "user-123")
+        # Act & Assert
+        with pytest.raises(ValueError, match="Le revenu n'existe pas"):
+            use_case.execute("income-999", "user-123")
 
     def test_get_income_with_minimal_data(self):
         """Test de récupération d'un revenu avec des données minimales."""
@@ -91,12 +89,9 @@ class TestGetIncome:
         mock_repository = Mock()
         use_case = GetIncome(mock_repository)
 
-        # Act
-        response = use_case.execute("", "user-123")
-
-        # Assert
-        assert response is None
-        mock_repository.get_by_id.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="L'id du revenu est requis"):
+            use_case.execute("", "user-123")
 
     def test_get_income_empty_user_id(self):
         """Test de récupération avec un ID d'utilisateur vide."""
@@ -104,12 +99,9 @@ class TestGetIncome:
         mock_repository = Mock()
         use_case = GetIncome(mock_repository)
 
-        # Act
-        response = use_case.execute("income-123", "")
-
-        # Assert
-        assert response is None
-        mock_repository.get_by_id.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="L'id de l'utilisateur est requis"):
+            use_case.execute("income-123", "")
 
     def test_get_income_validation_failure(self):
         """Test de récupération avec validation échouée."""
@@ -120,9 +112,6 @@ class TestGetIncome:
         # Mock pour simuler que le revenu n'existe pas
         mock_repository.get_by_id.return_value = None
 
-        # Act
-        response = use_case.execute("income-123", "user-123")
-
-        # Assert
-        assert response is None
-        mock_repository.get_by_id.assert_called_once_with("income-123", "user-123")
+        # Act & Assert
+        with pytest.raises(ValueError, match="Le revenu n'existe pas"):
+            use_case.execute("income-123", "user-123")

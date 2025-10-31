@@ -202,8 +202,9 @@ async def login_user(
         return tokens
 
     except ValueError as e:
+        # Les erreurs de validation des identifiants doivent retourner 401
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
         ) from e
     except Exception as e:

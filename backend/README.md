@@ -17,7 +17,7 @@ Ceci est le backend pour l'application **Forecast Budget**, une solution complè
 - 🗄️ **Base de données PostgreSQL** avec migrations Alembic
 - 🐳 **Déploiement Docker** prêt à l'emploi
 - 📚 **Documentation API** automatique (Swagger/ReDoc)
-- 🧪 **Tests unitaires** et d'intégration complets (121 tests)
+- 🧪 **Tests unitaires** et d'intégration complets (257 tests, 89% de couverture)
 - 🔄 **CI/CD** avec GitHub Actions
 
 ## 🛠️ Prérequis
@@ -64,7 +64,15 @@ SECRET_KEY=your_super_secret_key_here
 # CORS
 ORIGINS_ALLOWED=["http://localhost:3000"]
 DEBUG=true
+
+# Environnement (development ou production)
 ENVIRONMENT=development
+
+# SMS (Twilio - requis uniquement en production)
+# En développement, les SMS sont simulés et affichés dans les logs
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_FROM_NUMBER=your_twilio_phone_number
 ```
 
 ## 🚀 Installation et Démarrage
@@ -167,7 +175,9 @@ backend/
 │   ├── main.py                   # Point d'entrée FastAPI
 │   └── startup.py                # Configuration au démarrage
 ├── migrations/                   # Migrations Alembic
-├── tests/                        # Tests unitaires et d'intégration
+├── tests/                        # Tests (257 tests, 89% couverture)
+│   ├── unit/                     # Tests unitaires (106 tests)
+│   └── integration/              # Tests d'intégration (151 tests)
 ├── Dockerfile                    # Configuration Docker
 ├── docker-compose.yml            # Orchestration des services
 ├── requirements.txt              # Dépendances Python
@@ -189,9 +199,12 @@ Une fois l'application démarrée, la documentation interactive est disponible :
 - `POST /auth/register` - Inscription utilisateur
 - `POST /auth/login` - Connexion
 - `POST /auth/refresh` - Rafraîchir le token
+- `POST /auth/logout` - Déconnexion
 - `GET /auth/me` - Profil utilisateur
 - `GET /auth/me/sessions` - Liste des sessions actives
 - `DELETE /auth/me/sessions/{session_id}` - Révoquer une session
+- `POST /auth/request-password-reset` - Demander un code de réinitialisation par SMS
+- `POST /auth/verify-reset-code` - Vérifier le code et réinitialiser le mot de passe
 
 #### Dépenses
 - `GET /expenses/` - Liste des dépenses
@@ -212,7 +225,7 @@ Une fois l'application démarrée, la documentation interactive est disponible :
 - `GET /incomes/frequencies` - Liste des fréquences disponibles
 
 #### Prévisions
-- `GET /forecast/` - Prévisions budgétaires
+- `GET /forecasts?period=<period>` - Prévisions budgétaires (périodes : 1m, 3m, 6m, 1y)
 
 #### Import
 - `POST /imports/csv` - Importer des transactions depuis un fichier CSV
@@ -250,11 +263,12 @@ alembic current
 ### Migrations disponibles
 
 Les migrations actuelles créent les tables suivantes :
-- **users** - Utilisateurs de l'application
+- **users** - Utilisateurs de l'application (avec phone_number pour SMS)
 - **sessions** - Sessions actives des utilisateurs
 - **refresh_tokens** - Tokens de rafraîchissement JWT
 - **expenses** - Dépenses des utilisateurs
-- **incomes** - Revenus des utilisateurs (ajouté récemment)
+- **incomes** - Revenus des utilisateurs
+- **password_reset_codes** - Codes de réinitialisation de mot de passe par SMS
 
 **Note importante** : Si vous rencontrez l'erreur `relation "incomes" does not exist`, exécutez :
 ```bash
@@ -270,37 +284,63 @@ alembic upgrade head
 ### Exécution des tests
 
 ```bash
-# Tous les tests
+# Tous les tests (257 tests)
 pytest
 
-# Tests avec couverture
+# Tests avec couverture (89% de couverture)
 pytest --cov=app
 
+# Tests unitaires uniquement (rapides, ~1.3s)
+pytest tests/unit/
+
+# Tests d'intégration uniquement (avec DB, ~15s)
+pytest tests/integration/
+
 # Tests spécifiques
-pytest tests/use_cases/auth/
-pytest tests/domain/services/
+pytest tests/unit/use_cases/auth/
+pytest tests/integration/api/
 
 # Tests en mode verbose
 pytest -v
 
 # Tests avec rapport HTML
 pytest --cov=app --cov-report=html
+
+# Avec Docker
+docker compose exec api pytest --cov=app
 ```
 
 ### Structure des tests
 
 ```
 tests/
-├── domain/                       # Tests des domaines
-├── use_cases/                    # Tests des cas d'utilisation
-│   ├── auth/                     # Tests d'authentification
-│   ├── expenses/                 # Tests des dépenses
-│   ├── income/                   # Tests des revenus
-│   ├── forecast/                 # Tests des prévisions
-│   ├── imports/                  # Tests des imports CSV
-│   └── user/                     # Tests utilisateurs
+├── unit/                         # Tests unitaires (106 tests, ~1.3s)
+│   ├── domain/                   # Tests des services métier
+│   └── use_cases/                # Tests des cas d'utilisation
+│       ├── auth/                 # Authentification
+│       ├── expenses/             # Gestion des dépenses
+│       ├── income/               # Gestion des revenus
+│       ├── forecast/             # Prévisions
+│       ├── imports/              # Imports CSV
+│       └── user/                 # Gestion utilisateurs
+├── integration/                  # Tests d'intégration (151 tests, ~15s)
+│   ├── api/                      # Tests des endpoints API (67 tests)
+│   │   ├── test_auth_routes.py  # 18 tests auth
+│   │   ├── test_expense_routes.py # 18 tests expenses
+│   │   ├── test_income_routes.py  # 18 tests income
+│   │   └── test_forecast_routes.py # 13 tests forecast
+│   └── infrastructure/           # Tests repositories (84 tests)
 └── conftest.py                   # Configuration pytest
 ```
+
+### Statistiques des tests
+
+- **Total** : 257 tests
+- **Couverture** : 89%
+- **Tests unitaires** : 106 tests (~1.3s)
+- **Tests d'intégration** : 151 tests (~15s)
+- **Tests API** : 67 tests (auth, expenses, income, forecast)
+- **Tests repositories** : 84 tests
 
 ## 📥 Import CSV
 
@@ -404,12 +444,18 @@ docker run -d \
 # Sécurité renforcée
 SECRET_KEY=your_very_long_and_secure_secret_key
 DEBUG=false
+ENVIRONMENT=production
 
 # Base de données de production
 DATABASE_URL=postgresql://prod_user:prod_pass@prod_host:5432/prod_db
 
 # CORS restrictif
 ORIGINS_ALLOWED=["https://yourdomain.com"]
+
+# SMS Twilio (obligatoire en production)
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token
+TWILIO_FROM_NUMBER=+1234567890
 ```
 
 ## 🔧 Dépannage

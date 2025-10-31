@@ -116,11 +116,15 @@ class PasswordResetCodeRepository(PasswordResetCodeRepositoryInterface):
         Returns:
             PasswordResetCode: L'entité
         """
+        # S'assurer que les datetimes ont une timezone UTC
+        expires_at = code_db.expires_at.replace(tzinfo=UTC) if code_db.expires_at.tzinfo is None else code_db.expires_at
+        created_at = code_db.created_at.replace(tzinfo=UTC) if code_db.created_at.tzinfo is None else code_db.created_at
+
         return PasswordResetCode(
             id=code_db.id,
             user_id=code_db.user_id,
             code=code_db.code,
-            expires_at=code_db.expires_at,
-            created_at=code_db.created_at,
+            expires_at=expires_at,
+            created_at=created_at,
             used=code_db.used,
         )

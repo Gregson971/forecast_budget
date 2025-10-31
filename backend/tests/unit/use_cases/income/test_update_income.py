@@ -1,5 +1,6 @@
 """Tests pour le cas d'usage de mise à jour de revenu."""
 
+import pytest
 from datetime import datetime, UTC
 from unittest.mock import Mock
 
@@ -51,7 +52,7 @@ class TestUpdateIncome:
 
         # Assert
         assert response == updated_income
-        mock_repository.update.assert_called_once_with(existing_income, "user-123")
+        mock_repository.update.assert_called_once_with(existing_income)
 
     def test_update_income_not_found(self):
         """Test de mise à jour d'un revenu inexistant."""
@@ -75,12 +76,9 @@ class TestUpdateIncome:
             frequency=None,
         )
 
-        # Act
-        response = use_case.execute(income, "user-123")
-
-        # Assert
-        assert response is None
-        mock_repository.update.assert_called_once_with(income, "user-123")
+        # Act & Assert
+        with pytest.raises(ValueError, match="Le revenu n'existe pas ou n'a pas pu être mis à jour"):
+            use_case.execute(income, "user-123")
 
     def test_update_income_partial_update(self):
         """Test de mise à jour partielle d'un revenu."""
@@ -109,7 +107,7 @@ class TestUpdateIncome:
 
         # Assert
         assert response == existing_income
-        mock_repository.update.assert_called_once_with(existing_income, "user-123")
+        mock_repository.update.assert_called_once_with(existing_income)
 
         # Vérifier que le montant a été mis à jour
         updated_income = mock_repository.update.call_args[0][0]
@@ -137,12 +135,9 @@ class TestUpdateIncome:
             frequency=None,
         )
 
-        # Act
-        response = use_case.execute(income, "user-123")
-
-        # Assert
-        assert response is None
-        mock_repository.update.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="Le nom est requis"):
+            use_case.execute(income, "user-123")
 
     def test_update_income_empty_user_id(self):
         """Test de mise à jour avec un ID d'utilisateur vide."""
@@ -164,9 +159,6 @@ class TestUpdateIncome:
             frequency=None,
         )
 
-        # Act
-        response = use_case.execute(income, "")
-
-        # Assert
-        assert response is None
-        mock_repository.update.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="L'id de l'utilisateur est requis"):
+            use_case.execute(income, "")

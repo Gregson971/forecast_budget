@@ -50,7 +50,19 @@ class SQLUserRepository(UserRepositoryInterface):
         if not users_db:
             return []
 
-        return [User(**user_db.__dict__) for user_db in users_db]
+        return [
+            User(
+                id=user_db.id,
+                first_name=user_db.first_name,
+                last_name=user_db.last_name,
+                email=user_db.email,
+                password=user_db.password,
+                created_at=user_db.created_at,
+                updated_at=user_db.updated_at,
+                phone_number=user_db.phone_number,
+            )
+            for user_db in users_db
+        ]
 
     def get_by_email(self, email: str) -> User:
         """Récupère un utilisateur par son email."""

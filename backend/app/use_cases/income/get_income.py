@@ -10,15 +10,15 @@ class GetIncome:
     def __init__(self, income_repo: IncomeRepositoryInterface):
         self.income_repo = income_repo
 
-    def execute(self, income_id: str, user_id: str) -> Income | None:
+    def execute(self, income_id: str, user_id: str) -> Income:
         """Exécute le cas d'usage."""
 
-        try:
-            self.validate_income_id(income_id)
-            self.validate_user_id(user_id)
-            return self.income_repo.get_by_id(income_id, user_id)
-        except ValueError:
-            return None
+        self.validate_income_id(income_id)
+        self.validate_user_id(user_id)
+        income = self.income_repo.get_by_id(income_id, user_id)
+        if not income:
+            raise ValueError("Le revenu n'existe pas")
+        return income
 
     def validate_income_id(self, income_id: str) -> None:
         """Valide l'id du revenu."""

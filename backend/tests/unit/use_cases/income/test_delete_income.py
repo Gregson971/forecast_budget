@@ -1,5 +1,6 @@
 """Tests pour le cas d'usage de suppression de revenu."""
 
+import pytest
 from unittest.mock import Mock
 
 from app.use_cases.income.delete_income import DeleteIncome
@@ -34,12 +35,9 @@ class TestDeleteIncome:
         # Mock pour simuler que le revenu n'existe pas
         mock_repository.get_by_id.return_value = None
 
-        # Act
-        use_case.execute("income-999", "user-123")
-
-        # Assert
-        mock_repository.get_by_id.assert_called_once_with("income-999", "user-123")
-        mock_repository.delete.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="Le revenu n'existe pas"):
+            use_case.execute("income-999", "user-123")
 
     def test_delete_income_empty_income_id(self):
         """Test de suppression avec un ID de revenu vide."""
@@ -47,12 +45,9 @@ class TestDeleteIncome:
         mock_repository = Mock()
         use_case = DeleteIncome(mock_repository)
 
-        # Act
-        use_case.execute("", "user-123")
-
-        # Assert
-        mock_repository.get_by_id.assert_not_called()
-        mock_repository.delete.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="L'id du revenu est requis"):
+            use_case.execute("", "user-123")
 
     def test_delete_income_empty_user_id(self):
         """Test de suppression avec un ID d'utilisateur vide."""
@@ -60,9 +55,6 @@ class TestDeleteIncome:
         mock_repository = Mock()
         use_case = DeleteIncome(mock_repository)
 
-        # Act
-        use_case.execute("income-123", "")
-
-        # Assert
-        mock_repository.get_by_id.assert_not_called()
-        mock_repository.delete.assert_not_called()
+        # Act & Assert
+        with pytest.raises(ValueError, match="L'id de l'utilisateur est requis"):
+            use_case.execute("income-123", "")

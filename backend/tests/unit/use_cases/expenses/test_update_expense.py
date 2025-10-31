@@ -1,5 +1,6 @@
 """Module contenant les tests pour le cas d'utilisation de mise à jour d'une dépense."""
 
+import pytest
 from uuid import uuid4
 from datetime import datetime, UTC
 from app.domain.entities.expense import Expense
@@ -86,6 +87,5 @@ def test_update_expense_failure_with_invalid_expense_id():
         updated_at=datetime.now(UTC),
     )
 
-    result = use_case.execute(updated_expense, user_id)
-
-    assert result is None
+    with pytest.raises(ValueError, match="La dépense n'existe pas"):
+        use_case.execute(updated_expense, user_id)

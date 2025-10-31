@@ -10,21 +10,21 @@ class UpdateIncome:
     def __init__(self, income_repo: IncomeRepositoryInterface):
         self.income_repo = income_repo
 
-    def execute(self, income: Income, user_id: str) -> Income | None:
+    def execute(self, income: Income, user_id: str) -> Income:
         """Exécute le cas d'usage."""
 
-        try:
-            # Forcer la cohérence de is_recurring
-            if income.frequency and income.frequency != IncomeFrequency.ONE_TIME:
-                income.is_recurring = True
-            else:
-                income.is_recurring = False
+        # Forcer la cohérence de is_recurring
+        if income.frequency and income.frequency != IncomeFrequency.ONE_TIME:
+            income.is_recurring = True
+        else:
+            income.is_recurring = False
 
-            self.validate_income(income)
-            self.validate_user_id(user_id)
-            return self.income_repo.update(income, user_id)
-        except ValueError:
-            return None
+        self.validate_income(income)
+        self.validate_user_id(user_id)
+        updated_income = self.income_repo.update(income)
+        if not updated_income:
+            raise ValueError("Le revenu n'existe pas ou n'a pas pu être mis à jour")
+        return updated_income
 
     def validate_income(self, income: Income) -> None:
         """Valide le revenu."""

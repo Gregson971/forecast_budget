@@ -1,5 +1,6 @@
 """Module contenant les tests pour le cas d'utilisation de récupération d'une dépense."""
 
+import pytest
 from uuid import uuid4
 from datetime import datetime, UTC
 from app.domain.entities.expense import Expense
@@ -51,6 +52,5 @@ def test_get_expense_failure_with_invalid_expense_id():
     repo = InMemoryExpenseRepository()
     use_case = GetExpense(repo)
 
-    result = use_case.execute(uuid4(), uuid4())
-
-    assert result is None
+    with pytest.raises(ValueError, match="La dépense n'existe pas"):
+        use_case.execute(uuid4(), uuid4())

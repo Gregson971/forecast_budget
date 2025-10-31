@@ -10,21 +10,21 @@ class UpdateExpense:
     def __init__(self, expense_repo: ExpenseRepositoryInterface):
         self.expense_repo = expense_repo
 
-    def execute(self, expense: Expense, user_id: str) -> Expense | None:
+    def execute(self, expense: Expense, user_id: str) -> Expense:
         """Exécute le cas d'utilisation."""
 
-        try:
-            # Forcer la cohérence de is_recurring
-            if expense.frequency and expense.frequency != ExpenseFrequency.ONE_TIME:
-                expense.is_recurring = True
-            else:
-                expense.is_recurring = False
+        # Forcer la cohérence de is_recurring
+        if expense.frequency and expense.frequency != ExpenseFrequency.ONE_TIME:
+            expense.is_recurring = True
+        else:
+            expense.is_recurring = False
 
-            self.validate_expense(expense)
-            self.validate_user_id(user_id)
-            return self.expense_repo.update(expense, user_id)
-        except ValueError:
-            return None
+        self.validate_expense(expense)
+        self.validate_user_id(user_id)
+        updated_expense = self.expense_repo.update(expense, user_id)
+        if not updated_expense:
+            raise ValueError("La dépense n'existe pas ou n'a pas pu être mise à jour")
+        return updated_expense
 
     def validate_expense(self, expense: Expense) -> None:
         """Valide la dépense."""

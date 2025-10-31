@@ -43,6 +43,7 @@
 
 - **Authentification sécurisée** avec JWT
 - **Gestion des sessions** multiples
+- **Réinitialisation de mot de passe** par SMS (Twilio)
 - **Profil utilisateur** personnalisable
 - **Protection des données** privées
 
@@ -170,7 +171,9 @@ forecast_budget/
 │   │   ├── external_interfaces/ # Interfaces API
 │   │   └── main.py             # Point d'entrée
 │   ├── migrations/             # Migrations base de données
-│   ├── tests/                  # Tests unitaires
+│   ├── tests/                  # Tests (257 tests, 89% couverture)
+│   │   ├── unit/               # Tests unitaires (106 tests)
+│   │   └── integration/        # Tests d'intégration (151 tests)
 │   ├── requirements.txt        # Dépendances backend
 │   └── README.md               # Documentation backend
 ├── LICENSE                     # Licence du projet
@@ -194,6 +197,16 @@ SECRET_KEY=your_super_secret_key_here
 # CORS
 ORIGINS_ALLOWED=["http://localhost:3000"]
 
+# Environnement
+ENVIRONMENT=development
+DEBUG=true
+
+# SMS / Twilio (optionnel en développement, obligatoire en production)
+# En développement, les SMS sont simulés et affichés dans les logs
+# TWILIO_ACCOUNT_SID=your_twilio_account_sid
+# TWILIO_AUTH_TOKEN=your_twilio_auth_token
+# TWILIO_FROM_NUMBER=+1234567890
+
 # Note: Pour Docker, DATABASE_URL sera automatiquement configuré pour utiliser "postgres" au lieu de "localhost"
 ```
 
@@ -213,9 +226,24 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ```bash
 cd backend
-pytest
+
+# Tous les tests (257 tests, 89% de couverture)
 pytest --cov=app
+
+# Tests unitaires uniquement (rapides, ~1.3s)
+pytest tests/unit/
+
+# Tests d'intégration uniquement (avec DB, ~15s)
+pytest tests/integration/
+
+# Avec Docker
+docker compose exec api pytest --cov=app
 ```
+
+**Statistiques** : 257 tests au total
+- 106 tests unitaires (~1.3s)
+- 151 tests d'intégration (~15s)
+- 89% de couverture de code
 
 ### Tests Frontend
 
@@ -349,7 +377,9 @@ cd frontend && npm run test
 - **Alembic** - Migrations
 - **Pydantic** - Validation des données
 - **JWT** - Authentification
-- **Pytest** - Tests
+- **Pytest** - Tests (257 tests avec 89% de couverture)
+- **Twilio** - Service SMS pour réinitialisation de mot de passe
+- **GitHub Actions** - CI/CD automatisé
 
 ### DevOps
 
@@ -364,6 +394,7 @@ cd frontend && npm run test
 ### 🚀 Version 1.1 (En cours)
 
 - [x] Import des transactions depuis fichiers CSV
+- [x] Réinitialisation de mot de passe par SMS
 - [ ] Export des données (CSV, PDF)
 - [ ] Notifications push
 - [ ] Mode hors ligne

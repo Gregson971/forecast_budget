@@ -12,12 +12,9 @@ class DeleteExpense:
     def execute(self, expense_id: str, user_id: str) -> None:
         """Exécute le cas d'utilisation."""
 
-        try:
-            self.validate_expense_id(expense_id, user_id)
-            self.validate_user_id(user_id)
-            self.expense_repo.delete(expense_id, user_id)
-        except ValueError:
-            return None
+        self.validate_expense_id(expense_id, user_id)
+        self.validate_user_id(user_id)
+        self.expense_repo.delete(expense_id, user_id)
 
     def validate_expense_id(self, expense_id: str, user_id: str) -> None:
         """Valide l'id de la dépense."""

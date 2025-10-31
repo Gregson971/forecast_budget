@@ -12,12 +12,9 @@ class DeleteIncome:
     def execute(self, income_id: str, user_id: str) -> None:
         """Exécute le cas d'usage."""
 
-        try:
-            self.validate_user_id(user_id)
-            self.validate_income_id(income_id, user_id)
-            self.income_repo.delete(income_id, user_id)
-        except ValueError:
-            return None
+        self.validate_user_id(user_id)
+        self.validate_income_id(income_id, user_id)
+        self.income_repo.delete(income_id, user_id)
 
     def validate_income_id(self, income_id: str, user_id: str) -> None:
         """Valide l'id du revenu."""
