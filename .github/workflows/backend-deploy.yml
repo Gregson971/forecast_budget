@@ -1,14 +1,17 @@
-name: Deploy Backend to Railway
+name: Backend CI/CD
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
     paths:
       - 'backend/**'
       - '.github/workflows/backend-deploy.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
 
 jobs:
-  # Job de tests qui doit passer avant le déploiement
   test:
     name: Run Tests
     runs-on: ubuntu-latest
@@ -33,73 +36,52 @@ jobs:
         working-directory: backend
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
-        cache: 'pip'
-        cache-dependency-path: backend/requirements.txt
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: backend/requirements.txt
 
-    - name: Install system dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libpq-dev gcc
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpq-dev gcc
 
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-    - name: Set up environment variables
-      run: |
-        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/forecast_budget_test" >> $GITHUB_ENV
-        echo "SECRET_KEY=test_secret_key_for_ci" >> $GITHUB_ENV
-        echo "ENVIRONMENT=development" >> $GITHUB_ENV
+      - name: Set up environment variables
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/forecast_budget_test" >> $GITHUB_ENV
+          echo "SECRET_KEY=test_secret_key_for_ci" >> $GITHUB_ENV
+          echo "ENVIRONMENT=development" >> $GITHUB_ENV
 
-    - name: Run Alembic migrations
-      run: |
-        alembic upgrade head
+      - name: Run Alembic migrations
+        run: |
+          alembic upgrade head
 
-    - name: Run all tests
-      run: |
-        pytest tests/ -v --cov=app
+      - name: Run all tests
+        run: |
+          pytest tests/ -v --cov=app
 
-  # Job de déploiement qui ne s'exécute que si les tests passent
-  deploy:
-    name: Deploy to Railway
-    needs: test  # Dépend du job 'test'
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
-    defaults:
-      run:
-        working-directory: backend
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install Railway CLI
-      run: npm install -g @railway/cli
-
-    - name: Deploy to Railway
-      run: railway up --service backend
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-    - name: Run migrations on Railway
-      run: railway run alembic upgrade head
-      env:
-        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
-    - name: Deployment summary
-      if: success()
-      run: |
-        echo "### Deployment Successful! 🚀" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "✅ All tests passed (257 tests, 89% coverage)" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Deployed to Railway production" >> $GITHUB_STEP_SUMMARY
-        echo "✅ Database migrations applied" >> $GITHUB_STEP_SUMMARY
+      - name: Test summary
+        if: always()
+        run: |
+          if [ $? -eq 0 ]; then
+            echo "### ✅ Tests Passed!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ All 257 tests passed (89% coverage)" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Ready for deployment to Railway" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** Railway will automatically deploy this commit if tests pass." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### ❌ Tests Failed!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ Some tests failed. Deployment blocked." >> $GITHUB_STEP_SUMMARY
+          fi

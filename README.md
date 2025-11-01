@@ -313,11 +313,11 @@ Le projet dispose d'un système **CI/CD complet** avec GitHub Actions pour garan
 - ✅ Déploie sur **Vercel** si tests OK
 - Notifications de succès/échec
 
-**Backend Deploy** (`backend-deploy.yml`)
+**Backend CI/CD** (`backend-deploy.yml`)
 - ✅ Exécute **tous les tests backend** d'abord
 - ❌ **Bloque le déploiement** si les tests échouent
-- ✅ Déploie sur **Railway** si tests OK
-- Applique les migrations Alembic automatiquement
+- ✅ **Railway déploie automatiquement** via intégration GitHub native
+- Les migrations peuvent être configurées avec un Deploy Hook Railway
 
 ### 🔒 Protection de la production
 
@@ -346,7 +346,9 @@ Pour activer les déploiements automatiques, configurer les secrets GitHub :
 - `NEXT_PUBLIC_API_URL_PROD` - URL de l'API en production
 
 **Railway (Backend)**
-- `RAILWAY_TOKEN` - Token d'authentification Railway
+- Utilise l'intégration GitHub native (pas de secrets nécessaires)
+- Configuration via le Dashboard Railway
+- Voir [RAILWAY_SETUP.md](./RAILWAY_SETUP.md) pour les instructions
 
 📚 **Documentation complète** : [.github/workflows/README.md](.github/workflows/README.md)
 
