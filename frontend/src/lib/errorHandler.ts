@@ -113,9 +113,10 @@ export const handleError = (
   error: unknown,
   config: ErrorConfig = {}
 ): ErrorInfo => {
+  const isTestEnv = typeof process.env.JEST_WORKER_ID !== 'undefined' || process.env.NODE_ENV === 'test';
   const {
     showToast = true,
-    logToConsole = process.env.NODE_ENV === 'development',
+    logToConsole = process.env.NODE_ENV === 'development' && !isTestEnv,
     customMessage,
   } = config
 

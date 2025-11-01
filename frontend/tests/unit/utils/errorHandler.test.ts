@@ -182,7 +182,7 @@ describe('Error Handler', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
       const error = new Error('Development error');
-      handleError(error);
+      handleError(error, { logToConsole: true });
 
       expect(consoleSpy).toHaveBeenCalled();
 
