@@ -41,11 +41,16 @@
 
 ### 🔐 Sécurité et utilisateur
 
-- **Authentification sécurisée** avec JWT
-- **Gestion des sessions** multiples
-- **Réinitialisation de mot de passe** par SMS (Twilio)
-- **Profil utilisateur** personnalisable
-- **Protection des données** privées
+- **Authentification sécurisée** avec JWT et refresh tokens
+- **Gestion des sessions** multiples (révocation à distance)
+- **Réinitialisation de mot de passe** par SMS en 2 étapes
+  - Demande de code par email (envoi SMS sur le numéro associé)
+  - Vérification du code et définition du nouveau mot de passe
+  - Code à 6 chiffres valide 10 minutes
+  - Service SMS Mock en développement, Twilio en production
+- **Gestion du numéro de téléphone** dans le profil utilisateur
+- **Profil utilisateur** personnalisable (nom, prénom, email, téléphone)
+- **Protection des données** privées et isolation des utilisateurs
 
 ### 🎨 Interface utilisateur
 
@@ -285,12 +290,42 @@ railway up
 
 ## 📊 Fonctionnalités techniques
 
-### 🔐 Authentification
+### 🔐 Authentification et sécurité
 
-- **JWT Tokens** avec refresh automatique
-- **Gestion des sessions** multiples
-- **Protection des routes** sensibles
-- **Validation des données** côté client et serveur
+#### JWT Tokens
+- **Access tokens** avec expiration courte
+- **Refresh tokens** pour renouvellement automatique
+- **Protection des routes** sensibles côté client et serveur
+- **Validation des données** avec Pydantic (backend) et TypeScript (frontend)
+
+#### Réinitialisation de mot de passe
+La fonctionnalité complète de réinitialisation de mot de passe est disponible :
+
+**Flow utilisateur** :
+1. **Accès** : Cliquer sur "Mot de passe oublié ?" depuis la page de connexion ou "Changer le mot de passe" dans les paramètres du compte
+2. **Étape 1 - Demande de code** :
+   - Entrer l'adresse email du compte
+   - Un code à 6 chiffres est généré et envoyé par SMS au numéro de téléphone associé
+   - Le code expire après 10 minutes
+3. **Étape 2 - Réinitialisation** :
+   - Entrer le code reçu par SMS
+   - Définir le nouveau mot de passe (minimum 8 caractères)
+   - Confirmation du mot de passe
+4. **Redirection** : Retour automatique à la page de connexion
+
+**Configuration requise** :
+- L'utilisateur doit avoir un numéro de téléphone associé à son compte
+- Le numéro peut être ajouté/modifié dans Settings → Account → Informations personnelles
+- Format recommandé : international (+33612345678)
+
+**Environnement** :
+- **Développement** : Service SMS Mock (codes affichés dans les logs backend)
+- **Production** : Service Twilio pour envoi SMS réel
+
+#### Gestion des sessions
+- **Multi-sessions** : Un utilisateur peut être connecté sur plusieurs appareils
+- **Révocation** : Possibilité de révoquer des sessions spécifiques à distance
+- **Suivi** : Affichage de l'IP, user-agent et date de création pour chaque session
 
 ### 📈 Prévisions financières
 
