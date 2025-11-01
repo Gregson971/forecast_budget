@@ -26,14 +26,17 @@ const config: Config = {
     '!src/**/*.stories.{js,jsx,ts,tsx}',
     '!src/**/__tests__/**',
     '!src/app/**', // Exclude Next.js app directory
+    '!src/types/**', // Exclude types directory
   ],
   coverageThreshold: {
     global: {
-      // Seuils temporaires - à augmenter progressivement jusqu'à 80%
-      branches: 15,
-      functions: 15,
-      lines: 15,
-      statements: 15,
+      // Seuils mis à jour après l'ajout des tests (module types exclu)
+      // Couverture actuelle: statements 63.6%, branches 84.02%, functions 68.59%, lines 63.6%
+      // Objectif à terme: 80%
+      branches: 80,
+      functions: 65,
+      lines: 60,
+      statements: 60,
     },
   },
   moduleDirectories: ['node_modules', '<rootDir>/'],

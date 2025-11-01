@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import TransactionItem from './TransactionItem';
 import { Transaction, filterTransactions, sortTransactionsByDate } from '@/types/transaction';
 

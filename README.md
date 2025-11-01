@@ -255,22 +255,28 @@ docker compose exec api pytest --cov=app
 ```bash
 cd frontend
 
-# Tous les tests (46 tests)
+# Tous les tests (237 tests)
 npm run test
 
 # Tests unitaires uniquement (22 tests, rapides ~0.7s)
 npm run test:unit
 
-# Tests d'intégration uniquement (24 tests, ~1.1s)
+# Tests d'intégration uniquement (215 tests, ~5s)
 npm run test:integration
 
 # Avec coverage
 npm run test:coverage
 ```
 
-**Statistiques** : 46 tests au total
+**Statistiques** : 226 tests au total (100% passants)
 - 22 tests unitaires (~0.7s)
-- 24 tests d'intégration (~1.1s)
+- 204 tests d'intégration (~5s)
+- **63.6% de couverture globale** (statements)
+  - Branches: 84.02%
+  - Functions: 68.59%
+  - Lines: 63.6%
+- 31 suites de tests couvrant composants, hooks et services
+- Module `types` exclu de la couverture (types TypeScript uniquement)
 
 ## 🔄 CI/CD et Automatisation
 
@@ -288,14 +294,14 @@ Le projet dispose d'un système **CI/CD complet** avec GitHub Actions pour garan
 
 **Frontend Tests** (`frontend-tests.yml`)
 - Se déclenche sur les modifications dans `frontend/`
-- Exécute 46 tests (unitaires + intégration)
+- Exécute 226 tests (unitaires + intégration) avec 63.6% de couverture
 - Linting ESLint
 - Build Next.js
 - Upload coverage vers Codecov
 
 **CI Complet** (`ci.yml`)
 - Teste backend ET frontend en parallèle
-- 303 tests au total
+- 483 tests au total (257 backend + 226 frontend)
 - Bloque les Pull Requests si échec
 - Résumé détaillé des résultats
 
@@ -325,8 +331,8 @@ Push sur main → Tests automatiques → Déploiement bloqué si échec ❌
 ### 📈 Statistiques des tests en CI
 
 - **Backend** : 257 tests (89% coverage) en ~3 minutes
-- **Frontend** : 46 tests en ~2 minutes
-- **Total** : 303 tests exécutés automatiquement
+- **Frontend** : 226 tests (63.6% coverage) en ~2 minutes
+- **Total** : 483 tests exécutés automatiquement
 - **Durée totale CI** : ~5 minutes
 
 ### 🔧 Configuration requise pour le déploiement

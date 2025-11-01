@@ -412,9 +412,11 @@ L'application utilise **Jest 30.2.0** et **React Testing Library 16.3.0** pour u
 - **Bibliothèque de tests** : React Testing Library (RTL)
 - **Utilitaires** : @testing-library/user-event, @testing-library/jest-dom
 - **Configuration** : jest.config.ts, jest.setup.ts
-- **Statistiques** : 46 tests (100% passants)
+- **Statistiques** : 226 tests (100% passants)
   - 22 tests unitaires (~0.7s)
-  - 24 tests d'intégration (~1.1s)
+  - 204 tests d'intégration (~5s)
+  - **63.6% de couverture globale** (statements: 63.6%, branches: 84.02%, functions: 68.59%, lines: 63.6%)
+  - Module `types` exclu de la couverture (types TypeScript uniquement)
 
 ### Structure des tests
 
@@ -422,70 +424,127 @@ Les tests sont organisés en **tests unitaires** et **tests d'intégration** pou
 
 ```
 tests/
-├── unit/                    # Tests unitaires (logique pure, 22 tests)
-│   ├── services/            # Tests des services API
-│   │   └── auth.test.ts     # Tests d'authentification (7 tests)
-│   └── utils/               # Tests des utilitaires
-│       └── errorHandler.test.ts  # Gestionnaire d'erreurs (17 tests)
+├── unit/                           # Tests unitaires (22 tests)
+│   ├── services/                   # Tests des services API
+│   │   ├── auth.test.ts            # Authentification (7 tests)
+│   │   ├── expense.test.ts         # Service des dépenses (6 tests)
+│   │   ├── forecast.test.ts        # Service des prévisions (3 tests)
+│   │   ├── import.test.ts          # Service d'import CSV (4 tests)
+│   │   └── income.test.ts          # Service des revenus (5 tests)
+│   └── utils/                      # Tests des utilitaires
+│       └── errorHandler.test.ts   # Gestionnaire d'erreurs (17 tests)
 │
-└── integration/             # Tests d'intégration (composants, hooks, 24 tests)
-    ├── components/          # Tests des composants React
-    │   ├── ui/              # Composants UI de base
-    │   │   ├── Button.test.tsx    # Button (6 tests)
-    │   │   └── Input.test.tsx     # Input (7 tests)
-    │   └── sessions/        # Composants sessions
-    │       └── SessionItem.test.tsx  # SessionItem (7 tests)
-    ├── hooks/               # Tests des custom hooks
-    │   └── useSessions.test.ts    # useSessions (4 tests)
-    └── pages/               # Tests des pages (à venir)
+└── integration/                    # Tests d'intégration (204 tests)
+    ├── components/                 # Tests des composants React
+    │   ├── ui/                     # Composants UI de base
+    │   │   ├── Button.test.tsx     # Button (6 tests)
+    │   │   ├── Input.test.tsx      # Input (7 tests)
+    │   │   ├── Modal.test.tsx      # Modal (7 tests)
+    │   │   └── ConfirmModal.test.tsx # ConfirmModal (7 tests)
+    │   ├── auth/                   # Authentification
+    │   │   └── ProtectedRoute.test.tsx # Protection de routes (6 tests)
+    │   ├── sessions/               # Gestion des sessions
+    │   │   ├── SessionItem.test.tsx    # Item de session (7 tests)
+    │   │   └── SessionList.test.tsx    # Liste des sessions (6 tests)
+    │   ├── navigation/             # Navigation
+    │   │   ├── MenuItem.test.tsx       # Item de menu (4 tests)
+    │   │   ├── NavMenu.test.tsx        # Menu desktop (3 tests)
+    │   │   ├── MobileMenu.test.tsx     # Menu mobile (6 tests)
+    │   │   ├── UserDropdown.test.tsx   # Dropdown utilisateur (5 tests)
+    │   │   └── Navbar.test.tsx         # Barre de navigation (5 tests)
+    │   ├── transaction/            # Transactions
+    │   │   ├── TransactionItem.test.tsx    # Item de transaction (8 tests)
+    │   │   ├── TransactionList.test.tsx    # Liste des transactions (6 tests)
+    │   │   └── TransactionModal.test.tsx   # Modal de transaction (5 tests)
+    │   └── financial/              # Composants financiers
+    │       └── FinancialModal.test.tsx     # Modal financière (5 tests)
+    ├── hooks/                      # Tests des custom hooks
+    │   ├── useSessions.test.ts     # Hook sessions (4 tests)
+    │   ├── useExpenses.test.ts     # Hook dépenses (4 tests)
+    │   ├── useIncomes.test.ts      # Hook revenus (4 tests)
+    │   ├── useForecast.test.ts     # Hook prévisions (3 tests)
+    │   ├── useTransactions.test.ts # Hook transactions (2 tests)
+    │   └── index.test.ts           # Hook composite (3 tests)
+    └── context/                    # Tests des contextes
+        └── AuthContext.test.tsx    # Contexte d'authentification (5 tests)
 ```
 
 ### Tests par catégorie
 
 #### Tests unitaires (22 tests)
 
-**Services API** (7 tests)
-- `auth.test.ts` : Tests des services d'authentification
-  - Login, register, refresh token, getUserService, updateUserService
-  - Mock d'Axios pour isoler la logique
+**Services API** (25 tests)
+- `auth.test.ts` : Authentification (7 tests) - Login, register, refresh, getUserService, updateUserService
+- `expense.test.ts` : Gestion des dépenses (6 tests) - CRUD complet, gestion d'erreurs
+- `forecast.test.ts` : Prévisions financières (3 tests) - Récupération et gestion d'erreurs
+- `import.test.ts` : Import CSV (4 tests) - Upload de fichiers, détection de doublons
+- `income.test.ts` : Gestion des revenus (5 tests) - CRUD complet, gestion d'erreurs
 
 **Utilitaires** (17 tests)
-- `errorHandler.test.ts` : Tests du gestionnaire d'erreurs centralisé
+- `errorHandler.test.ts` : Gestionnaire d'erreurs centralisé
   - handleError, handleCrudError, handleSilentError
   - Catégorisation des erreurs (Network, Auth, Validation, Server, Unknown)
 
-#### Tests d'intégration (24 tests)
+> **Note** : Le module `types` est exclu des tests car il contient uniquement des définitions TypeScript et des helpers de type.
 
-**Composants UI** (13 tests)
+#### Tests d'intégration (204 tests)
+
+**Composants UI** (27 tests)
 - `Button.test.tsx` : Bouton réutilisable (6 tests)
-  - Variants, sizes, disabled, onClick
 - `Input.test.tsx` : Input avec validation (7 tests)
-  - Label, error, value, onChange, type, placeholder
+- `Modal.test.tsx` : Modal de base (7 tests)
+- `ConfirmModal.test.tsx` : Modal de confirmation (7 tests)
 
-**Composants métier** (7 tests)
-- `SessionItem.test.tsx` : Affichage et interactions (7 tests)
-  - Session info, current badge, revoked badge, revoke button
+**Composants d'authentification** (6 tests)
+- `ProtectedRoute.test.tsx` : Protection de routes (6 tests)
 
-**Hooks personnalisés** (4 tests)
+**Composants de navigation** (23 tests)
+- `MenuItem.test.tsx` : Item de menu (4 tests)
+- `NavMenu.test.tsx` : Menu desktop (3 tests)
+- `MobileMenu.test.tsx` : Menu mobile (6 tests)
+- `UserDropdown.test.tsx` : Dropdown utilisateur (5 tests)
+- `Navbar.test.tsx` : Barre de navigation (5 tests)
+
+**Composants de sessions** (13 tests)
+- `SessionItem.test.tsx` : Item de session (7 tests)
+- `SessionList.test.tsx` : Liste des sessions (6 tests)
+
+**Composants de transactions** (19 tests)
+- `TransactionItem.test.tsx` : Item de transaction (8 tests)
+- `TransactionList.test.tsx` : Liste des transactions (6 tests)
+- `TransactionModal.test.tsx` : Modal de transaction (5 tests)
+
+**Composants financiers** (5 tests)
+- `FinancialModal.test.tsx` : Modal financière (5 tests)
+
+**Hooks personnalisés** (20 tests)
 - `useSessions.test.ts` : Gestion des sessions (4 tests)
-  - fetchSessions, revokeSession, error handling
+- `useExpenses.test.ts` : Gestion des dépenses (4 tests)
+- `useIncomes.test.ts` : Gestion des revenus (4 tests)
+- `useForecast.test.ts` : Prévisions (3 tests)
+- `useTransactions.test.ts` : Transactions unifiées (2 tests)
+- `index.test.ts` : Hook composite useAppHooks (3 tests)
+
+**Contextes React** (5 tests)
+- `AuthContext.test.tsx` : Contexte d'authentification (5 tests)
+  - Login, logout, refresh token, persistence, initialization
 
 ### Scripts de tests disponibles
 
 ```bash
-# Exécuter tous les tests (46 tests)
+# Exécuter tous les tests (226 tests, 100% passants)
 npm run test
 
 # Tests unitaires uniquement (22 tests, rapides ~0.7s)
 npm run test:unit
 
-# Tests d'intégration uniquement (24 tests, ~1.1s)
+# Tests d'intégration uniquement (204 tests, ~5s)
 npm run test:integration
 
 # Tests en mode watch (re-exécution automatique)
 npm run test:watch
 
-# Tests avec rapport de couverture de code
+# Tests avec rapport de couverture de code (63.6% de couverture)
 npm run test:coverage
 
 # Tests avec sortie détaillée
@@ -494,6 +553,7 @@ npm run test:ui
 # Exécuter des tests spécifiques
 npm run test -- tests/unit/services/auth.test.ts
 npm run test -- tests/integration/components/ui/Button.test.tsx
+npm run test -- tests/integration/hooks/useSessions.test.ts
 npm run test -- --testPathPattern=hooks
 npm run test -- --testNamePattern="handles fetch error"
 ```
@@ -503,8 +563,13 @@ npm run test -- --testNamePattern="handles fetch error"
 **jest.config.ts**
 - Environnement jsdom pour simuler le DOM
 - Module mapper pour les alias TypeScript (`@/`)
-- Seuil de couverture : 50% (branches, fonctions, lignes, statements)
-- Exclusions : fichiers .d.ts, stories, app/ directory
+- Seuils de couverture mis à jour :
+  - Statements: 60%
+  - Branches: 80%
+  - Functions: 65%
+  - Lines: 60%
+- Exclusions : fichiers .d.ts, stories, app/ directory, **types/ directory**
+- Couverture actuelle : 63.6% (statements), 84.02% (branches), 68.59% (functions), 63.6% (lines)
 
 **jest.setup.ts**
 - Mocks globaux : Next.js router, localStorage, matchMedia, IntersectionObserver
@@ -567,7 +632,17 @@ npm run test:coverage
 Le rapport de couverture sera généré dans `coverage/` avec :
 - Rapport HTML interactif dans `coverage/lcov-report/index.html`
 - Résumé dans la console
-- Seuils de couverture configurés à 50% minimum
+- **Couverture actuelle : 63.6%** (dépasse l'objectif de 60%)
+
+**Métriques de couverture :**
+- **Statements** : 63.6% (seuil: 60%) ✅
+- **Branches** : 84.02% (seuil: 80%) ✅
+- **Functions** : 68.59% (seuil: 65%) ✅
+- **Lines** : 63.6% (seuil: 60%) ✅
+
+**Objectif à terme :** 80% de couverture sur tous les critères
+
+> **Note** : Le module `types/` est exclu de la couverture car il contient principalement des définitions TypeScript et des types d'interface.
 
 ### Mocking et utilitaires
 

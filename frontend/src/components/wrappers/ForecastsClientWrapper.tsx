@@ -2,17 +2,7 @@
 
 import { useState } from 'react';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  TimeScale,
-} from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, TimeScale, TooltipItem } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
@@ -65,10 +55,7 @@ export default function ForecastsClientWrapper() {
 
   // Préparer les données pour Chart.js
   const chartData = {
-    labels: [
-      ...data.expenses_data.map((d) => new Date(d.date)),
-      ...data.forecast_expenses.map((d) => new Date(d.date)),
-    ],
+    labels: [...data.expenses_data.map((d) => new Date(d.date)), ...data.forecast_expenses.map((d) => new Date(d.date))],
     datasets: [
       {
         label: 'Dépenses historiques',
@@ -139,16 +126,18 @@ export default function ForecastsClientWrapper() {
         borderColor: '#383838',
         borderWidth: 1,
         callbacks: {
-          title: (context: { parsed: { x: number } }[]) => {
-            const date = new Date(context[0].parsed.x);
+          title: (context: TooltipItem<'line'>[]) => {
+            const date = new Date(context[0].parsed.x as number);
             return date.toLocaleDateString('fr-FR', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             });
           },
-          label: (context: { dataset: { label: string }; parsed: { y: number } }) => {
-            return `${context.dataset.label}: ${context.parsed.y.toLocaleString('fr-FR', {
+          label: (context: TooltipItem<'line'>) => {
+            const label = context.dataset.label || '';
+            const value = context.parsed.y as number;
+            return `${label}: ${value.toLocaleString('fr-FR', {
               style: 'currency',
               currency: 'EUR',
             })}`;
@@ -213,9 +202,7 @@ export default function ForecastsClientWrapper() {
             key={option.value}
             onClick={() => setSelectedPeriod(option.value)}
             className={`ripple px-4 py-2 rounded font-medium transition-all ${
-              selectedPeriod === option.value
-                ? 'bg-primary text-primary-foreground elevation-2'
-                : 'bg-secondary text-white hover:bg-muted elevation-1'
+              selectedPeriod === option.value ? 'bg-primary text-primary-foreground elevation-2' : 'bg-secondary text-white hover:bg-muted elevation-1'
             }`}
           >
             {option.label}
@@ -276,8 +263,7 @@ export default function ForecastsClientWrapper() {
           <strong className='text-white'>Ligne continue :</strong> Données historiques
         </p>
         <p className='text-sm text-muted-foreground'>
-          <strong className='text-white'>Ligne pointillée :</strong> Données prévisionnelles basées sur vos habitudes
-          de dépenses et revenus récurrents
+          <strong className='text-white'>Ligne pointillée :</strong> Données prévisionnelles basées sur vos habitudes de dépenses et revenus récurrents
         </p>
       </div>
     </ProtectedRoute>
