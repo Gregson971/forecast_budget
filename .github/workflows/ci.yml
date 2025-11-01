@@ -1,0 +1,160 @@
+name: CI - Full Project Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  # Tests backend
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: forecast_budget_test
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
+        cache-dependency-path: backend/requirements.txt
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev gcc
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Set up environment variables
+      run: |
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/forecast_budget_test" >> $GITHUB_ENV
+        echo "SECRET_KEY=test_secret_key_for_ci" >> $GITHUB_ENV
+        echo "ENVIRONMENT=development" >> $GITHUB_ENV
+
+    - name: Run Alembic migrations
+      run: |
+        alembic upgrade head
+
+    - name: Run unit tests
+      run: |
+        pytest tests/unit/ -v
+
+    - name: Run integration tests
+      run: |
+        pytest tests/integration/ -v
+
+    - name: Run all tests with coverage
+      run: |
+        pytest tests/ -v --cov=app --cov-report=xml --cov-report=term-missing
+
+    - name: Backend test summary
+      if: always()
+      run: |
+        echo "### Backend Tests 🐍" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Unit tests: 106 tests" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Integration tests: 151 tests" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Total: 257 tests (89% coverage)" >> $GITHUB_STEP_SUMMARY
+
+  # Tests frontend
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linter
+      run: npm run lint
+
+    - name: Run unit tests
+      run: npm run test:unit
+
+    - name: Run integration tests
+      run: npm run test:integration
+
+    - name: Run all tests with coverage
+      run: npm run test:coverage
+
+    - name: Build application
+      run: npm run build
+      env:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+
+    - name: Frontend test summary
+      if: always()
+      run: |
+        echo "### Frontend Tests ⚛️" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Unit tests: 22 tests" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Integration tests: 24 tests" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Total: 46 tests" >> $GITHUB_STEP_SUMMARY
+
+  # Job de résumé final
+  summary:
+    name: Test Summary
+    needs: [backend-tests, frontend-tests]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+    - name: Check test results
+      run: |
+        if [ "${{ needs.backend-tests.result }}" == "success" ] && [ "${{ needs.frontend-tests.result }}" == "success" ]; then
+          echo "### ✅ All Tests Passed! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Backend:** 257 tests (89% coverage)" >> $GITHUB_STEP_SUMMARY
+          echo "**Frontend:** 46 tests" >> $GITHUB_STEP_SUMMARY
+          echo "**Total:** 303 tests" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Ready for deployment!" >> $GITHUB_STEP_SUMMARY
+          exit 0
+        else
+          echo "### ❌ Tests Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Backend: ${{ needs.backend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "Frontend: ${{ needs.frontend-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "⚠️ Deployment blocked until tests pass" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi

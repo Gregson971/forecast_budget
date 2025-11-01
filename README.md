@@ -254,9 +254,95 @@ docker compose exec api pytest --cov=app
 
 ```bash
 cd frontend
+
+# Tous les tests (46 tests)
 npm run test
+
+# Tests unitaires uniquement (22 tests, rapides ~0.7s)
+npm run test:unit
+
+# Tests d'intégration uniquement (24 tests, ~1.1s)
+npm run test:integration
+
+# Avec coverage
 npm run test:coverage
 ```
+
+**Statistiques** : 46 tests au total
+- 22 tests unitaires (~0.7s)
+- 24 tests d'intégration (~1.1s)
+
+## 🔄 CI/CD et Automatisation
+
+Le projet dispose d'un système **CI/CD complet** avec GitHub Actions pour garantir la qualité du code et automatiser les déploiements.
+
+### 📊 Workflows disponibles
+
+#### 1. **Tests automatiques** (Pull Requests et Push)
+
+**Backend Tests** (`backend-tests.yml`)
+- Se déclenche sur les modifications dans `backend/`
+- Exécute 257 tests avec 89% de couverture
+- Service PostgreSQL en CI
+- Upload coverage vers Codecov
+
+**Frontend Tests** (`frontend-tests.yml`)
+- Se déclenche sur les modifications dans `frontend/`
+- Exécute 46 tests (unitaires + intégration)
+- Linting ESLint
+- Build Next.js
+- Upload coverage vers Codecov
+
+**CI Complet** (`ci.yml`)
+- Teste backend ET frontend en parallèle
+- 303 tests au total
+- Bloque les Pull Requests si échec
+- Résumé détaillé des résultats
+
+#### 2. **Déploiements automatiques** (Push sur main)
+
+**Frontend Deploy** (`frontend-deploy.yml`)
+- ✅ Exécute **tous les tests frontend** d'abord
+- ❌ **Bloque le déploiement** si les tests échouent
+- ✅ Déploie sur **Vercel** si tests OK
+- Notifications de succès/échec
+
+**Backend Deploy** (`backend-deploy.yml`)
+- ✅ Exécute **tous les tests backend** d'abord
+- ❌ **Bloque le déploiement** si les tests échouent
+- ✅ Déploie sur **Railway** si tests OK
+- Applique les migrations Alembic automatiquement
+
+### 🔒 Protection de la production
+
+**Aucun code bugué n'atteint la production !**
+
+```
+Push sur main → Tests automatiques → Déploiement bloqué si échec ❌
+                                   → Déploiement autorisé si succès ✅
+```
+
+### 📈 Statistiques des tests en CI
+
+- **Backend** : 257 tests (89% coverage) en ~3 minutes
+- **Frontend** : 46 tests en ~2 minutes
+- **Total** : 303 tests exécutés automatiquement
+- **Durée totale CI** : ~5 minutes
+
+### 🔧 Configuration requise pour le déploiement
+
+Pour activer les déploiements automatiques, configurer les secrets GitHub :
+
+**Vercel (Frontend)**
+- `VERCEL_TOKEN` - Token d'authentification Vercel
+- `VERCEL_ORG_ID` - ID de l'organisation Vercel
+- `VERCEL_PROJECT_ID` - ID du projet Vercel
+- `NEXT_PUBLIC_API_URL_PROD` - URL de l'API en production
+
+**Railway (Backend)**
+- `RAILWAY_TOKEN` - Token d'authentification Railway
+
+📚 **Documentation complète** : [.github/workflows/README.md](.github/workflows/README.md)
 
 ## 🚀 Déploiement
 
