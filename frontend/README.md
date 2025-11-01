@@ -412,43 +412,75 @@ L'application utilise **Jest 30.2.0** et **React Testing Library 16.3.0** pour u
 - **Bibliothèque de tests** : React Testing Library (RTL)
 - **Utilitaires** : @testing-library/user-event, @testing-library/jest-dom
 - **Configuration** : jest.config.ts, jest.setup.ts
-- **Couverture actuelle** : 46 tests (100% passants)
+- **Statistiques** : 46 tests (100% passants)
+  - 22 tests unitaires (~0.7s)
+  - 24 tests d'intégration (~1.1s)
 
 ### Structure des tests
 
+Les tests sont organisés en **tests unitaires** et **tests d'intégration** pour une meilleure maintenabilité :
+
 ```
 tests/
-├── components/              # Tests des composants React
-│   ├── ui/                  # Tests des composants UI (Button, Input)
-│   └── sessions/            # Tests des composants sessions
-├── hooks/                   # Tests des custom hooks (useSessions)
-├── services/                # Tests des services API (auth)
-└── utils/                   # Tests des utilitaires (errorHandler)
+├── unit/                    # Tests unitaires (logique pure, 22 tests)
+│   ├── services/            # Tests des services API
+│   │   └── auth.test.ts     # Tests d'authentification (7 tests)
+│   └── utils/               # Tests des utilitaires
+│       └── errorHandler.test.ts  # Gestionnaire d'erreurs (17 tests)
+│
+└── integration/             # Tests d'intégration (composants, hooks, 24 tests)
+    ├── components/          # Tests des composants React
+    │   ├── ui/              # Composants UI de base
+    │   │   ├── Button.test.tsx    # Button (6 tests)
+    │   │   └── Input.test.tsx     # Input (7 tests)
+    │   └── sessions/        # Composants sessions
+    │       └── SessionItem.test.tsx  # SessionItem (7 tests)
+    ├── hooks/               # Tests des custom hooks
+    │   └── useSessions.test.ts    # useSessions (4 tests)
+    └── pages/               # Tests des pages (à venir)
 ```
 
-### Tests existants
+### Tests par catégorie
 
-**Composants UI** (13 tests)
-- `Button.test.tsx` : Tests du composant Button (6 tests)
-- `Input.test.tsx` : Tests du composant Input avec validation (7 tests)
-
-**Composants métier** (7 tests)
-- `SessionItem.test.tsx` : Tests d'affichage et interactions (7 tests)
-
-**Hooks personnalisés** (4 tests)
-- `useSessions.test.ts` : Tests du hook de gestion des sessions (4 tests)
+#### Tests unitaires (22 tests)
 
 **Services API** (7 tests)
-- `auth.test.ts` : Tests des services d'authentification (7 tests)
+- `auth.test.ts` : Tests des services d'authentification
+  - Login, register, refresh token, getUserService, updateUserService
+  - Mock d'Axios pour isoler la logique
 
 **Utilitaires** (17 tests)
-- `errorHandler.test.ts` : Tests du gestionnaire d'erreurs centralisé (17 tests)
+- `errorHandler.test.ts` : Tests du gestionnaire d'erreurs centralisé
+  - handleError, handleCrudError, handleSilentError
+  - Catégorisation des erreurs (Network, Auth, Validation, Server, Unknown)
+
+#### Tests d'intégration (24 tests)
+
+**Composants UI** (13 tests)
+- `Button.test.tsx` : Bouton réutilisable (6 tests)
+  - Variants, sizes, disabled, onClick
+- `Input.test.tsx` : Input avec validation (7 tests)
+  - Label, error, value, onChange, type, placeholder
+
+**Composants métier** (7 tests)
+- `SessionItem.test.tsx` : Affichage et interactions (7 tests)
+  - Session info, current badge, revoked badge, revoke button
+
+**Hooks personnalisés** (4 tests)
+- `useSessions.test.ts` : Gestion des sessions (4 tests)
+  - fetchSessions, revokeSession, error handling
 
 ### Scripts de tests disponibles
 
 ```bash
-# Exécuter tous les tests
+# Exécuter tous les tests (46 tests)
 npm run test
+
+# Tests unitaires uniquement (22 tests, rapides ~0.7s)
+npm run test:unit
+
+# Tests d'intégration uniquement (24 tests, ~1.1s)
+npm run test:integration
 
 # Tests en mode watch (re-exécution automatique)
 npm run test:watch
@@ -460,7 +492,8 @@ npm run test:coverage
 npm run test:ui
 
 # Exécuter des tests spécifiques
-npm run test -- tests/components/ui/Button.test.tsx
+npm run test -- tests/unit/services/auth.test.ts
+npm run test -- tests/integration/components/ui/Button.test.tsx
 npm run test -- --testPathPattern=hooks
 npm run test -- --testNamePattern="handles fetch error"
 ```

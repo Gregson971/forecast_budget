@@ -1,21 +1,46 @@
 # Tests Frontend - Forecast Budget
 
-Ce dossier contient tous les tests pour l'application frontend Forecast Budget.
+Ce dossier contient tous les tests pour l'application frontend Forecast Budget, organisés en **tests unitaires** et **tests d'intégration**.
 
 ## 📁 Structure des Tests
 
+Les tests sont organisés en deux catégories principales :
+
 ```
 tests/
-├── components/           # Tests des composants React
-│   ├── ui/              # Tests des composants UI de base
-│   ├── sessions/        # Tests des composants de sessions
-│   ├── profile/         # Tests des composants de profil
-│   └── ...
-├── hooks/               # Tests des hooks personnalisés
-├── services/            # Tests des services API
-├── utils/               # Tests des utilitaires
-└── README.md           # Ce fichier
+├── unit/                    # Tests unitaires (22 tests, ~0.7s)
+│   ├── services/            # Tests des services API
+│   │   └── auth.test.ts     # Authentification (7 tests)
+│   └── utils/               # Tests des utilitaires
+│       └── errorHandler.test.ts  # Gestionnaire d'erreurs (17 tests)
+│
+├── integration/             # Tests d'intégration (24 tests, ~1.1s)
+│   ├── components/          # Tests des composants React
+│   │   ├── ui/              # Composants UI de base
+│   │   │   ├── Button.test.tsx    # Button (6 tests)
+│   │   │   └── Input.test.tsx     # Input (7 tests)
+│   │   └── sessions/        # Composants sessions
+│   │       └── SessionItem.test.tsx  # SessionItem (7 tests)
+│   ├── hooks/               # Tests des hooks personnalisés
+│   │   └── useSessions.test.ts    # useSessions (4 tests)
+│   └── pages/               # Tests des pages (à venir)
+│
+└── README.md               # Ce fichier
 ```
+
+### Distinction Unitaires vs Intégration
+
+**Tests unitaires** (`tests/unit/`)
+- Testent des fonctions ou modules isolés
+- Aucune dépendance au DOM ou à React
+- Services API, utilitaires, helpers
+- Très rapides (< 1s)
+
+**Tests d'intégration** (`tests/integration/`)
+- Testent des composants React rendus
+- Testent des hooks avec effets de bord
+- Testent des interactions utilisateur
+- Peuvent être plus lents (utilisation du DOM virtuel)
 
 ## 🛠️ Technologies Utilisées
 
@@ -26,9 +51,19 @@ tests/
 
 ## 🚀 Commandes de Test
 
-### Exécuter tous les tests
+### Exécuter tous les tests (46 tests)
 ```bash
 npm test
+```
+
+### Tests unitaires uniquement (22 tests, ~0.7s)
+```bash
+npm run test:unit
+```
+
+### Tests d'intégration uniquement (24 tests, ~1.1s)
+```bash
+npm run test:integration
 ```
 
 ### Mode watch (développement)
@@ -48,12 +83,14 @@ npm run test:ui
 
 ### Exécuter un test spécifique
 ```bash
-npm test -- Button.test.tsx
+npm test -- tests/unit/services/auth.test.ts
+npm test -- tests/integration/components/ui/Button.test.tsx
 ```
 
 ### Exécuter les tests d'un dossier
 ```bash
-npm test -- tests/components
+npm test -- tests/unit
+npm test -- tests/integration/components
 ```
 
 ## 📝 Conventions de Tests
