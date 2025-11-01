@@ -5,7 +5,7 @@ import SessionList from '@/components/sessions/SessionList';
 import ProtectedRoute from '@/components/auth/ProtectedRoute';
 
 export default function SessionsClientWrapper() {
-  const { sessions, sessionsLoading, sessionsError, fetchSessions } = useSessions();
+  const { sessionsLoading, sessionsError, fetchSessions } = useSessions();
 
   if (sessionsLoading) {
     return (

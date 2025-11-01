@@ -26,8 +26,9 @@ export default function LoginPage() {
     try {
       await login(username, password);
       // La redirection et les toasts sont gérés dans le contexte AuthContext
-    } catch (error: any) {
-      setError(error.response?.data?.detail || 'Erreur lors de la connexion');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      setError(err.response?.data?.detail || 'Erreur lors de la connexion');
     } finally {
       setLoading(false);
     }

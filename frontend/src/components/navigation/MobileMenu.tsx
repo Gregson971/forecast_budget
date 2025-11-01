@@ -66,7 +66,7 @@ export default function MobileMenu({ open, onClose, user, logout }: MobileMenuPr
         {user ? (
           <button
             onClick={() => {
-              logout && logout();
+              logout?.();
               onClose();
             }}
             className='w-full px-4 py-2 bg-gradient-to-r from-red-600 to-pink-600 text-white font-medium rounded-xl hover:from-red-700 hover:to-pink-700 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/25'

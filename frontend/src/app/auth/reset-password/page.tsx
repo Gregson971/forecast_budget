@@ -37,8 +37,9 @@ export default function ResetPasswordPage() {
       } else {
         setError(response.message || 'Erreur lors de l\'envoi du code');
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de l\'envoi du code';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de l\'envoi du code';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -75,8 +76,9 @@ export default function ResetPasswordPage() {
       } else {
         setError(response.message || 'Erreur lors de la réinitialisation');
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la réinitialisation';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la réinitialisation';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {

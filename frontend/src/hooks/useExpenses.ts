@@ -89,8 +89,9 @@ export const useExpenses = () => {
       const data = await getExpensesService();
       setExpensesState({ loading: false, error: null, data });
       return data;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la récupération des dépenses';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la récupération des dépenses';
       setExpensesState({ loading: false, error: errorMessage, data: null });
       throw error;
     }
@@ -106,8 +107,9 @@ export const useExpenses = () => {
       await fetchExpenses();
 
       return data;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la création de la dépense';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la création de la dépense';
       setCreateExpenseState({ loading: false, error: errorMessage, data: null });
       throw error;
     }
@@ -123,8 +125,9 @@ export const useExpenses = () => {
       await fetchExpenses();
       
       return true;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la suppression de la dépense';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la suppression de la dépense';
       setDeleteExpenseState({ loading: false, error: errorMessage, data: null });
       throw error;
     }
@@ -140,8 +143,9 @@ export const useExpenses = () => {
       await fetchExpenses();
       
       return data;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la modification de la dépense';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la modification de la dépense';
       setUpdateExpenseState({ loading: false, error: errorMessage, data: null });
       throw error;
     }

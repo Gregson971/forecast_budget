@@ -1,0 +1,13 @@
+node_modules
+.next
+out
+dist
+build
+.cache
+public
+*.config.js
+*.config.ts
+next-env.d.ts
+coverage
+.turbo
+

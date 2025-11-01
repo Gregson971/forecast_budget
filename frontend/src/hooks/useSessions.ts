@@ -36,8 +36,9 @@ export const useSessions = () => {
       const data = await getSessionsService(accessToken);
       setSessionsState({ loading: false, error: null, data });
       return data;
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la récupération des sessions';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la récupération des sessions';
       setSessionsState({ loading: false, error: errorMessage, data: null });
       throw error;
     }
@@ -57,8 +58,9 @@ export const useSessions = () => {
       
       // Rafraîchir la liste des sessions après révocation
       await fetchSessions();
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.detail || 'Erreur lors de la révocation de la session';
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { detail?: string } } };
+      const errorMessage = err.response?.data?.detail || 'Erreur lors de la révocation de la session';
       setRevokeState({ loading: false, error: errorMessage });
       throw error;
     }

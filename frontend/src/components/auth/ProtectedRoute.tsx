@@ -25,7 +25,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
         <div className='glass-card p-8 rounded-2xl'>
           <div className='flex items-center space-x-4'>
             <div className='w-8 h-8 border-2 border-green-500 border-t-transparent rounded-full animate-spin'></div>
-            <span className='text-white text-lg'>Vérification de l'authentification...</span>
+            <span className='text-white text-lg'>Vérification de l&apos;authentification...</span>
           </div>
         </div>
       </div>

@@ -17,14 +17,15 @@ export const useIncomes = () => {
       setError(null);
       const data = await incomeService.getIncomes();
       setIncomes(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number } };
       let errorMessage = 'Erreur lors du chargement des revenus';
       
-      if (!err.response) {
+      if (!error.response) {
         errorMessage = 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
-      } else if (err.response.status === 401) {
+      } else if (error.response.status === 401) {
         errorMessage = 'Session expirée. Veuillez vous reconnecter.';
-      } else if (err.response.status >= 500) {
+      } else if (error.response.status && error.response.status >= 500) {
         errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
       }
       
@@ -39,7 +40,7 @@ export const useIncomes = () => {
     try {
       const data = await incomeService.getCategories();
       setCategories(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleSilentError(err);
       // Ne pas afficher d'erreur pour les catégories car ce n'est pas critique
     }
@@ -50,7 +51,7 @@ export const useIncomes = () => {
     try {
       const data = await incomeService.getFrequencies();
       setFrequencies(data);
-    } catch (err: any) {
+    } catch (err: unknown) {
       handleSilentError(err);
       // Ne pas afficher d'erreur pour les fréquences car ce n'est pas critique
     }
@@ -63,16 +64,17 @@ export const useIncomes = () => {
       const newIncome = await incomeService.createIncome(data);
       setIncomes(prev => [newIncome, ...prev]);
       return newIncome;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number; data?: { detail?: string } } };
       let errorMessage = 'Erreur lors de la création du revenu';
       
-      if (!err.response) {
+      if (!error.response) {
         errorMessage = 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
-      } else if (err.response.status === 401) {
+      } else if (error.response.status === 401) {
         errorMessage = 'Session expirée. Veuillez vous reconnecter.';
-      } else if (err.response.status === 422) {
-        errorMessage = err.response.data?.detail || 'Données invalides';
-      } else if (err.response.status >= 500) {
+      } else if (error.response.status === 422) {
+        errorMessage = error.response.data?.detail || 'Données invalides';
+      } else if (error.response.status && error.response.status >= 500) {
         errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
       }
       
@@ -90,16 +92,17 @@ export const useIncomes = () => {
         income.id === id ? updatedIncome : income
       ));
       return updatedIncome;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number; data?: { detail?: string } } };
       let errorMessage = 'Erreur lors de la mise à jour du revenu';
       
-      if (!err.response) {
+      if (!error.response) {
         errorMessage = 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
-      } else if (err.response.status === 401) {
+      } else if (error.response.status === 401) {
         errorMessage = 'Session expirée. Veuillez vous reconnecter.';
-      } else if (err.response.status === 422) {
-        errorMessage = err.response.data?.detail || 'Données invalides';
-      } else if (err.response.status >= 500) {
+      } else if (error.response.status === 422) {
+        errorMessage = error.response.data?.detail || 'Données invalides';
+      } else if (error.response.status && error.response.status >= 500) {
         errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
       }
       
@@ -114,14 +117,15 @@ export const useIncomes = () => {
       setError(null);
       await incomeService.deleteIncome(id);
       setIncomes(prev => prev.filter(income => income.id !== id));
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const error = err as { response?: { status?: number } };
       let errorMessage = 'Erreur lors de la suppression du revenu';
       
-      if (!err.response) {
+      if (!error.response) {
         errorMessage = 'Erreur de connexion au serveur. Vérifiez votre connexion internet.';
-      } else if (err.response.status === 401) {
+      } else if (error.response.status === 401) {
         errorMessage = 'Session expirée. Veuillez vous reconnecter.';
-      } else if (err.response.status >= 500) {
+      } else if (error.response.status && error.response.status >= 500) {
         errorMessage = 'Erreur serveur. Veuillez réessayer plus tard.';
       }
       

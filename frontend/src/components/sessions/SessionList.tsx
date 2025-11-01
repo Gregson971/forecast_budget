@@ -4,7 +4,7 @@ import SessionItem from './SessionItem';
 import { handleSilentError } from '@/lib/errorHandler';
 
 export default function SessionList() {
-  const { sessions, sessionsLoading, sessionsError, revokeSession, revokeLoading, revokeError } = useSessions();
+  const { sessions, sessionsLoading, sessionsError, revokeSession, revokeError } = useSessions();
 
   // Récupérer le refresh_token actuel pour identifier la session courante
   const currentRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;

@@ -54,15 +54,15 @@ export interface BaseFinancialRequest {
 }
 
 // Types spécifiques pour les dépenses
-export interface Expense extends BaseFinancialItem {}
+export type Expense = BaseFinancialItem;
 
-export interface CreateExpenseRequest extends BaseFinancialRequest {}
+export type CreateExpenseRequest = BaseFinancialRequest;
 
-export interface UpdateExpenseRequest extends BaseFinancialRequest {}
+export type UpdateExpenseRequest = BaseFinancialRequest;
 
 // Types spécifiques pour les revenus
-export interface Income extends BaseFinancialItem {}
+export type Income = BaseFinancialItem;
 
-export interface CreateIncomeRequest extends BaseFinancialRequest {}
+export type CreateIncomeRequest = BaseFinancialRequest;
 
-export interface UpdateIncomeRequest extends BaseFinancialRequest {} 
+export type UpdateIncomeRequest = BaseFinancialRequest; 

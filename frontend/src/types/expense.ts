@@ -7,8 +7,8 @@ export type {
 } from './financial';
 
 // Types spécifiques pour les dépenses
-export interface Expense extends BaseFinancialItem {}
+export type Expense = BaseFinancialItem;
 
-export interface CreateExpenseRequest extends BaseFinancialRequest {}
+export type CreateExpenseRequest = BaseFinancialRequest;
 
-export interface UpdateExpenseRequest extends BaseFinancialRequest {} 
+export type UpdateExpenseRequest = BaseFinancialRequest; 

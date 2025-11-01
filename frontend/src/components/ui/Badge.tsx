@@ -1,5 +1,3 @@
-import { cn } from '@/lib/utils';
-
 type BadgeProps = {
   children: React.ReactNode;
   variant?: 'default' | 'success' | 'warning' | 'error' | 'info' | 'outline' | 'destructive';

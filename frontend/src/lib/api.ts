@@ -2,9 +2,13 @@ import axios from "axios"
 import { handleSilentError } from "./errorHandler"
 
 let isRefreshing = false
-let failedQueue: any[] = []
+interface QueueItem {
+  resolve: (value: unknown) => void;
+  reject: (reason?: unknown) => void;
+}
+let failedQueue: QueueItem[] = []
 
-const processQueue = (error: any, token: string | null = null) => {
+const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue.forEach(prom => {
     if (error) {
       prom.reject(error)
@@ -56,7 +60,7 @@ instance.interceptors.response.use(
           localStorage.setItem("access_token", newAccessToken)
           error.config.headers.Authorization = `Bearer ${newAccessToken}`
           return instance(error.config)
-        } catch (refreshError) {
+        } catch {
           // Si le refresh échoue aussi, on déconnecte l'utilisateur
           localStorage.removeItem("access_token")
           localStorage.removeItem('refresh_token')

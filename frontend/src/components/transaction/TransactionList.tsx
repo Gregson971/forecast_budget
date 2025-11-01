@@ -60,7 +60,7 @@ export default function TransactionList({ transactions, onDelete, onEdit }: Tran
   const balance = totalIncomes - totalExpenses;
 
   // Reset page when filters change
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [filter, selectedMonth, selectedYear]);
 

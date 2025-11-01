@@ -36,7 +36,7 @@ export default function AboutPage() {
             </div>
             <h3 className='text-xl font-semibold text-white mb-3'>Gestion des Dépenses</h3>
             <p className='text-gray-400 leading-relaxed'>
-              Enregistrez et catégorisez vos dépenses quotidiennes. Suivez vos habitudes de consommation et identifiez les opportunités d'économies.
+              Enregistrez et catégorisez vos dépenses quotidiennes. Suivez vos habitudes de consommation et identifiez les opportunités d&apos;économies.
             </p>
           </div>
 
@@ -91,13 +91,13 @@ export default function AboutPage() {
         {/* Section Contact */}
         <div className='glass-card p-8 rounded-lg mb-12 fade-in elevation-2'>
           <h2 className='text-3xl font-semibold text-white mb-6'>Contact</h2>
-          <p className='text-gray-300 leading-relaxed mb-6'>Vous avez des questions, des suggestions ou besoin d'aide ? N'hésitez pas à nous contacter.</p>
+          <p className='text-gray-300 leading-relaxed mb-6'>Vous avez des questions, des suggestions ou besoin d&apos;aide ? N&apos;hésitez pas à nous contacter.</p>
           <div className='flex flex-col sm:flex-row gap-4'>
             <Link
               href='/'
               className='inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 font-medium'
             >
-              Retour à l'accueil
+              Retour à l&apos;accueil
               <svg className='w-4 h-4 ml-2' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
                 <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M10 19l-7-7m0 0l7-7m-7 7h18' />
               </svg>

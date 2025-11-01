@@ -105,8 +105,9 @@ export default function FinancialForm({ item, onAdd, onUpdate, categories, frequ
           frequency: '',
         });
       }
-    } catch (error: any) {
-      setError(error.message || `Erreur lors de ${isEditMode ? 'la modification' : 'la création'} de ${isExpense ? 'la dépense' : 'le revenu'}`);
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      setError(err.message || `Erreur lors de ${isEditMode ? 'la modification' : 'la création'} de ${isExpense ? 'la dépense' : 'le revenu'}`);
     }
   };
 

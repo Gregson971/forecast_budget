@@ -1,11 +1,12 @@
 import api from '@/lib/api';
+import type { CreateExpenseRequest, UpdateExpenseRequest } from '@/types/expense';
 
 export const getExpensesService = async () => {
   const res = await api.get('/expenses');
   return res.data;
 };
 
-export const createExpenseService = async (expense: any) => {
+export const createExpenseService = async (expense: CreateExpenseRequest) => {
   const res = await api.post('/expenses', expense);
   return res.data;
 };
@@ -25,7 +26,7 @@ export const getExpenseService = async (expense_id: string) => {
   return res.data;
 };
 
-export const updateExpenseService = async (expense_id: string, expenseData: any) => {
+export const updateExpenseService = async (expense_id: string, expenseData: UpdateExpenseRequest) => {
   // Récupérer d'abord la dépense existante
   const existingExpense = await getExpenseService(expense_id);
 

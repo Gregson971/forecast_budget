@@ -15,7 +15,6 @@ import {
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
-import { fr } from 'date-fns/locale';
 
 import { useForecast } from '@/hooks/useForecast';
 import { ForecastPeriod } from '@/services/forecast';
@@ -140,7 +139,7 @@ export default function ForecastsClientWrapper() {
         borderColor: '#383838',
         borderWidth: 1,
         callbacks: {
-          title: (context: any) => {
+          title: (context: { parsed: { x: number } }[]) => {
             const date = new Date(context[0].parsed.x);
             return date.toLocaleDateString('fr-FR', {
               year: 'numeric',
@@ -148,7 +147,7 @@ export default function ForecastsClientWrapper() {
               day: 'numeric',
             });
           },
-          label: (context: any) => {
+          label: (context: { dataset: { label: string }; parsed: { y: number } }) => {
             return `${context.dataset.label}: ${context.parsed.y.toLocaleString('fr-FR', {
               style: 'currency',
               currency: 'EUR',
@@ -186,8 +185,8 @@ export default function ForecastsClientWrapper() {
         },
         ticks: {
           color: '#9e9e9e',
-          callback: (value: any) => {
-            return value.toLocaleString('fr-FR', {
+          callback: (value: string | number) => {
+            return Number(value).toLocaleString('fr-FR', {
               style: 'currency',
               currency: 'EUR',
             });

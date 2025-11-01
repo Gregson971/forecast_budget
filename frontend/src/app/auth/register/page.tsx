@@ -80,7 +80,7 @@ export default function RegisterPage() {
               </svg>
             </div>
             <h1 className='text-3xl font-bold text-white mb-2'>Créer un compte</h1>
-            <p className='text-muted-foreground'>Rejoignez Forecast Budget dès aujourd'hui</p>
+            <p className='text-muted-foreground'>Rejoignez Forecast Budget dès aujourd&apos;hui</p>
           </div>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
