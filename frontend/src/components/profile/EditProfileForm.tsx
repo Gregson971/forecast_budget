@@ -14,6 +14,7 @@ export default function EditProfileForm() {
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
     email: user?.email || '',
+    phone_number: user?.phone_number || '',
   });
 
   const handleEdit = () => {
@@ -22,6 +23,7 @@ export default function EditProfileForm() {
       first_name: user?.first_name || '',
       last_name: user?.last_name || '',
       email: user?.email || '',
+      phone_number: user?.phone_number || '',
     });
   };
 
@@ -31,6 +33,7 @@ export default function EditProfileForm() {
       first_name: user?.first_name || '',
       last_name: user?.last_name || '',
       email: user?.email || '',
+      phone_number: user?.phone_number || '',
     });
   };
 
@@ -40,7 +43,7 @@ export default function EditProfileForm() {
 
     try {
       // Envoyer uniquement les champs modifiés
-      const changes: { first_name?: string; last_name?: string; email?: string } = {};
+      const changes: { first_name?: string; last_name?: string; email?: string; phone_number?: string } = {};
 
       if (formData.first_name !== user?.first_name) {
         changes.first_name = formData.first_name;
@@ -50,6 +53,9 @@ export default function EditProfileForm() {
       }
       if (formData.email !== user?.email) {
         changes.email = formData.email;
+      }
+      if (formData.phone_number !== user?.phone_number) {
+        changes.phone_number = formData.phone_number;
       }
 
       if (Object.keys(changes).length === 0) {
@@ -143,6 +149,18 @@ export default function EditProfileForm() {
                 <p className='text-white'>{user?.email}</p>
               </div>
             </div>
+
+            {/* Numéro de téléphone */}
+            <div className='md:col-span-2'>
+              <label className='block text-sm font-medium text-muted-foreground mb-2'>Numéro de téléphone</label>
+              <div className='glass p-3 rounded-lg elevation-1 flex items-center'>
+                {user?.phone_number ? (
+                  <p className='text-white'>{user.phone_number}</p>
+                ) : (
+                  <p className='text-muted-foreground italic'>Non renseigné (requis pour réinitialiser le mot de passe)</p>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       ) : (
@@ -175,6 +193,15 @@ export default function EditProfileForm() {
             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
             placeholder='votre@email.com'
             required
+          />
+
+          <Input
+            label='Numéro de téléphone'
+            type='tel'
+            value={formData.phone_number}
+            onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
+            placeholder='+33612345678'
+            helperText='Format international recommandé (ex: +33612345678). Requis pour la réinitialisation du mot de passe par SMS.'
           />
 
           <div className='flex gap-3 justify-end'>

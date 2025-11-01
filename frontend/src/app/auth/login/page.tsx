@@ -70,7 +70,14 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className='space-y-6'>
             <Input label='Email' type='email' placeholder='votre@email.com' value={username} onChange={(e) => setUsername(e.target.value)} required />
 
-            <Input label='Mot de passe' type='password' placeholder='Votre mot de passe' value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <div>
+              <Input label='Mot de passe' type='password' placeholder='Votre mot de passe' value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <div className='mt-2 text-right'>
+                <Link href='/auth/reset-password' className='text-sm text-primary hover:text-accent transition-colors'>
+                  Mot de passe oublié ?
+                </Link>
+              </div>
+            </div>
 
             {error && (
               <div className='p-3 bg-destructive/10 border border-destructive/30 rounded elevation-1'>

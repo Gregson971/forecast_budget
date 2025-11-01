@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   error?: string;
+  helperText?: string;
 };
 
-export default function Input({ label, error, className, type, ...props }: InputProps) {
+export default function Input({ label, error, helperText, className, type, ...props }: InputProps) {
   const [showPassword, setShowPassword] = useState(false);
   const isPasswordField = type === 'password';
   const inputType = isPasswordField && showPassword ? 'text' : type;
@@ -62,6 +63,7 @@ export default function Input({ label, error, className, type, ...props }: Input
         )}
       </div>
       {error && <p className='text-sm text-red-400'>{error}</p>}
+      {!error && helperText && <p className='text-sm text-muted-foreground'>{helperText}</p>}
     </div>
   );
 }

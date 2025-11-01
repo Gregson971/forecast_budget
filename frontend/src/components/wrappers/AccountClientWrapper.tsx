@@ -78,10 +78,10 @@ export default function AccountClientWrapper() {
         </h2>
 
         <div className='space-y-3'>
-          {/* Changer le mot de passe - Désactivé pour le moment */}
-          <button
-            disabled
-            className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 opacity-50 cursor-not-allowed'
+          {/* Changer le mot de passe */}
+          <Link
+            href='/auth/reset-password'
+            className='w-full flex items-center justify-between p-4 glass rounded-lg elevation-1 hover:elevation-2 transition-all hover:bg-white/5'
           >
             <div className='flex items-center space-x-3'>
               <svg className='w-5 h-5 text-primary' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
@@ -94,13 +94,13 @@ export default function AccountClientWrapper() {
               </svg>
               <div className='text-left'>
                 <p className='font-medium text-white'>Changer le mot de passe</p>
-                <p className='text-sm text-muted-foreground'>Bientôt disponible</p>
+                <p className='text-sm text-muted-foreground'>Réinitialiser votre mot de passe par SMS</p>
               </div>
             </div>
             <svg className='w-5 h-5 text-muted-foreground' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
               <path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M9 5l7 7-7 7' />
             </svg>
-          </button>
+          </Link>
 
           {/* Supprimer le compte */}
           <button

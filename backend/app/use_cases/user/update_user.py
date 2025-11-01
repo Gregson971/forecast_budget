@@ -20,7 +20,7 @@ class UpdateUser:
 
         Args:
             user_id: ID de l'utilisateur à mettre à jour
-            update_data: Données à mettre à jour (first_name, last_name, email)
+            update_data: Données à mettre à jour (first_name, last_name, email, phone_number)
 
         Returns:
             User: L'utilisateur mis à jour
@@ -101,6 +101,18 @@ class UpdateUser:
 
             validated_data["email"] = email
 
+        # Valider phone_number
+        if "phone_number" in update_data:
+            phone_number = update_data["phone_number"]
+            if phone_number:  # Si non vide, valider
+                phone_number = phone_number.strip()
+                if len(phone_number) > 20:
+                    raise ValueError("Le numéro de téléphone est trop long")
+                validated_data["phone_number"] = phone_number
+            else:
+                # Permet de supprimer le numéro (mettre à null)
+                validated_data["phone_number"] = None
+
         return validated_data
 
     def is_valid_email(self, email: str) -> bool:
@@ -125,6 +137,7 @@ class UpdateUser:
             last_name=update_data.get("last_name", existing_user.last_name),
             email=update_data.get("email", existing_user.email),
             password=existing_user.password,  # Le mot de passe reste inchangé
+            phone_number=update_data.get("phone_number", existing_user.phone_number),
             created_at=existing_user.created_at,
             updated_at=datetime.now(UTC),
         )

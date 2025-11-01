@@ -6,14 +6,14 @@ import { toast } from 'sonner';
 import { loginService, registerService, refreshTokenService, getUserService, updateUserService } from '@/services/auth';
 import { handleError, handleSilentError } from '@/lib/errorHandler';
 
-type User = { email: string; first_name: string; last_name: string };
+type User = { email: string; first_name: string; last_name: string; phone_number?: string };
 type AuthContextType = {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, first_name: string, last_name: string) => Promise<void>;
   logout: () => void;
   getUser: () => Promise<User | null>;
-  updateUser: (data: { first_name?: string; last_name?: string; email?: string }) => Promise<void>;
+  updateUser: (data: { first_name?: string; last_name?: string; email?: string; phone_number?: string }) => Promise<void>;
   isAuthenticated: boolean;
   isLoading: boolean;
 };
@@ -150,7 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const updateUser = async (data: { first_name?: string; last_name?: string; email?: string }) => {
+  const updateUser = async (data: { first_name?: string; last_name?: string; email?: string; phone_number?: string }) => {
     const access_token = localStorage.getItem('access_token');
     if (!access_token) {
       toast.error('Vous devez être connecté pour modifier votre profil');

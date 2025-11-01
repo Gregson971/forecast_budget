@@ -34,6 +34,7 @@ class UserResponse(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
+    phone_number: Optional[str] = None
     created_at: datetime
     updated_at: datetime
 
@@ -44,6 +45,7 @@ class UpdateUserRequest(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[EmailStr] = None
+    phone_number: Optional[str] = None
 
 
 @user_router.get("/{user_id}", response_model=UserResponse)
