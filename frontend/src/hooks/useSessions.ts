@@ -1,14 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { getSessionsService, revokeSessionService } from '@/services/auth';
-
-interface Session {
-  id: string;
-  user_agent: string;
-  ip_address: string;
-  created_at: string;
-  last_used_at: string;
-  is_current: boolean;
-}
+import type { Session } from '@/types/auth';
 
 interface SessionsState {
   loading: boolean;

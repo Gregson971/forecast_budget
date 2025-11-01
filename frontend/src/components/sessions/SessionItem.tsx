@@ -1,9 +1,10 @@
 import { formatDistanceToNow } from 'date-fns';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
+import type { Session } from '@/types/auth';
 
 type Props = {
-  session: any;
+  session: Session;
   isCurrent: boolean;
   onRevoke: () => void;
 };

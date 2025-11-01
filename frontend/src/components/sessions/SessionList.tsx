@@ -6,6 +6,9 @@ import { handleSilentError } from '@/lib/errorHandler';
 export default function SessionList() {
   const { sessions, sessionsLoading, sessionsError, revokeSession, revokeLoading, revokeError } = useSessions();
 
+  // Récupérer le refresh_token actuel pour identifier la session courante
+  const currentRefreshToken = typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null;
+
   const handleRevoke = async (id: string) => {
     try {
       await revokeSession(id);
@@ -63,7 +66,12 @@ export default function SessionList() {
       )}
 
       {sessions.map((session) => (
-        <SessionItem key={session.id} session={session} isCurrent={session.is_current} onRevoke={() => handleRevoke(session.id)} />
+        <SessionItem
+          key={session.id}
+          session={session}
+          isCurrent={session.refresh_token === currentRefreshToken}
+          onRevoke={() => handleRevoke(session.id)}
+        />
       ))}
     </div>
   );

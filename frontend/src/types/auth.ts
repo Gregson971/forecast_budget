@@ -35,8 +35,7 @@ export interface Session {
   user_agent: string
   ip_address: string
   created_at: string
-  expires_at: string
-  is_active: boolean
+  revoked: boolean
 }
 
 export interface RequestPasswordResetRequest {
